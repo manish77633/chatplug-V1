@@ -1,0 +1,1534 @@
+{
+  "directed": false,
+  "multigraph": false,
+  "graph": {},
+  "nodes": [
+    {
+      "label": "fix-bots.js",
+      "file_type": "code",
+      "source_file": "E:\\ChatPlug\\backend\\fix-bots.js",
+      "source_location": "L1",
+      "id": "e_chatplug_backend_fix_bots_js",
+      "community": 18,
+      "norm_label": "fix-bots.js"
+    },
+    {
+      "label": "run()",
+      "file_type": "code",
+      "source_file": "E:\\ChatPlug\\backend\\fix-bots.js",
+      "source_location": "L4",
+      "id": "fix_bots_run",
+      "community": 18,
+      "norm_label": "run()"
+    },
+    {
+      "label": "server.js",
+      "file_type": "code",
+      "source_file": "E:\\ChatPlug\\backend\\server.js",
+      "source_location": "L1",
+      "id": "e_chatplug_backend_server_js",
+      "community": 21,
+      "norm_label": "server.js"
+    },
+    {
+      "label": "test-embedded.js",
+      "file_type": "code",
+      "source_file": "E:\\ChatPlug\\backend\\test-embedded.js",
+      "source_location": "L1",
+      "id": "e_chatplug_backend_test_embedded_js",
+      "community": 19,
+      "norm_label": "test-embedded.js"
+    },
+    {
+      "label": "test()",
+      "file_type": "code",
+      "source_file": "E:\\ChatPlug\\backend\\test-embedded.js",
+      "source_location": "L2",
+      "id": "test_embedded_test",
+      "community": 19,
+      "norm_label": "test()"
+    },
+    {
+      "label": "authController.js",
+      "file_type": "code",
+      "source_file": "E:\\ChatPlug\\backend\\controllers\\authController.js",
+      "source_location": "L1",
+      "id": "e_chatplug_backend_controllers_authcontroller_js",
+      "community": 1,
+      "norm_label": "authcontroller.js"
+    },
+    {
+      "label": "signToken()",
+      "file_type": "code",
+      "source_file": "E:\\ChatPlug\\embediq\\backend\\controllers\\authController.js",
+      "source_location": "L4",
+      "id": "authcontroller_signtoken",
+      "community": 1,
+      "norm_label": "signtoken()"
+    },
+    {
+      "label": "chatbotController.js",
+      "file_type": "code",
+      "source_file": "E:\\ChatPlug\\backend\\controllers\\chatbotController.js",
+      "source_location": "L1",
+      "id": "e_chatplug_backend_controllers_chatbotcontroller_js",
+      "community": 22,
+      "norm_label": "chatbotcontroller.js"
+    },
+    {
+      "label": "chatController.js",
+      "file_type": "code",
+      "source_file": "E:\\ChatPlug\\backend\\controllers\\chatController.js",
+      "source_location": "L1",
+      "id": "e_chatplug_backend_controllers_chatcontroller_js",
+      "community": 23,
+      "norm_label": "chatcontroller.js"
+    },
+    {
+      "label": "documentController.js",
+      "file_type": "code",
+      "source_file": "E:\\ChatPlug\\backend\\controllers\\documentController.js",
+      "source_location": "L1",
+      "id": "e_chatplug_backend_controllers_documentcontroller_js",
+      "community": 24,
+      "norm_label": "documentcontroller.js"
+    },
+    {
+      "label": "embedController.js",
+      "file_type": "code",
+      "source_file": "E:\\ChatPlug\\backend\\controllers\\embedController.js",
+      "source_location": "L1",
+      "id": "e_chatplug_backend_controllers_embedcontroller_js",
+      "community": 25,
+      "norm_label": "embedcontroller.js"
+    },
+    {
+      "label": "embeddingQueue.js",
+      "file_type": "code",
+      "source_file": "E:\\ChatPlug\\backend\\jobs\\embeddingQueue.js",
+      "source_location": "L1",
+      "id": "e_chatplug_backend_jobs_embeddingqueue_js",
+      "community": 2,
+      "norm_label": "embeddingqueue.js"
+    },
+    {
+      "label": "createMemoryQueue()",
+      "file_type": "code",
+      "source_file": "E:\\ChatPlug\\embediq\\backend\\jobs\\embeddingQueue.js",
+      "source_location": "L61",
+      "id": "embeddingqueue_creatememoryqueue",
+      "community": 2,
+      "norm_label": "creatememoryqueue()"
+    },
+    {
+      "label": "worker.js",
+      "file_type": "code",
+      "source_file": "E:\\ChatPlug\\backend\\jobs\\worker.js",
+      "source_location": "L1",
+      "id": "e_chatplug_backend_jobs_worker_js",
+      "community": 26,
+      "norm_label": "worker.js"
+    },
+    {
+      "label": "auth.js",
+      "file_type": "code",
+      "source_file": "E:\\ChatPlug\\backend\\middleware\\auth.js",
+      "source_location": "L1",
+      "id": "e_chatplug_backend_middleware_auth_js",
+      "community": 27,
+      "norm_label": "auth.js"
+    },
+    {
+      "label": "rateLimiter.js",
+      "file_type": "code",
+      "source_file": "E:\\ChatPlug\\backend\\middleware\\rateLimiter.js",
+      "source_location": "L1",
+      "id": "e_chatplug_backend_middleware_ratelimiter_js",
+      "community": 3,
+      "norm_label": "ratelimiter.js"
+    },
+    {
+      "label": "make()",
+      "file_type": "code",
+      "source_file": "E:\\ChatPlug\\embediq\\backend\\middleware\\rateLimiter.js",
+      "source_location": "L3",
+      "id": "ratelimiter_make",
+      "community": 3,
+      "norm_label": "make()"
+    },
+    {
+      "label": "Chatbot.js",
+      "file_type": "code",
+      "source_file": "E:\\ChatPlug\\backend\\models\\Chatbot.js",
+      "source_location": "L1",
+      "id": "e_chatplug_backend_models_chatbot_js",
+      "community": 28,
+      "norm_label": "chatbot.js"
+    },
+    {
+      "label": "ChatSession.js",
+      "file_type": "code",
+      "source_file": "E:\\ChatPlug\\backend\\models\\ChatSession.js",
+      "source_location": "L1",
+      "id": "e_chatplug_backend_models_chatsession_js",
+      "community": 29,
+      "norm_label": "chatsession.js"
+    },
+    {
+      "label": "Chunk.js",
+      "file_type": "code",
+      "source_file": "E:\\ChatPlug\\backend\\models\\Chunk.js",
+      "source_location": "L1",
+      "id": "e_chatplug_backend_models_chunk_js",
+      "community": 30,
+      "norm_label": "chunk.js"
+    },
+    {
+      "label": "Document.js",
+      "file_type": "code",
+      "source_file": "E:\\ChatPlug\\backend\\models\\Document.js",
+      "source_location": "L1",
+      "id": "e_chatplug_backend_models_document_js",
+      "community": 31,
+      "norm_label": "document.js"
+    },
+    {
+      "label": "User.js",
+      "file_type": "code",
+      "source_file": "E:\\ChatPlug\\backend\\models\\User.js",
+      "source_location": "L1",
+      "id": "e_chatplug_backend_models_user_js",
+      "community": 32,
+      "norm_label": "user.js"
+    },
+    {
+      "label": "admin.js",
+      "file_type": "code",
+      "source_file": "E:\\ChatPlug\\backend\\routes\\admin.js",
+      "source_location": "L1",
+      "id": "e_chatplug_backend_routes_admin_js",
+      "community": 33,
+      "norm_label": "admin.js"
+    },
+    {
+      "label": "analytics.js",
+      "file_type": "code",
+      "source_file": "E:\\ChatPlug\\backend\\routes\\analytics.js",
+      "source_location": "L1",
+      "id": "e_chatplug_backend_routes_analytics_js",
+      "community": 34,
+      "norm_label": "analytics.js"
+    },
+    {
+      "label": "auth.js",
+      "file_type": "code",
+      "source_file": "E:\\ChatPlug\\backend\\routes\\auth.js",
+      "source_location": "L1",
+      "id": "e_chatplug_backend_routes_auth_js",
+      "community": 35,
+      "norm_label": "auth.js"
+    },
+    {
+      "label": "chat.js",
+      "file_type": "code",
+      "source_file": "E:\\ChatPlug\\backend\\routes\\chat.js",
+      "source_location": "L1",
+      "id": "e_chatplug_backend_routes_chat_js",
+      "community": 36,
+      "norm_label": "chat.js"
+    },
+    {
+      "label": "chatbots.js",
+      "file_type": "code",
+      "source_file": "E:\\ChatPlug\\backend\\routes\\chatbots.js",
+      "source_location": "L1",
+      "id": "e_chatplug_backend_routes_chatbots_js",
+      "community": 37,
+      "norm_label": "chatbots.js"
+    },
+    {
+      "label": "documents.js",
+      "file_type": "code",
+      "source_file": "E:\\ChatPlug\\backend\\routes\\documents.js",
+      "source_location": "L1",
+      "id": "e_chatplug_backend_routes_documents_js",
+      "community": 38,
+      "norm_label": "documents.js"
+    },
+    {
+      "label": "webhooks.js",
+      "file_type": "code",
+      "source_file": "E:\\ChatPlug\\backend\\routes\\webhooks.js",
+      "source_location": "L1",
+      "id": "e_chatplug_backend_routes_webhooks_js",
+      "community": 4,
+      "norm_label": "webhooks.js"
+    },
+    {
+      "label": "verifySignature()",
+      "file_type": "code",
+      "source_file": "E:\\ChatPlug\\embediq\\backend\\routes\\webhooks.js",
+      "source_location": "L5",
+      "id": "webhooks_verifysignature",
+      "community": 4,
+      "norm_label": "verifysignature()"
+    },
+    {
+      "label": "documentService.js",
+      "file_type": "code",
+      "source_file": "E:\\ChatPlug\\backend\\services\\documentService.js",
+      "source_location": "L1",
+      "id": "e_chatplug_backend_services_documentservice_js",
+      "community": 39,
+      "norm_label": "documentservice.js"
+    },
+    {
+      "label": "embeddingService.js",
+      "file_type": "code",
+      "source_file": "E:\\ChatPlug\\backend\\services\\embeddingService.js",
+      "source_location": "L1",
+      "id": "e_chatplug_backend_services_embeddingservice_js",
+      "community": 20,
+      "norm_label": "embeddingservice.js"
+    },
+    {
+      "label": "cosineSimilarity()",
+      "file_type": "code",
+      "source_file": "E:\\ChatPlug\\backend\\services\\embeddingService.js",
+      "source_location": "L51",
+      "id": "embeddingservice_cosinesimilarity",
+      "community": 20,
+      "norm_label": "cosinesimilarity()"
+    },
+    {
+      "label": "server.js",
+      "file_type": "code",
+      "source_file": "E:\\ChatPlug\\embediq\\backend\\server.js",
+      "source_location": "L1",
+      "id": "e_chatplug_embediq_backend_server_js",
+      "community": 40,
+      "norm_label": "server.js"
+    },
+    {
+      "label": "authController.js",
+      "file_type": "code",
+      "source_file": "E:\\ChatPlug\\embediq\\backend\\controllers\\authController.js",
+      "source_location": "L1",
+      "id": "e_chatplug_embediq_backend_controllers_authcontroller_js",
+      "community": 1,
+      "norm_label": "authcontroller.js"
+    },
+    {
+      "label": "chatbotController.js",
+      "file_type": "code",
+      "source_file": "E:\\ChatPlug\\embediq\\backend\\controllers\\chatbotController.js",
+      "source_location": "L1",
+      "id": "e_chatplug_embediq_backend_controllers_chatbotcontroller_js",
+      "community": 41,
+      "norm_label": "chatbotcontroller.js"
+    },
+    {
+      "label": "chatController.js",
+      "file_type": "code",
+      "source_file": "E:\\ChatPlug\\embediq\\backend\\controllers\\chatController.js",
+      "source_location": "L1",
+      "id": "e_chatplug_embediq_backend_controllers_chatcontroller_js",
+      "community": 42,
+      "norm_label": "chatcontroller.js"
+    },
+    {
+      "label": "documentController.js",
+      "file_type": "code",
+      "source_file": "E:\\ChatPlug\\embediq\\backend\\controllers\\documentController.js",
+      "source_location": "L1",
+      "id": "e_chatplug_embediq_backend_controllers_documentcontroller_js",
+      "community": 43,
+      "norm_label": "documentcontroller.js"
+    },
+    {
+      "label": "embedController.js",
+      "file_type": "code",
+      "source_file": "E:\\ChatPlug\\embediq\\backend\\controllers\\embedController.js",
+      "source_location": "L1",
+      "id": "e_chatplug_embediq_backend_controllers_embedcontroller_js",
+      "community": 44,
+      "norm_label": "embedcontroller.js"
+    },
+    {
+      "label": "embeddingQueue.js",
+      "file_type": "code",
+      "source_file": "E:\\ChatPlug\\embediq\\backend\\jobs\\embeddingQueue.js",
+      "source_location": "L1",
+      "id": "e_chatplug_embediq_backend_jobs_embeddingqueue_js",
+      "community": 2,
+      "norm_label": "embeddingqueue.js"
+    },
+    {
+      "label": "worker.js",
+      "file_type": "code",
+      "source_file": "E:\\ChatPlug\\embediq\\backend\\jobs\\worker.js",
+      "source_location": "L1",
+      "id": "e_chatplug_embediq_backend_jobs_worker_js",
+      "community": 45,
+      "norm_label": "worker.js"
+    },
+    {
+      "label": "auth.js",
+      "file_type": "code",
+      "source_file": "E:\\ChatPlug\\embediq\\backend\\middleware\\auth.js",
+      "source_location": "L1",
+      "id": "e_chatplug_embediq_backend_middleware_auth_js",
+      "community": 46,
+      "norm_label": "auth.js"
+    },
+    {
+      "label": "rateLimiter.js",
+      "file_type": "code",
+      "source_file": "E:\\ChatPlug\\embediq\\backend\\middleware\\rateLimiter.js",
+      "source_location": "L1",
+      "id": "e_chatplug_embediq_backend_middleware_ratelimiter_js",
+      "community": 3,
+      "norm_label": "ratelimiter.js"
+    },
+    {
+      "label": "Chatbot.js",
+      "file_type": "code",
+      "source_file": "E:\\ChatPlug\\embediq\\backend\\models\\Chatbot.js",
+      "source_location": "L1",
+      "id": "e_chatplug_embediq_backend_models_chatbot_js",
+      "community": 47,
+      "norm_label": "chatbot.js"
+    },
+    {
+      "label": "ChatSession.js",
+      "file_type": "code",
+      "source_file": "E:\\ChatPlug\\embediq\\backend\\models\\ChatSession.js",
+      "source_location": "L1",
+      "id": "e_chatplug_embediq_backend_models_chatsession_js",
+      "community": 48,
+      "norm_label": "chatsession.js"
+    },
+    {
+      "label": "Document.js",
+      "file_type": "code",
+      "source_file": "E:\\ChatPlug\\embediq\\backend\\models\\Document.js",
+      "source_location": "L1",
+      "id": "e_chatplug_embediq_backend_models_document_js",
+      "community": 49,
+      "norm_label": "document.js"
+    },
+    {
+      "label": "User.js",
+      "file_type": "code",
+      "source_file": "E:\\ChatPlug\\embediq\\backend\\models\\User.js",
+      "source_location": "L1",
+      "id": "e_chatplug_embediq_backend_models_user_js",
+      "community": 50,
+      "norm_label": "user.js"
+    },
+    {
+      "label": "admin.js",
+      "file_type": "code",
+      "source_file": "E:\\ChatPlug\\embediq\\backend\\routes\\admin.js",
+      "source_location": "L1",
+      "id": "e_chatplug_embediq_backend_routes_admin_js",
+      "community": 51,
+      "norm_label": "admin.js"
+    },
+    {
+      "label": "analytics.js",
+      "file_type": "code",
+      "source_file": "E:\\ChatPlug\\embediq\\backend\\routes\\analytics.js",
+      "source_location": "L1",
+      "id": "e_chatplug_embediq_backend_routes_analytics_js",
+      "community": 52,
+      "norm_label": "analytics.js"
+    },
+    {
+      "label": "auth.js",
+      "file_type": "code",
+      "source_file": "E:\\ChatPlug\\embediq\\backend\\routes\\auth.js",
+      "source_location": "L1",
+      "id": "e_chatplug_embediq_backend_routes_auth_js",
+      "community": 53,
+      "norm_label": "auth.js"
+    },
+    {
+      "label": "chat.js",
+      "file_type": "code",
+      "source_file": "E:\\ChatPlug\\embediq\\backend\\routes\\chat.js",
+      "source_location": "L1",
+      "id": "e_chatplug_embediq_backend_routes_chat_js",
+      "community": 54,
+      "norm_label": "chat.js"
+    },
+    {
+      "label": "chatbots.js",
+      "file_type": "code",
+      "source_file": "E:\\ChatPlug\\embediq\\backend\\routes\\chatbots.js",
+      "source_location": "L1",
+      "id": "e_chatplug_embediq_backend_routes_chatbots_js",
+      "community": 55,
+      "norm_label": "chatbots.js"
+    },
+    {
+      "label": "documents.js",
+      "file_type": "code",
+      "source_file": "E:\\ChatPlug\\embediq\\backend\\routes\\documents.js",
+      "source_location": "L1",
+      "id": "e_chatplug_embediq_backend_routes_documents_js",
+      "community": 56,
+      "norm_label": "documents.js"
+    },
+    {
+      "label": "webhooks.js",
+      "file_type": "code",
+      "source_file": "E:\\ChatPlug\\embediq\\backend\\routes\\webhooks.js",
+      "source_location": "L1",
+      "id": "e_chatplug_embediq_backend_routes_webhooks_js",
+      "community": 4,
+      "norm_label": "webhooks.js"
+    },
+    {
+      "label": "documentService.js",
+      "file_type": "code",
+      "source_file": "E:\\ChatPlug\\embediq\\backend\\services\\documentService.js",
+      "source_location": "L1",
+      "id": "e_chatplug_embediq_backend_services_documentservice_js",
+      "community": 57,
+      "norm_label": "documentservice.js"
+    },
+    {
+      "label": "embeddingService.js",
+      "file_type": "code",
+      "source_file": "E:\\ChatPlug\\embediq\\backend\\services\\embeddingService.js",
+      "source_location": "L1",
+      "id": "e_chatplug_embediq_backend_services_embeddingservice_js",
+      "community": 58,
+      "norm_label": "embeddingservice.js"
+    },
+    {
+      "label": "postcss.config.js",
+      "file_type": "code",
+      "source_file": "E:\\ChatPlug\\embediq\\frontend\\postcss.config.js",
+      "source_location": "L1",
+      "id": "e_chatplug_embediq_frontend_postcss_config_js",
+      "community": 59,
+      "norm_label": "postcss.config.js"
+    },
+    {
+      "label": "tailwind.config.js",
+      "file_type": "code",
+      "source_file": "E:\\ChatPlug\\embediq\\frontend\\tailwind.config.js",
+      "source_location": "L1",
+      "id": "e_chatplug_embediq_frontend_tailwind_config_js",
+      "community": 60,
+      "norm_label": "tailwind.config.js"
+    },
+    {
+      "label": "vite.config.js",
+      "file_type": "code",
+      "source_file": "E:\\ChatPlug\\embediq\\frontend\\vite.config.js",
+      "source_location": "L1",
+      "id": "e_chatplug_embediq_frontend_vite_config_js",
+      "community": 61,
+      "norm_label": "vite.config.js"
+    },
+    {
+      "label": "App.jsx",
+      "file_type": "code",
+      "source_file": "E:\\ChatPlug\\embediq\\frontend\\src\\App.jsx",
+      "source_location": "L1",
+      "id": "e_chatplug_embediq_frontend_src_app_jsx",
+      "community": 0,
+      "norm_label": "app.jsx"
+    },
+    {
+      "label": "Protected()",
+      "file_type": "code",
+      "source_file": "E:\\ChatPlug\\frontend\\src\\App.jsx",
+      "source_location": "L15",
+      "id": "app_protected",
+      "community": 0,
+      "norm_label": "protected()"
+    },
+    {
+      "label": "AdminRoute()",
+      "file_type": "code",
+      "source_file": "E:\\ChatPlug\\frontend\\src\\App.jsx",
+      "source_location": "L20",
+      "id": "app_adminroute",
+      "community": 0,
+      "norm_label": "adminroute()"
+    },
+    {
+      "label": "App()",
+      "file_type": "code",
+      "source_file": "E:\\ChatPlug\\frontend\\src\\App.jsx",
+      "source_location": "L25",
+      "id": "app_app",
+      "community": 0,
+      "norm_label": "app()"
+    },
+    {
+      "label": "main.jsx",
+      "file_type": "code",
+      "source_file": "E:\\ChatPlug\\embediq\\frontend\\src\\main.jsx",
+      "source_location": "L1",
+      "id": "e_chatplug_embediq_frontend_src_main_jsx",
+      "community": 62,
+      "norm_label": "main.jsx"
+    },
+    {
+      "label": "AuthCard.jsx",
+      "file_type": "code",
+      "source_file": "E:\\ChatPlug\\embediq\\frontend\\src\\components\\ui\\AuthCard.jsx",
+      "source_location": "L1",
+      "id": "e_chatplug_embediq_frontend_src_components_ui_authcard_jsx",
+      "community": 5,
+      "norm_label": "authcard.jsx"
+    },
+    {
+      "label": "AuthCard()",
+      "file_type": "code",
+      "source_file": "E:\\ChatPlug\\frontend\\src\\components\\ui\\AuthCard.jsx",
+      "source_location": "L3",
+      "id": "authcard_authcard",
+      "community": 5,
+      "norm_label": "authcard()"
+    },
+    {
+      "label": "Button.jsx",
+      "file_type": "code",
+      "source_file": "E:\\ChatPlug\\embediq\\frontend\\src\\components\\ui\\Button.jsx",
+      "source_location": "L1",
+      "id": "e_chatplug_embediq_frontend_src_components_ui_button_jsx",
+      "community": 6,
+      "norm_label": "button.jsx"
+    },
+    {
+      "label": "Button()",
+      "file_type": "code",
+      "source_file": "E:\\ChatPlug\\frontend\\src\\components\\ui\\Button.jsx",
+      "source_location": "L1",
+      "id": "button_button",
+      "community": 6,
+      "norm_label": "button()"
+    },
+    {
+      "label": "FormInput.jsx",
+      "file_type": "code",
+      "source_file": "E:\\ChatPlug\\embediq\\frontend\\src\\components\\ui\\FormInput.jsx",
+      "source_location": "L1",
+      "id": "e_chatplug_embediq_frontend_src_components_ui_forminput_jsx",
+      "community": 7,
+      "norm_label": "forminput.jsx"
+    },
+    {
+      "label": "FormInput()",
+      "file_type": "code",
+      "source_file": "E:\\ChatPlug\\frontend\\src\\components\\ui\\FormInput.jsx",
+      "source_location": "L1",
+      "id": "forminput_forminput",
+      "community": 7,
+      "norm_label": "forminput()"
+    },
+    {
+      "label": "Navbar.jsx",
+      "file_type": "code",
+      "source_file": "E:\\ChatPlug\\embediq\\frontend\\src\\components\\ui\\Navbar.jsx",
+      "source_location": "L1",
+      "id": "e_chatplug_embediq_frontend_src_components_ui_navbar_jsx",
+      "community": 8,
+      "norm_label": "navbar.jsx"
+    },
+    {
+      "label": "Navbar()",
+      "file_type": "code",
+      "source_file": "E:\\ChatPlug\\frontend\\src\\components\\ui\\Navbar.jsx",
+      "source_location": "L7",
+      "id": "navbar_navbar",
+      "community": 8,
+      "norm_label": "navbar()"
+    },
+    {
+      "label": "AdminPanel.jsx",
+      "file_type": "code",
+      "source_file": "E:\\ChatPlug\\embediq\\frontend\\src\\pages\\AdminPanel.jsx",
+      "source_location": "L1",
+      "id": "e_chatplug_embediq_frontend_src_pages_adminpanel_jsx",
+      "community": 9,
+      "norm_label": "adminpanel.jsx"
+    },
+    {
+      "label": "AdminPanel()",
+      "file_type": "code",
+      "source_file": "E:\\ChatPlug\\frontend\\src\\pages\\AdminPanel.jsx",
+      "source_location": "L7",
+      "id": "adminpanel_adminpanel",
+      "community": 9,
+      "norm_label": "adminpanel()"
+    },
+    {
+      "label": "Analytics.jsx",
+      "file_type": "code",
+      "source_file": "E:\\ChatPlug\\embediq\\frontend\\src\\pages\\Analytics.jsx",
+      "source_location": "L1",
+      "id": "e_chatplug_embediq_frontend_src_pages_analytics_jsx",
+      "community": 10,
+      "norm_label": "analytics.jsx"
+    },
+    {
+      "label": "Analytics()",
+      "file_type": "code",
+      "source_file": "E:\\ChatPlug\\frontend\\src\\pages\\Analytics.jsx",
+      "source_location": "L7",
+      "id": "analytics_analytics",
+      "community": 10,
+      "norm_label": "analytics()"
+    },
+    {
+      "label": "ChatbotDetail.jsx",
+      "file_type": "code",
+      "source_file": "E:\\ChatPlug\\embediq\\frontend\\src\\pages\\ChatbotDetail.jsx",
+      "source_location": "L1",
+      "id": "e_chatplug_embediq_frontend_src_pages_chatbotdetail_jsx",
+      "community": 11,
+      "norm_label": "chatbotdetail.jsx"
+    },
+    {
+      "label": "ChatbotDetail()",
+      "file_type": "code",
+      "source_file": "E:\\ChatPlug\\frontend\\src\\pages\\ChatbotDetail.jsx",
+      "source_location": "L13",
+      "id": "chatbotdetail_chatbotdetail",
+      "community": 11,
+      "norm_label": "chatbotdetail()"
+    },
+    {
+      "label": "Dashboard.jsx",
+      "file_type": "code",
+      "source_file": "E:\\ChatPlug\\embediq\\frontend\\src\\pages\\Dashboard.jsx",
+      "source_location": "L1",
+      "id": "e_chatplug_embediq_frontend_src_pages_dashboard_jsx",
+      "community": 12,
+      "norm_label": "dashboard.jsx"
+    },
+    {
+      "label": "Dashboard()",
+      "file_type": "code",
+      "source_file": "E:\\ChatPlug\\frontend\\src\\pages\\Dashboard.jsx",
+      "source_location": "L12",
+      "id": "dashboard_dashboard",
+      "community": 12,
+      "norm_label": "dashboard()"
+    },
+    {
+      "label": "Docs.jsx",
+      "file_type": "code",
+      "source_file": "E:\\ChatPlug\\embediq\\frontend\\src\\pages\\Docs.jsx",
+      "source_location": "L1",
+      "id": "e_chatplug_embediq_frontend_src_pages_docs_jsx",
+      "community": 13,
+      "norm_label": "docs.jsx"
+    },
+    {
+      "label": "Docs()",
+      "file_type": "code",
+      "source_file": "E:\\ChatPlug\\frontend\\src\\pages\\Docs.jsx",
+      "source_location": "L42",
+      "id": "docs_docs",
+      "community": 13,
+      "norm_label": "docs()"
+    },
+    {
+      "label": "Landing.jsx",
+      "file_type": "code",
+      "source_file": "E:\\ChatPlug\\embediq\\frontend\\src\\pages\\Landing.jsx",
+      "source_location": "L1",
+      "id": "e_chatplug_embediq_frontend_src_pages_landing_jsx",
+      "community": 14,
+      "norm_label": "landing.jsx"
+    },
+    {
+      "label": "Landing()",
+      "file_type": "code",
+      "source_file": "E:\\ChatPlug\\frontend\\src\\pages\\Landing.jsx",
+      "source_location": "L35",
+      "id": "landing_landing",
+      "community": 14,
+      "norm_label": "landing()"
+    },
+    {
+      "label": "Login.jsx",
+      "file_type": "code",
+      "source_file": "E:\\ChatPlug\\embediq\\frontend\\src\\pages\\Login.jsx",
+      "source_location": "L1",
+      "id": "e_chatplug_embediq_frontend_src_pages_login_jsx",
+      "community": 15,
+      "norm_label": "login.jsx"
+    },
+    {
+      "label": "Login()",
+      "file_type": "code",
+      "source_file": "E:\\ChatPlug\\frontend\\src\\pages\\Login.jsx",
+      "source_location": "L12",
+      "id": "login_login",
+      "community": 15,
+      "norm_label": "login()"
+    },
+    {
+      "label": "Playground.jsx",
+      "file_type": "code",
+      "source_file": "E:\\ChatPlug\\embediq\\frontend\\src\\pages\\Playground.jsx",
+      "source_location": "L1",
+      "id": "e_chatplug_embediq_frontend_src_pages_playground_jsx",
+      "community": 16,
+      "norm_label": "playground.jsx"
+    },
+    {
+      "label": "Playground()",
+      "file_type": "code",
+      "source_file": "E:\\ChatPlug\\frontend\\src\\pages\\Playground.jsx",
+      "source_location": "L8",
+      "id": "playground_playground",
+      "community": 16,
+      "norm_label": "playground()"
+    },
+    {
+      "label": "Register.jsx",
+      "file_type": "code",
+      "source_file": "E:\\ChatPlug\\embediq\\frontend\\src\\pages\\Register.jsx",
+      "source_location": "L1",
+      "id": "e_chatplug_embediq_frontend_src_pages_register_jsx",
+      "community": 17,
+      "norm_label": "register.jsx"
+    },
+    {
+      "label": "Register()",
+      "file_type": "code",
+      "source_file": "E:\\ChatPlug\\frontend\\src\\pages\\Register.jsx",
+      "source_location": "L12",
+      "id": "register_register",
+      "community": 17,
+      "norm_label": "register()"
+    },
+    {
+      "label": "authStore.js",
+      "file_type": "code",
+      "source_file": "E:\\ChatPlug\\embediq\\frontend\\src\\store\\authStore.js",
+      "source_location": "L1",
+      "id": "e_chatplug_embediq_frontend_src_store_authstore_js",
+      "community": 63,
+      "norm_label": "authstore.js"
+    },
+    {
+      "label": "api.js",
+      "file_type": "code",
+      "source_file": "E:\\ChatPlug\\embediq\\frontend\\src\\utils\\api.js",
+      "source_location": "L1",
+      "id": "e_chatplug_embediq_frontend_src_utils_api_js",
+      "community": 64,
+      "norm_label": "api.js"
+    },
+    {
+      "label": "postcss.config.js",
+      "file_type": "code",
+      "source_file": "E:\\ChatPlug\\frontend\\postcss.config.js",
+      "source_location": "L1",
+      "id": "e_chatplug_frontend_postcss_config_js",
+      "community": 65,
+      "norm_label": "postcss.config.js"
+    },
+    {
+      "label": "tailwind.config.js",
+      "file_type": "code",
+      "source_file": "E:\\ChatPlug\\frontend\\tailwind.config.js",
+      "source_location": "L1",
+      "id": "e_chatplug_frontend_tailwind_config_js",
+      "community": 66,
+      "norm_label": "tailwind.config.js"
+    },
+    {
+      "label": "vite.config.js",
+      "file_type": "code",
+      "source_file": "E:\\ChatPlug\\frontend\\vite.config.js",
+      "source_location": "L1",
+      "id": "e_chatplug_frontend_vite_config_js",
+      "community": 67,
+      "norm_label": "vite.config.js"
+    },
+    {
+      "label": "App.jsx",
+      "file_type": "code",
+      "source_file": "E:\\ChatPlug\\frontend\\src\\App.jsx",
+      "source_location": "L1",
+      "id": "e_chatplug_frontend_src_app_jsx",
+      "community": 0,
+      "norm_label": "app.jsx"
+    },
+    {
+      "label": "main.jsx",
+      "file_type": "code",
+      "source_file": "E:\\ChatPlug\\frontend\\src\\main.jsx",
+      "source_location": "L1",
+      "id": "e_chatplug_frontend_src_main_jsx",
+      "community": 68,
+      "norm_label": "main.jsx"
+    },
+    {
+      "label": "AuthCard.jsx",
+      "file_type": "code",
+      "source_file": "E:\\ChatPlug\\frontend\\src\\components\\ui\\AuthCard.jsx",
+      "source_location": "L1",
+      "id": "e_chatplug_frontend_src_components_ui_authcard_jsx",
+      "community": 5,
+      "norm_label": "authcard.jsx"
+    },
+    {
+      "label": "Button.jsx",
+      "file_type": "code",
+      "source_file": "E:\\ChatPlug\\frontend\\src\\components\\ui\\Button.jsx",
+      "source_location": "L1",
+      "id": "e_chatplug_frontend_src_components_ui_button_jsx",
+      "community": 6,
+      "norm_label": "button.jsx"
+    },
+    {
+      "label": "FormInput.jsx",
+      "file_type": "code",
+      "source_file": "E:\\ChatPlug\\frontend\\src\\components\\ui\\FormInput.jsx",
+      "source_location": "L1",
+      "id": "e_chatplug_frontend_src_components_ui_forminput_jsx",
+      "community": 7,
+      "norm_label": "forminput.jsx"
+    },
+    {
+      "label": "Navbar.jsx",
+      "file_type": "code",
+      "source_file": "E:\\ChatPlug\\frontend\\src\\components\\ui\\Navbar.jsx",
+      "source_location": "L1",
+      "id": "e_chatplug_frontend_src_components_ui_navbar_jsx",
+      "community": 8,
+      "norm_label": "navbar.jsx"
+    },
+    {
+      "label": "AdminPanel.jsx",
+      "file_type": "code",
+      "source_file": "E:\\ChatPlug\\frontend\\src\\pages\\AdminPanel.jsx",
+      "source_location": "L1",
+      "id": "e_chatplug_frontend_src_pages_adminpanel_jsx",
+      "community": 9,
+      "norm_label": "adminpanel.jsx"
+    },
+    {
+      "label": "Analytics.jsx",
+      "file_type": "code",
+      "source_file": "E:\\ChatPlug\\frontend\\src\\pages\\Analytics.jsx",
+      "source_location": "L1",
+      "id": "e_chatplug_frontend_src_pages_analytics_jsx",
+      "community": 10,
+      "norm_label": "analytics.jsx"
+    },
+    {
+      "label": "ChatbotDetail.jsx",
+      "file_type": "code",
+      "source_file": "E:\\ChatPlug\\frontend\\src\\pages\\ChatbotDetail.jsx",
+      "source_location": "L1",
+      "id": "e_chatplug_frontend_src_pages_chatbotdetail_jsx",
+      "community": 11,
+      "norm_label": "chatbotdetail.jsx"
+    },
+    {
+      "label": "Dashboard.jsx",
+      "file_type": "code",
+      "source_file": "E:\\ChatPlug\\frontend\\src\\pages\\Dashboard.jsx",
+      "source_location": "L1",
+      "id": "e_chatplug_frontend_src_pages_dashboard_jsx",
+      "community": 12,
+      "norm_label": "dashboard.jsx"
+    },
+    {
+      "label": "Docs.jsx",
+      "file_type": "code",
+      "source_file": "E:\\ChatPlug\\frontend\\src\\pages\\Docs.jsx",
+      "source_location": "L1",
+      "id": "e_chatplug_frontend_src_pages_docs_jsx",
+      "community": 13,
+      "norm_label": "docs.jsx"
+    },
+    {
+      "label": "Landing.jsx",
+      "file_type": "code",
+      "source_file": "E:\\ChatPlug\\frontend\\src\\pages\\Landing.jsx",
+      "source_location": "L1",
+      "id": "e_chatplug_frontend_src_pages_landing_jsx",
+      "community": 14,
+      "norm_label": "landing.jsx"
+    },
+    {
+      "label": "Login.jsx",
+      "file_type": "code",
+      "source_file": "E:\\ChatPlug\\frontend\\src\\pages\\Login.jsx",
+      "source_location": "L1",
+      "id": "e_chatplug_frontend_src_pages_login_jsx",
+      "community": 15,
+      "norm_label": "login.jsx"
+    },
+    {
+      "label": "Playground.jsx",
+      "file_type": "code",
+      "source_file": "E:\\ChatPlug\\frontend\\src\\pages\\Playground.jsx",
+      "source_location": "L1",
+      "id": "e_chatplug_frontend_src_pages_playground_jsx",
+      "community": 16,
+      "norm_label": "playground.jsx"
+    },
+    {
+      "label": "Register.jsx",
+      "file_type": "code",
+      "source_file": "E:\\ChatPlug\\frontend\\src\\pages\\Register.jsx",
+      "source_location": "L1",
+      "id": "e_chatplug_frontend_src_pages_register_jsx",
+      "community": 17,
+      "norm_label": "register.jsx"
+    },
+    {
+      "label": "authStore.js",
+      "file_type": "code",
+      "source_file": "E:\\ChatPlug\\frontend\\src\\store\\authStore.js",
+      "source_location": "L1",
+      "id": "e_chatplug_frontend_src_store_authstore_js",
+      "community": 69,
+      "norm_label": "authstore.js"
+    },
+    {
+      "label": "api.js",
+      "file_type": "code",
+      "source_file": "E:\\ChatPlug\\frontend\\src\\utils\\api.js",
+      "source_location": "L1",
+      "id": "e_chatplug_frontend_src_utils_api_js",
+      "community": 70,
+      "norm_label": "api.js"
+    }
+  ],
+  "links": [
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "E:\\ChatPlug\\backend\\fix-bots.js",
+      "source_location": "L4",
+      "weight": 1.0,
+      "_src": "e_chatplug_backend_fix_bots_js",
+      "_tgt": "fix_bots_run",
+      "source": "e_chatplug_backend_fix_bots_js",
+      "target": "fix_bots_run",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "E:\\ChatPlug\\backend\\test-embedded.js",
+      "source_location": "L2",
+      "weight": 1.0,
+      "_src": "e_chatplug_backend_test_embedded_js",
+      "_tgt": "test_embedded_test",
+      "source": "e_chatplug_backend_test_embedded_js",
+      "target": "test_embedded_test",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "E:\\ChatPlug\\backend\\controllers\\authController.js",
+      "source_location": "L4",
+      "weight": 1.0,
+      "_src": "e_chatplug_backend_controllers_authcontroller_js",
+      "_tgt": "authcontroller_signtoken",
+      "source": "e_chatplug_backend_controllers_authcontroller_js",
+      "target": "authcontroller_signtoken",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "E:\\ChatPlug\\embediq\\backend\\controllers\\authController.js",
+      "source_location": "L4",
+      "weight": 1.0,
+      "_src": "e_chatplug_embediq_backend_controllers_authcontroller_js",
+      "_tgt": "authcontroller_signtoken",
+      "source": "authcontroller_signtoken",
+      "target": "e_chatplug_embediq_backend_controllers_authcontroller_js",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "E:\\ChatPlug\\backend\\jobs\\embeddingQueue.js",
+      "source_location": "L61",
+      "weight": 1.0,
+      "_src": "e_chatplug_backend_jobs_embeddingqueue_js",
+      "_tgt": "embeddingqueue_creatememoryqueue",
+      "source": "e_chatplug_backend_jobs_embeddingqueue_js",
+      "target": "embeddingqueue_creatememoryqueue",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "E:\\ChatPlug\\embediq\\backend\\jobs\\embeddingQueue.js",
+      "source_location": "L61",
+      "weight": 1.0,
+      "_src": "e_chatplug_embediq_backend_jobs_embeddingqueue_js",
+      "_tgt": "embeddingqueue_creatememoryqueue",
+      "source": "embeddingqueue_creatememoryqueue",
+      "target": "e_chatplug_embediq_backend_jobs_embeddingqueue_js",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "E:\\ChatPlug\\backend\\middleware\\rateLimiter.js",
+      "source_location": "L3",
+      "weight": 1.0,
+      "_src": "e_chatplug_backend_middleware_ratelimiter_js",
+      "_tgt": "ratelimiter_make",
+      "source": "e_chatplug_backend_middleware_ratelimiter_js",
+      "target": "ratelimiter_make",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "E:\\ChatPlug\\embediq\\backend\\middleware\\rateLimiter.js",
+      "source_location": "L3",
+      "weight": 1.0,
+      "_src": "e_chatplug_embediq_backend_middleware_ratelimiter_js",
+      "_tgt": "ratelimiter_make",
+      "source": "ratelimiter_make",
+      "target": "e_chatplug_embediq_backend_middleware_ratelimiter_js",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "E:\\ChatPlug\\backend\\routes\\webhooks.js",
+      "source_location": "L5",
+      "weight": 1.0,
+      "_src": "e_chatplug_backend_routes_webhooks_js",
+      "_tgt": "webhooks_verifysignature",
+      "source": "e_chatplug_backend_routes_webhooks_js",
+      "target": "webhooks_verifysignature",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "E:\\ChatPlug\\embediq\\backend\\routes\\webhooks.js",
+      "source_location": "L5",
+      "weight": 1.0,
+      "_src": "e_chatplug_embediq_backend_routes_webhooks_js",
+      "_tgt": "webhooks_verifysignature",
+      "source": "webhooks_verifysignature",
+      "target": "e_chatplug_embediq_backend_routes_webhooks_js",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "E:\\ChatPlug\\backend\\services\\embeddingService.js",
+      "source_location": "L51",
+      "weight": 1.0,
+      "_src": "e_chatplug_backend_services_embeddingservice_js",
+      "_tgt": "embeddingservice_cosinesimilarity",
+      "source": "e_chatplug_backend_services_embeddingservice_js",
+      "target": "embeddingservice_cosinesimilarity",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "E:\\ChatPlug\\embediq\\frontend\\src\\App.jsx",
+      "source_location": "L15",
+      "weight": 1.0,
+      "_src": "e_chatplug_embediq_frontend_src_app_jsx",
+      "_tgt": "app_protected",
+      "source": "e_chatplug_embediq_frontend_src_app_jsx",
+      "target": "app_protected",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "E:\\ChatPlug\\embediq\\frontend\\src\\App.jsx",
+      "source_location": "L20",
+      "weight": 1.0,
+      "_src": "e_chatplug_embediq_frontend_src_app_jsx",
+      "_tgt": "app_adminroute",
+      "source": "e_chatplug_embediq_frontend_src_app_jsx",
+      "target": "app_adminroute",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "E:\\ChatPlug\\embediq\\frontend\\src\\App.jsx",
+      "source_location": "L25",
+      "weight": 1.0,
+      "_src": "e_chatplug_embediq_frontend_src_app_jsx",
+      "_tgt": "app_app",
+      "source": "e_chatplug_embediq_frontend_src_app_jsx",
+      "target": "app_app",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "E:\\ChatPlug\\frontend\\src\\App.jsx",
+      "source_location": "L15",
+      "weight": 1.0,
+      "_src": "e_chatplug_frontend_src_app_jsx",
+      "_tgt": "app_protected",
+      "source": "app_protected",
+      "target": "e_chatplug_frontend_src_app_jsx",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "E:\\ChatPlug\\frontend\\src\\App.jsx",
+      "source_location": "L20",
+      "weight": 1.0,
+      "_src": "e_chatplug_frontend_src_app_jsx",
+      "_tgt": "app_adminroute",
+      "source": "app_adminroute",
+      "target": "e_chatplug_frontend_src_app_jsx",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "E:\\ChatPlug\\frontend\\src\\App.jsx",
+      "source_location": "L25",
+      "weight": 1.0,
+      "_src": "e_chatplug_frontend_src_app_jsx",
+      "_tgt": "app_app",
+      "source": "app_app",
+      "target": "e_chatplug_frontend_src_app_jsx",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "E:\\ChatPlug\\embediq\\frontend\\src\\components\\ui\\AuthCard.jsx",
+      "source_location": "L3",
+      "weight": 1.0,
+      "_src": "e_chatplug_embediq_frontend_src_components_ui_authcard_jsx",
+      "_tgt": "authcard_authcard",
+      "source": "e_chatplug_embediq_frontend_src_components_ui_authcard_jsx",
+      "target": "authcard_authcard",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "E:\\ChatPlug\\frontend\\src\\components\\ui\\AuthCard.jsx",
+      "source_location": "L3",
+      "weight": 1.0,
+      "_src": "e_chatplug_frontend_src_components_ui_authcard_jsx",
+      "_tgt": "authcard_authcard",
+      "source": "authcard_authcard",
+      "target": "e_chatplug_frontend_src_components_ui_authcard_jsx",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "E:\\ChatPlug\\embediq\\frontend\\src\\components\\ui\\Button.jsx",
+      "source_location": "L1",
+      "weight": 1.0,
+      "_src": "e_chatplug_embediq_frontend_src_components_ui_button_jsx",
+      "_tgt": "button_button",
+      "source": "e_chatplug_embediq_frontend_src_components_ui_button_jsx",
+      "target": "button_button",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "E:\\ChatPlug\\frontend\\src\\components\\ui\\Button.jsx",
+      "source_location": "L1",
+      "weight": 1.0,
+      "_src": "e_chatplug_frontend_src_components_ui_button_jsx",
+      "_tgt": "button_button",
+      "source": "button_button",
+      "target": "e_chatplug_frontend_src_components_ui_button_jsx",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "E:\\ChatPlug\\embediq\\frontend\\src\\components\\ui\\FormInput.jsx",
+      "source_location": "L1",
+      "weight": 1.0,
+      "_src": "e_chatplug_embediq_frontend_src_components_ui_forminput_jsx",
+      "_tgt": "forminput_forminput",
+      "source": "e_chatplug_embediq_frontend_src_components_ui_forminput_jsx",
+      "target": "forminput_forminput",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "E:\\ChatPlug\\frontend\\src\\components\\ui\\FormInput.jsx",
+      "source_location": "L1",
+      "weight": 1.0,
+      "_src": "e_chatplug_frontend_src_components_ui_forminput_jsx",
+      "_tgt": "forminput_forminput",
+      "source": "forminput_forminput",
+      "target": "e_chatplug_frontend_src_components_ui_forminput_jsx",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "E:\\ChatPlug\\embediq\\frontend\\src\\components\\ui\\Navbar.jsx",
+      "source_location": "L7",
+      "weight": 1.0,
+      "_src": "e_chatplug_embediq_frontend_src_components_ui_navbar_jsx",
+      "_tgt": "navbar_navbar",
+      "source": "e_chatplug_embediq_frontend_src_components_ui_navbar_jsx",
+      "target": "navbar_navbar",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "E:\\ChatPlug\\frontend\\src\\components\\ui\\Navbar.jsx",
+      "source_location": "L7",
+      "weight": 1.0,
+      "_src": "e_chatplug_frontend_src_components_ui_navbar_jsx",
+      "_tgt": "navbar_navbar",
+      "source": "navbar_navbar",
+      "target": "e_chatplug_frontend_src_components_ui_navbar_jsx",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "E:\\ChatPlug\\embediq\\frontend\\src\\pages\\AdminPanel.jsx",
+      "source_location": "L7",
+      "weight": 1.0,
+      "_src": "e_chatplug_embediq_frontend_src_pages_adminpanel_jsx",
+      "_tgt": "adminpanel_adminpanel",
+      "source": "e_chatplug_embediq_frontend_src_pages_adminpanel_jsx",
+      "target": "adminpanel_adminpanel",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "E:\\ChatPlug\\frontend\\src\\pages\\AdminPanel.jsx",
+      "source_location": "L7",
+      "weight": 1.0,
+      "_src": "e_chatplug_frontend_src_pages_adminpanel_jsx",
+      "_tgt": "adminpanel_adminpanel",
+      "source": "adminpanel_adminpanel",
+      "target": "e_chatplug_frontend_src_pages_adminpanel_jsx",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "E:\\ChatPlug\\embediq\\frontend\\src\\pages\\Analytics.jsx",
+      "source_location": "L7",
+      "weight": 1.0,
+      "_src": "e_chatplug_embediq_frontend_src_pages_analytics_jsx",
+      "_tgt": "analytics_analytics",
+      "source": "e_chatplug_embediq_frontend_src_pages_analytics_jsx",
+      "target": "analytics_analytics",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "E:\\ChatPlug\\frontend\\src\\pages\\Analytics.jsx",
+      "source_location": "L7",
+      "weight": 1.0,
+      "_src": "e_chatplug_frontend_src_pages_analytics_jsx",
+      "_tgt": "analytics_analytics",
+      "source": "analytics_analytics",
+      "target": "e_chatplug_frontend_src_pages_analytics_jsx",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "E:\\ChatPlug\\embediq\\frontend\\src\\pages\\ChatbotDetail.jsx",
+      "source_location": "L13",
+      "weight": 1.0,
+      "_src": "e_chatplug_embediq_frontend_src_pages_chatbotdetail_jsx",
+      "_tgt": "chatbotdetail_chatbotdetail",
+      "source": "e_chatplug_embediq_frontend_src_pages_chatbotdetail_jsx",
+      "target": "chatbotdetail_chatbotdetail",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "E:\\ChatPlug\\frontend\\src\\pages\\ChatbotDetail.jsx",
+      "source_location": "L13",
+      "weight": 1.0,
+      "_src": "e_chatplug_frontend_src_pages_chatbotdetail_jsx",
+      "_tgt": "chatbotdetail_chatbotdetail",
+      "source": "chatbotdetail_chatbotdetail",
+      "target": "e_chatplug_frontend_src_pages_chatbotdetail_jsx",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "E:\\ChatPlug\\embediq\\frontend\\src\\pages\\Dashboard.jsx",
+      "source_location": "L12",
+      "weight": 1.0,
+      "_src": "e_chatplug_embediq_frontend_src_pages_dashboard_jsx",
+      "_tgt": "dashboard_dashboard",
+      "source": "e_chatplug_embediq_frontend_src_pages_dashboard_jsx",
+      "target": "dashboard_dashboard",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "E:\\ChatPlug\\frontend\\src\\pages\\Dashboard.jsx",
+      "source_location": "L12",
+      "weight": 1.0,
+      "_src": "e_chatplug_frontend_src_pages_dashboard_jsx",
+      "_tgt": "dashboard_dashboard",
+      "source": "dashboard_dashboard",
+      "target": "e_chatplug_frontend_src_pages_dashboard_jsx",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "E:\\ChatPlug\\embediq\\frontend\\src\\pages\\Docs.jsx",
+      "source_location": "L42",
+      "weight": 1.0,
+      "_src": "e_chatplug_embediq_frontend_src_pages_docs_jsx",
+      "_tgt": "docs_docs",
+      "source": "e_chatplug_embediq_frontend_src_pages_docs_jsx",
+      "target": "docs_docs",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "E:\\ChatPlug\\frontend\\src\\pages\\Docs.jsx",
+      "source_location": "L42",
+      "weight": 1.0,
+      "_src": "e_chatplug_frontend_src_pages_docs_jsx",
+      "_tgt": "docs_docs",
+      "source": "docs_docs",
+      "target": "e_chatplug_frontend_src_pages_docs_jsx",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "E:\\ChatPlug\\embediq\\frontend\\src\\pages\\Landing.jsx",
+      "source_location": "L35",
+      "weight": 1.0,
+      "_src": "e_chatplug_embediq_frontend_src_pages_landing_jsx",
+      "_tgt": "landing_landing",
+      "source": "e_chatplug_embediq_frontend_src_pages_landing_jsx",
+      "target": "landing_landing",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "E:\\ChatPlug\\frontend\\src\\pages\\Landing.jsx",
+      "source_location": "L35",
+      "weight": 1.0,
+      "_src": "e_chatplug_frontend_src_pages_landing_jsx",
+      "_tgt": "landing_landing",
+      "source": "landing_landing",
+      "target": "e_chatplug_frontend_src_pages_landing_jsx",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "E:\\ChatPlug\\embediq\\frontend\\src\\pages\\Login.jsx",
+      "source_location": "L12",
+      "weight": 1.0,
+      "_src": "e_chatplug_embediq_frontend_src_pages_login_jsx",
+      "_tgt": "login_login",
+      "source": "e_chatplug_embediq_frontend_src_pages_login_jsx",
+      "target": "login_login",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "E:\\ChatPlug\\frontend\\src\\pages\\Login.jsx",
+      "source_location": "L12",
+      "weight": 1.0,
+      "_src": "e_chatplug_frontend_src_pages_login_jsx",
+      "_tgt": "login_login",
+      "source": "login_login",
+      "target": "e_chatplug_frontend_src_pages_login_jsx",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "E:\\ChatPlug\\embediq\\frontend\\src\\pages\\Playground.jsx",
+      "source_location": "L8",
+      "weight": 1.0,
+      "_src": "e_chatplug_embediq_frontend_src_pages_playground_jsx",
+      "_tgt": "playground_playground",
+      "source": "e_chatplug_embediq_frontend_src_pages_playground_jsx",
+      "target": "playground_playground",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "E:\\ChatPlug\\frontend\\src\\pages\\Playground.jsx",
+      "source_location": "L8",
+      "weight": 1.0,
+      "_src": "e_chatplug_frontend_src_pages_playground_jsx",
+      "_tgt": "playground_playground",
+      "source": "playground_playground",
+      "target": "e_chatplug_frontend_src_pages_playground_jsx",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "E:\\ChatPlug\\embediq\\frontend\\src\\pages\\Register.jsx",
+      "source_location": "L12",
+      "weight": 1.0,
+      "_src": "e_chatplug_embediq_frontend_src_pages_register_jsx",
+      "_tgt": "register_register",
+      "source": "e_chatplug_embediq_frontend_src_pages_register_jsx",
+      "target": "register_register",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "E:\\ChatPlug\\frontend\\src\\pages\\Register.jsx",
+      "source_location": "L12",
+      "weight": 1.0,
+      "_src": "e_chatplug_frontend_src_pages_register_jsx",
+      "_tgt": "register_register",
+      "source": "register_register",
+      "target": "e_chatplug_frontend_src_pages_register_jsx",
+      "confidence_score": 1.0
+    }
+  ],
+  "hyperedges": []
+}
