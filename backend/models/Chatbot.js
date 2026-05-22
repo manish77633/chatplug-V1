@@ -23,6 +23,7 @@ const chatbotSchema = new mongoose.Schema({
     model:           { type: String, default: 'gpt-4o-mini' },
     language:        { type: String, default: 'en' },
     fallbackMessage: { type: String, default: "I don't have enough information to answer that." },
+    enableGoogleSearch: { type: Boolean, default: true },
   },
 
   // Widget UI customization

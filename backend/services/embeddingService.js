@@ -23,13 +23,20 @@ exports.embedDocument = async ({ text, documentId, chatbotId, namespace, metadat
     const batch = chunks.slice(i, i + batchSize);
     const texts = batch.map(c => c.pageContent);
     
-const ai = new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY || process.env.GOOGLE_GENAI_API_KEY });
+    const ai = new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY || process.env.GOOGLE_GENAI_API_KEY });
     const result = await ai.models.embedContent({
       model: 'gemini-embedding-001',
       contents: texts
     });
     
-    const vectors = result.embeddings.map(e => e.values);
+    let vectors;
+    if (result.embedding) {
+      vectors = [result.embedding.values];
+    } else if (result.embeddings) {
+      vectors = result.embeddings.map(e => e.values);
+    } else {
+      throw new Error('No embeddings returned from Gemini API');
+    }
     
     const chunkDocs = batch.map((chunk, j) => {
       return {
@@ -72,7 +79,12 @@ exports.queryEmbeddings = async ({ query, namespace, topK = 5 }) => {
     model: 'gemini-embedding-001',
     contents: query
   });
-  const queryVector = result.embeddings[0].values;
+  
+  const embedding = result.embedding || (result.embeddings && result.embeddings[0]);
+  if (!embedding) {
+    throw new Error('No embedding returned from Gemini API');
+  }
+  const queryVector = embedding.values;
   
   const chunks = await Chunk.find({ chatbot: chatbot._id }).lean();
   

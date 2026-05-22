@@ -91,12 +91,18 @@ Rules:
       }
       contents.push({ role: 'user', parts: [{ text: message }] });
 
+      const config = {
+        systemInstruction: systemPrompt
+      };
+
+      if (chatbot.settings?.enableGoogleSearch !== false) {
+        config.tools = [{ googleSearch: {} }];
+      }
+
       const streamResult = await ai.models.generateContentStream({
         model: 'gemini-2.5-flash',
         contents,
-        config: {
-          systemInstruction: systemPrompt
-        }
+        config
       });
 
       let fullResponse = '';

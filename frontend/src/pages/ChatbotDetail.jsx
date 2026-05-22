@@ -107,8 +107,16 @@ export default function ChatbotDetail() {
     } catch { toast.error('Save failed') }
   }
 
+  const getEmbedUrl = () => {
+    const apiUrl = import.meta.env.VITE_API_URL || ''
+    if (apiUrl) {
+      return apiUrl.replace(/\/api\/?$/, '')
+    }
+    return window.location.origin
+  }
+
   const embedSnippet = chatbot
-    ? `<script src="${window.location.origin}/embed/${chatbot.embedId}/widget.js"></script>`
+    ? `<script src="${getEmbedUrl()}/embed/${chatbot.embedId}/widget.js"></script>`
     : ''
 
   if (loading) return (
@@ -358,6 +366,18 @@ export default function ChatbotDetail() {
                       <span>🎯 Precise</span>
                       <span>🎨 Creative</span>
                     </div>
+                  </div>
+                  <div className="flex items-center justify-between p-4 bg-surface rounded-2xl border border-border">
+                    <div className="pr-4">
+                      <label className="text-sm font-semibold text-text block">AI Web Search (Google Grounding)</label>
+                      <p className="text-xs text-muted mt-0.5">If the answer is not in your documents, use Google Search to provide up-to-date AI answers.</p>
+                    </div>
+                    <label className="relative inline-flex items-center cursor-pointer shrink-0">
+                      <input type="checkbox" className="sr-only peer"
+                        checked={settings.enableGoogleSearch !== false}
+                        onChange={e => setSettings(p => ({ ...p, enableGoogleSearch: e.target.checked }))} />
+                      <div className="w-11 h-6 bg-border peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-border after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-acid"></div>
+                    </label>
                   </div>
                 </div>
                 <div className="flex gap-3 mt-8">

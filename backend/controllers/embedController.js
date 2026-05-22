@@ -10,11 +10,13 @@ exports.serveWidget = async (req, res, next) => {
     const { widget } = chatbot;
     const API = process.env.CLIENT_ORIGIN || 'https://api.embediq.com';
 
+    const backendOrigin = `${req.protocol}://${req.get('host')}`;
+
     // Ultra-light vanilla JS embed script
     const script = `
 (function() {
   var BOT_ID = "${req.params.botId}";
-  var API = window.location.origin;
+  var API = "${backendOrigin}";
   
   // Find current script tag to infer API base URL if needed
   var scripts = document.getElementsByTagName('script');
@@ -23,7 +25,9 @@ exports.serveWidget = async (req, res, next) => {
   if (currentScript && currentScript.src) {
     try {
       var url = new URL(currentScript.src);
-      API = url.origin;
+      if (url.origin && url.origin !== "null") {
+        API = url.origin;
+      }
     } catch(e) {}
   }
 
