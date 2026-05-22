@@ -2,15 +2,18 @@ import { Routes, Route, Navigate } from 'react-router-dom'
 import { useAuthStore } from './store/authStore'
 import { Toaster } from 'react-hot-toast'
 
-import Landing      from './pages/Landing'
-import Login        from './pages/Login'
-import Register     from './pages/Register'
-import Dashboard    from './pages/Dashboard'
+import Landing       from './pages/Landing'
+import Login         from './pages/Login'
+import Register      from './pages/Register'
+import Dashboard     from './pages/Dashboard'
 import ChatbotDetail from './pages/ChatbotDetail'
-import Playground   from './pages/Playground'
-import Analytics    from './pages/Analytics'
-import Docs         from './pages/Docs'
-import AdminPanel   from './pages/AdminPanel'
+import Playground    from './pages/Playground'
+import Analytics     from './pages/Analytics'
+import Docs          from './pages/Docs'
+import DocsApi       from './pages/DocsApi'
+import DocsGuides    from './pages/DocsGuides'
+import Settings      from './pages/Settings'
+import AdminPanel    from './pages/AdminPanel'
 
 const Protected = ({ children }) => {
   const { token } = useAuthStore()
@@ -26,16 +29,24 @@ export default function App() {
   return (
     <>
       <Routes>
-        <Route path="/"         element={<Landing />} />
-        <Route path="/login"    element={<Login />} />
-        <Route path="/register" element={<Register />} />
-        <Route path="/docs"     element={<Docs />} />
+        {/* Public */}
+        <Route path="/"            element={<Landing />} />
+        <Route path="/login"       element={<Login />} />
+        <Route path="/register"    element={<Register />} />
+        <Route path="/docs"        element={<Docs />} />
+        <Route path="/docs/api"    element={<DocsApi />} />
+        <Route path="/docs/guides" element={<DocsGuides />} />
 
-        <Route path="/dashboard" element={<Protected><Dashboard /></Protected>} />
-        <Route path="/chatbot/:id" element={<Protected><ChatbotDetail /></Protected>} />
-        <Route path="/chatbot/:id/playground" element={<Protected><Playground /></Protected>} />
-        <Route path="/chatbot/:id/analytics"  element={<Protected><Analytics /></Protected>} />
+        {/* Protected */}
+        <Route path="/dashboard"                      element={<Protected><Dashboard /></Protected>} />
+        <Route path="/settings"                       element={<Protected><Settings /></Protected>} />
+        <Route path="/chatbot/:id"                    element={<Protected><ChatbotDetail /></Protected>} />
+        <Route path="/chatbot/:id/playground"         element={<Protected><Playground /></Protected>} />
+        <Route path="/chatbot/:id/analytics"          element={<Protected><Analytics /></Protected>} />
+        {/* Global analytics overview (no bot id) */}
+        <Route path="/analytics"                      element={<Protected><Analytics /></Protected>} />
 
+        {/* Admin */}
         <Route path="/admin" element={<Protected><AdminRoute><AdminPanel /></AdminRoute></Protected>} />
 
         <Route path="*" element={<Navigate to="/" replace />} />

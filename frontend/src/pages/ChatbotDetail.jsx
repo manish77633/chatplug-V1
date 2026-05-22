@@ -160,9 +160,9 @@ export default function ChatbotDetail() {
   return (
     <div className="min-h-screen bg-background text-text-primary font-inter flex flex-col selection:bg-accent/30 selection:text-text-primary overflow-x-hidden relative">
       {/* ─── NAV ─── */}
-      <nav className="flex items-center justify-between px-8 py-4 border-b border-border bg-surface sticky top-0 z-40 shadow-sm">
+      <nav className="flex items-center justify-between px-4 sm:px-8 py-3 sm:py-4 border-b border-border bg-surface sticky top-0 z-40 shadow-sm">
         <div className="flex items-center gap-4">
-          <Link to="/dashboard" className="p-2 rounded-lg text-text-muted hover:text-text-primary hover:bg-surface-elevated transition-colors">
+          <Link to="/dashboard" id="chatbot-detail-back" className="p-2 rounded-lg text-text-muted hover:text-text-primary hover:bg-surface-elevated transition-colors min-w-[44px] min-h-[44px] flex items-center justify-center">
             <ArrowLeft size={20} />
           </Link>
           <div className="flex items-center gap-3">
@@ -181,15 +181,17 @@ export default function ChatbotDetail() {
       </nav>
 
       {/* ─── MAIN CONTENT ─── */}
-      <div className="flex-1 w-full max-w-7xl mx-auto px-6 py-12 relative z-10 flex flex-col">
+      <div className="flex-1 w-full max-w-7xl mx-auto px-4 sm:px-6 py-6 sm:py-12 relative z-10 flex flex-col">
         
         {/* ─── STEPPER HEADER ─── */}
-        <div className="w-full max-w-4xl mx-auto mb-16 relative">
-          <div className="absolute top-6 left-[10%] right-[10%] h-1 bg-surface-elevated rounded-full overflow-hidden z-0">
+        <div className="w-full max-w-4xl mx-auto mb-8 sm:mb-16 relative">
+          {/* Progress bar — hidden on mobile for cleanliness */}
+          <div className="hidden sm:block absolute top-6 left-[10%] right-[10%] h-1 bg-surface-elevated rounded-full overflow-hidden z-0">
             <div className="h-full bg-accent transition-all duration-700 ease-in-out" style={{ width: `${(step / 3) * 100}%` }} />
           </div>
-          
-          <div className="flex justify-between relative z-10">
+
+          {/* Desktop stepper */}
+          <div className="hidden sm:flex justify-between relative z-10">
             {STEPS.map((label, i) => (
               <div key={i} className="flex flex-col items-center gap-3 relative">
                 <div className="relative">
@@ -197,6 +199,7 @@ export default function ChatbotDetail() {
                     <div className="absolute inset-0 bg-accent rounded-full animate-ping opacity-30 scale-150" />
                   )}
                   <button
+                    id={`step-btn-${i}`}
                     onClick={() => i < step && setStep(i)}
                     className={`w-12 h-12 rounded-full flex items-center justify-center font-bold text-sm transition-all duration-300 relative z-10
                       ${i < step ? 'bg-accent text-white hover:scale-105 shadow-lg shadow-accent/20 cursor-pointer' : 
@@ -212,6 +215,33 @@ export default function ChatbotDetail() {
                 </span>
               </div>
             ))}
+          </div>
+
+          {/* Mobile stepper — compact dots + current label */}
+          <div className="sm:hidden">
+            <div className="flex items-center justify-center gap-3 mb-3">
+              {STEPS.map((_, i) => (
+                <button
+                  key={i}
+                  id={`step-dot-${i}`}
+                  onClick={() => i < step && setStep(i)}
+                  disabled={i > step}
+                  className={`rounded-full transition-all duration-300 ${
+                    i < step  ? 'w-6 h-6 bg-accent flex items-center justify-center cursor-pointer' :
+                    i === step ? 'w-8 h-8 bg-surface-elevated border-2 border-accent text-accent text-xs font-bold flex items-center justify-center' :
+                    'w-6 h-6 bg-surface border border-border cursor-not-allowed'
+                  }`}
+                >
+                  {i < step ? <Check size={10} className="text-white" /> : i === step ? i + 1 : null}
+                </button>
+              ))}
+            </div>
+            <p className="text-center text-sm font-semibold text-text-primary">
+              Step {step + 1} of {STEPS.length}: {STEPS[step]}
+            </p>
+            <div className="mt-2 h-1 bg-surface-elevated rounded-full overflow-hidden">
+              <div className="h-full bg-accent transition-all duration-700" style={{ width: `${(step / 3) * 100}%` }} />
+            </div>
           </div>
         </div>
 

@@ -3,9 +3,10 @@ import { Link } from 'react-router-dom'
 import { motion } from 'framer-motion'
 import toast from 'react-hot-toast'
 import {
-  Users, Bot, MessageSquare, DollarSign, Search, Filter, MoreVertical,
-  ChevronLeft, Database, Activity, CheckCircle2, Server
+  Users, Bot, MessageSquare, DollarSign, Search, Filter,
+  ChevronLeft, Database, Activity, Server, Edit, UserX, Trash2
 } from 'lucide-react'
+import ActionMenu from '../components/ui/ActionMenu'
 
 const MOCK_USERS = [
   { id: 1, name: 'Alex Rivera', email: 'alex@example.com', plan: 'Pro', bots: 4, queries: '12.4k', joined: 'Oct 12, 2025' },
@@ -138,8 +139,8 @@ export default function AdminPanel() {
               </div>
             </div>
 
-            {/* Table */}
-            <div className="overflow-x-auto flex-1">
+            {/* Desktop Table */}
+            <div className="hidden md:block overflow-x-auto flex-1">
               <table className="w-full text-left text-sm whitespace-nowrap">
                 <thead className="bg-background text-text-muted border-b border-border">
                   <tr>
@@ -153,7 +154,7 @@ export default function AdminPanel() {
                 </thead>
                 <tbody>
                   {filteredUsers.map((user, i) => (
-                    <motion.tr 
+                    <motion.tr
                       key={user.id}
                       initial={{ opacity: 0 }}
                       animate={{ opacity: 1 }}
@@ -184,14 +185,59 @@ export default function AdminPanel() {
                       <td className="p-4 text-center font-mono font-medium">{user.queries}</td>
                       <td className="p-4 text-text-muted">{user.joined}</td>
                       <td className="p-4 text-right">
-                        <button className="p-1.5 text-text-muted hover:text-text-primary rounded-lg hover:bg-background transition-colors inline-flex">
-                          <MoreVertical size={16} />
-                        </button>
+                        <ActionMenu
+                          align="right"
+                          actions={[
+                            { label: 'Edit User',    icon: Edit,    onClick: () => toast(`Editing ${user.name}`, { icon: '✏️' }) },
+                            { label: 'Suspend User', icon: UserX,   onClick: () => toast.error(`${user.name} suspended`) },
+                            { label: 'Delete User',  icon: Trash2,  onClick: () => toast.error(`${user.name} deleted`), danger: true },
+                          ]}
+                        />
                       </td>
                     </motion.tr>
                   ))}
                 </tbody>
               </table>
+            </div>
+
+            {/* Mobile Card List */}
+            <div className="md:hidden divide-y divide-border flex-1">
+              {filteredUsers.map((user, i) => (
+                <motion.div
+                  key={user.id}
+                  initial={{ opacity: 0, y: 8 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: i * 0.05 }}
+                  className="p-4 flex items-start justify-between gap-3"
+                >
+                  <div className="flex items-center gap-3 flex-1 min-w-0">
+                    <div className="w-10 h-10 rounded-full bg-gradient-to-br from-accent/80 to-accent-secondary/80 flex items-center justify-center text-white font-bold text-sm shrink-0">
+                      {user.name[0]}
+                    </div>
+                    <div className="min-w-0">
+                      <p className="font-semibold text-text-primary text-sm truncate">{user.name}</p>
+                      <p className="text-xs text-text-muted truncate">{user.email}</p>
+                      <div className="flex items-center gap-2 mt-1.5 flex-wrap">
+                        <span className={`px-2 py-0.5 rounded-md text-[10px] font-bold uppercase ${
+                          user.plan === 'Pro' ? 'bg-accent/10 text-accent' :
+                          user.plan === 'Enterprise' ? 'bg-purple-500/10 text-purple-400' :
+                          'bg-surface-elevated text-text-muted'
+                        }`}>{user.plan}</span>
+                        <span className="text-xs text-text-muted">{user.bots} bots</span>
+                        <span className="text-xs text-text-muted">{user.queries} queries</span>
+                      </div>
+                    </div>
+                  </div>
+                  <ActionMenu
+                    align="right"
+                    actions={[
+                      { label: 'Edit User',    icon: Edit,   onClick: () => toast(`Editing ${user.name}`, { icon: '✏️' }) },
+                      { label: 'Suspend User', icon: UserX,  onClick: () => toast.error(`${user.name} suspended`) },
+                      { label: 'Delete User',  icon: Trash2, onClick: () => toast.error(`${user.name} deleted`), danger: true },
+                    ]}
+                  />
+                </motion.div>
+              ))}
             </div>
 
             {/* Pagination Footer */}

@@ -133,7 +133,7 @@ export default function Landing() {
             </motion.div>
 
             <motion.div variants={itemVariants}>
-              <h1 className="text-[48px] md:text-[64px] font-bold tracking-tight text-text-primary leading-[1.1] mb-6">
+              <h1 className="text-[32px] sm:text-[48px] md:text-[64px] font-bold tracking-tight text-text-primary leading-[1.1] mb-6">
                 Embed AI that{' '}
                 <span className="gradient-text">
                   actually understands
@@ -143,7 +143,7 @@ export default function Landing() {
             </motion.div>
 
             <motion.div variants={itemVariants}>
-              <p className="text-lg md:text-[18px] text-text-muted leading-[1.6] mb-10 max-w-xl">
+              <p className="text-base md:text-[18px] text-text-muted leading-[1.6] mb-8 max-w-xl">
                 Train a chatbot on your docs in minutes. Embed anywhere with one script tag.
               </p>
             </motion.div>
@@ -526,9 +526,9 @@ export default function Landing() {
             <div>
               <h4 className="text-text-primary font-medium mb-6">Docs</h4>
               <ul className="space-y-4 text-sm text-text-muted">
-                <li><Link to="/docs" className="hover:text-accent transition-colors">Quickstart</Link></li>
-                <li><Link to="/docs/api" className="hover:text-accent transition-colors">API Reference</Link></li>
-                <li><Link to="/docs/guides" className="hover:text-accent transition-colors">Guides</Link></li>
+                <li><Link to="/docs" id="footer-docs-quickstart" className="hover:text-accent transition-colors">Quickstart</Link></li>
+                <li><Link to="/docs/api" id="footer-docs-api" className="hover:text-accent transition-colors">API Reference</Link></li>
+                <li><Link to="/docs/guides" id="footer-docs-guides" className="hover:text-accent transition-colors">Guides</Link></li>
               </ul>
             </div>
             <div>

@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react'
-import { Link } from 'react-router-dom'
+import { Link, useParams } from 'react-router-dom'
 import { motion } from 'framer-motion'
 import {
   BarChart3, Clock, MessageSquare, Bot, ChevronLeft, ArrowUp, ArrowDown,
@@ -60,6 +60,9 @@ function CountUp({ end }) {
 }
 
 export default function Analytics() {
+  const { id } = useParams()
+  const backTo   = id ? `/chatbot/${id}` : '/dashboard'
+  const backLabel = id ? 'Chatbot' : 'Dashboard'
   const [loading, setLoading] = useState(true)
   const [timeRange, setTimeRange] = useState('7d')
   const [sortConfig, setSortConfig] = useState({ key: 'count', direction: 'desc' })
@@ -125,32 +128,36 @@ export default function Analytics() {
       {/* Breadcrumb Header */}
       <div className="border-b border-border bg-surface/50 backdrop-blur-md sticky top-0 z-40">
         <div className="max-w-7xl mx-auto px-6 py-4 flex items-center justify-between">
-          <div className="flex items-center gap-4">
-            <Link to="/dashboard" className="p-2 -ml-2 rounded-lg text-text-muted hover:text-text-primary hover:bg-surface-elevated transition-colors">
+        <div className="flex items-center gap-3">
+            <Link
+              id="analytics-back-btn"
+              to={backTo}
+              className="p-2 -ml-2 rounded-lg text-text-muted hover:text-text-primary hover:bg-surface-elevated transition-colors min-w-[44px] min-h-[44px] flex items-center justify-center"
+            >
               <ChevronLeft size={20} />
             </Link>
             <div>
-              <h1 className="text-xl font-bold text-text-primary leading-tight">Analytics Overview</h1>
+              <h1 className="text-lg sm:text-xl font-bold text-text-primary leading-tight">Analytics Overview</h1>
               <div className="flex items-center gap-2 text-xs text-text-muted font-medium mt-0.5">
-                <Link to="/dashboard" className="hover:text-accent transition-colors">Dashboard</Link>
+                <Link to={backTo} className="hover:text-accent transition-colors">{backLabel}</Link>
                 <span>/</span>
                 <span className="text-text-primary">Analytics</span>
               </div>
             </div>
           </div>
 
-          {/* Time Range Selector */}
           <div className="relative bg-surface border border-border rounded-lg p-1 flex text-sm font-medium">
             {['7d', '30d', '90d'].map(range => (
               <button
                 key={range}
+                id={`time-range-${range}`}
                 onClick={() => setTimeRange(range)}
-                className={`relative px-4 py-1.5 rounded-md transition-colors z-10 ${timeRange === range ? 'text-white' : 'text-text-muted hover:text-text-primary'}`}
+                className={`relative px-3 sm:px-4 py-1.5 rounded-md transition-colors z-10 ${timeRange === range ? 'text-white' : 'text-text-muted hover:text-text-primary'}`}
               >
                 {timeRange === range && (
                   <motion.div layoutId="range-pill" className="absolute inset-0 bg-accent rounded-md -z-10" transition={{ type: "spring", stiffness: 300, damping: 30 }} />
                 )}
-                {range === '7d' ? '7 days' : range === '30d' ? '30 days' : '90 days'}
+                {range === '7d' ? '7d' : range === '30d' ? '30d' : '90d'}
               </button>
             ))}
           </div>
@@ -267,19 +274,20 @@ export default function Analytics() {
         {/* ─── CHARTS ROW 2 ─── */}
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
           
-          {/* Top Questions Table */}
-          <motion.div 
+          {/* Top Questions Table — desktop */}
+          <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.4 }}
             className="lg:col-span-2 bg-surface border border-border rounded-3xl overflow-hidden"
           >
-            <div className="p-6 border-b border-border flex items-center justify-between">
-              <h3 className="text-lg font-bold text-text-primary">Top Questions Asked</h3>
+            <div className="p-5 sm:p-6 border-b border-border flex items-center justify-between">
+              <h3 className="text-base sm:text-lg font-bold text-text-primary">Top Questions Asked</h3>
               <div className="relative">
                 <button
+                  id="analytics-filter-btn"
                   onClick={() => setShowFilter(f => !f)}
-                  className={`text-sm font-medium transition-colors flex items-center gap-1 ${showFilter ? 'text-accent' : 'text-text-muted hover:text-accent'}`}
+                  className={`text-sm font-medium transition-colors flex items-center gap-1 min-h-[44px] px-2 ${showFilter ? 'text-accent' : 'text-text-muted hover:text-accent'}`}
                 >
                   <Filter size={14} /> Filter
                 </button>
@@ -301,13 +309,15 @@ export default function Analytics() {
                 )}
               </div>
             </div>
-            <div className="overflow-x-auto">
+
+            {/* Desktop table */}
+            <div className="hidden md:block overflow-x-auto">
               <table className="w-full text-left text-sm">
                 <thead className="bg-background text-text-muted border-b border-border">
                   <tr>
                     {['Question', 'Bot', 'Count', 'Sentiment'].map((col) => (
-                      <th 
-                        key={col} 
+                      <th
+                        key={col}
                         className="p-4 font-semibold cursor-pointer hover:text-text-primary transition-colors group"
                         onClick={() => requestSort(col)}
                       >
@@ -324,7 +334,7 @@ export default function Analytics() {
                 </thead>
                 <tbody>
                   {sortedTableData.map((row, i) => (
-                    <motion.tr 
+                    <motion.tr
                       key={row.id}
                       initial={{ opacity: 0, y: 10 }}
                       whileInView={{ opacity: 1, y: 0 }}
@@ -348,6 +358,26 @@ export default function Analytics() {
                   ))}
                 </tbody>
               </table>
+            </div>
+
+            {/* Mobile card list */}
+            <div className="md:hidden divide-y divide-border">
+              {sortedTableData.map((row, i) => (
+                <div key={row.id} className="p-4 space-y-2">
+                  <p className="text-sm font-semibold text-text-primary">{row.q}</p>
+                  <div className="flex items-center gap-3 flex-wrap">
+                    <span className="text-xs text-text-muted">{row.bot}</span>
+                    <span className="text-xs font-mono font-bold text-text-primary">{row.count} asks</span>
+                    <span className={`px-2 py-0.5 rounded-full text-[10px] font-bold uppercase ${
+                      row.sentiment === 'Positive' ? 'bg-green-500/10 text-green-400' :
+                      row.sentiment === 'Negative' ? 'bg-red-500/10 text-red-400' :
+                      'bg-surface-elevated text-text-muted'
+                    }`}>
+                      {row.sentiment}
+                    </span>
+                  </div>
+                </div>
+              ))}
             </div>
           </motion.div>
 

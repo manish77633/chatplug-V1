@@ -4,7 +4,7 @@ import { motion, AnimatePresence } from 'framer-motion'
 import {
   Send, Bot, User, Loader2, RefreshCw, AlertCircle, Settings,
   Maximize2, Minimize2, Paperclip, ChevronRight, FileText, Database, Clock, Terminal, ChevronLeft,
-  ChevronDown, MessageSquare
+  ChevronDown, MessageSquare, Menu, X
 } from 'lucide-react'
 import api from '../utils/api'
 import toast from 'react-hot-toast'
@@ -32,6 +32,7 @@ export default function Playground() {
   
   // UI State
   const [rightPanelOpen, setRightPanelOpen] = useState(true)
+  const [leftSidebarOpen, setLeftSidebarOpen] = useState(false)
   const [isFullscreen, setIsFullscreen] = useState(false)
   const [mockMetrics, setMockMetrics] = useState({ tokens: 0, ms: 0, chunks: [] })
   
@@ -211,14 +212,30 @@ export default function Playground() {
 
   return (
     <div className="h-screen bg-background text-text-primary font-inter flex overflow-hidden selection:bg-accent/30">
-      
+
       {/* ─── LEFT PANEL: Bot Selector ─── */}
-      <div className="w-[260px] bg-surface border-r border-border flex flex-col shrink-0">
+      {/* Mobile: slide-in overlay; Desktop: always visible */}
+      {leftSidebarOpen && (
+        <div
+          className="fixed inset-0 bg-background/80 backdrop-blur-sm z-30 lg:hidden"
+          onClick={() => setLeftSidebarOpen(false)}
+        />
+      )}
+      <div className={`fixed lg:static inset-y-0 left-0 z-40 w-[260px] bg-surface border-r border-border flex flex-col shrink-0 transition-transform duration-300 ${
+        leftSidebarOpen ? 'translate-x-0' : '-translate-x-full lg:translate-x-0'
+      }`}>
         <div className="p-4 border-b border-border flex items-center gap-3">
-          <Link to="/dashboard" className="p-2 -ml-2 rounded-lg hover:bg-surface-elevated text-text-muted hover:text-text-primary transition-colors">
+          <Link to="/dashboard" id="playground-back-btn" className="p-2 -ml-2 rounded-lg hover:bg-surface-elevated text-text-muted hover:text-text-primary transition-colors min-w-[44px] min-h-[44px] flex items-center justify-center">
             <ChevronLeft size={20} />
           </Link>
-          <h2 className="font-bold text-text-primary">Playground</h2>
+          <h2 className="font-bold text-text-primary flex-1">Playground</h2>
+          <button
+            id="playground-close-sidebar"
+            onClick={() => setLeftSidebarOpen(false)}
+            className="lg:hidden p-2 text-text-muted hover:text-text-primary rounded-lg hover:bg-surface-elevated"
+          >
+            <X size={18} />
+          </button>
         </div>
         
         <div className="p-4 flex-1 overflow-y-auto">
@@ -255,8 +272,16 @@ export default function Playground() {
         <div className="absolute inset-0 pointer-events-none opacity-[0.02] noise-bg" />
 
         {/* Chat Header */}
-        <div className="h-16 border-b border-border bg-surface/50 backdrop-blur-md flex items-center justify-between px-6 shrink-0 relative z-10">
+        <div className="h-14 border-b border-border bg-surface/50 backdrop-blur-md flex items-center justify-between px-4 sm:px-6 shrink-0 relative z-10">
           <div className="flex items-center gap-3">
+            {/* Mobile hamburger for left sidebar */}
+            <button
+              id="playground-open-sidebar"
+              onClick={() => setLeftSidebarOpen(true)}
+              className="lg:hidden p-2 -ml-2 text-text-muted hover:text-text-primary hover:bg-surface-elevated rounded-lg transition-colors min-w-[44px] min-h-[44px] flex items-center justify-center"
+            >
+              <Menu size={20} />
+            </button>
             <div className="relative">
               <div className="w-10 h-10 rounded-full flex items-center justify-center text-white shadow-md" style={{ backgroundColor: accentColor }}>
                 <Bot size={20} />
@@ -266,7 +291,7 @@ export default function Playground() {
               </div>
             </div>
             <div>
-              <h2 className="font-bold text-text-primary leading-tight">{chatbot?.name}</h2>
+              <h2 className="font-bold text-text-primary leading-tight text-sm sm:text-base">{chatbot?.name}</h2>
               <p className="text-xs text-text-muted font-medium">{isReady ? 'Online' : 'Training...'}</p>
             </div>
           </div>
