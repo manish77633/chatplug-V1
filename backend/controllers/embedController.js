@@ -123,6 +123,9 @@ exports.serveWidget = async (req, res, next) => {
 
     res.setHeader('Content-Type', 'application/javascript');
     res.setHeader('Cache-Control', 'public, max-age=300');
+    // Allow any website to load this embed script (overrides Helmet's same-origin CORP)
+    res.setHeader('Cross-Origin-Resource-Policy', 'cross-origin');
+    res.setHeader('Access-Control-Allow-Origin', '*');
     res.send(script);
   } catch (err) { next(err); }
 };
