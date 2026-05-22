@@ -74,10 +74,12 @@ Rules:
 - Be concise and helpful`;
 
     try {
-      // Stream response via SSE
+      // Stream response via SSE — allow any origin (public embed API)
       res.setHeader('Content-Type', 'text/event-stream');
       res.setHeader('Cache-Control', 'no-cache');
       res.setHeader('Connection', 'keep-alive');
+      res.setHeader('Access-Control-Allow-Origin', '*');
+      res.setHeader('Cross-Origin-Resource-Policy', 'cross-origin');
       res.flushHeaders();
 
       const contents = [];

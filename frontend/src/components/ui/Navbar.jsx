@@ -1,13 +1,19 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
-import { Menu, X, LogOut } from 'lucide-react'
+import { Menu, X, LogOut, Zap } from 'lucide-react'
 import { useAuthStore } from '../../store/authStore'
-import Button from './Button'
 
 export default function Navbar({ isAuthenticated }) {
   const [mobileOpen, setMobileOpen] = useState(false)
+  const [scrolled, setScrolled] = useState(false)
   const { user, logout } = useAuthStore()
   const navigate = useNavigate()
+
+  useEffect(() => {
+    const handleScroll = () => setScrolled(window.scrollY > 20)
+    window.addEventListener('scroll', handleScroll)
+    return () => window.removeEventListener('scroll', handleScroll)
+  }, [])
 
   const handleLogout = () => {
     logout()
@@ -15,35 +21,66 @@ export default function Navbar({ isAuthenticated }) {
   }
 
   return (
-    <nav className="fixed top-0 left-0 right-0 z-50 transition-all duration-300 backdrop-blur-md bg-white/70 border-b border-border/60">
+    <nav className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 border-b ${scrolled ? 'glass border-border/100' : 'bg-transparent border-transparent'}`}>
       <div className="max-w-7xl mx-auto px-6 py-4 flex items-center justify-between">
         {/* Logo */}
-        <Link to="/" className="flex items-center gap-3 group">
-          <div className="w-10 h-10 bg-gradient-to-br from-acid to-violet rounded-xl flex items-center justify-center shadow-lg shadow-acid/20 group-hover:scale-110 transition-transform">
-            <span className="text-white font-black text-lg">E</span>
+        <Link to="/" className="flex items-center gap-2 group">
+          <div className="w-8 h-8 rounded-xl flex items-center justify-center">
+            <Zap size={20} className="text-accent group-hover:scale-110 transition-transform" />
           </div>
-          <span className="text-xl font-black text-text tracking-tight hidden sm:block">
-            Embed<span className="text-gradient">IQ</span>
+          <span className="text-xl font-bold tracking-tight">
+            <span className="gradient-text">ChatPlug</span>
           </span>
         </Link>
 
-        {/* Desktop Menu */}
-        <div className="hidden md:flex items-center gap-8 font-semibold">
+        {/* Desktop Menu - Center */}
+        <div className="hidden md:flex items-center gap-8 font-medium">
+          <button
+            onClick={() => {
+              const el = document.getElementById('features')
+              if (el) el.scrollIntoView({ behavior: 'smooth' })
+              else navigate('/#features')
+            }}
+            className="text-sm text-text-muted hover:text-text-primary transition-colors relative group"
+          >
+            Features
+            <span className="absolute -bottom-1 left-0 w-0 h-0.5 bg-accent transition-all duration-300 group-hover:w-full" />
+          </button>
+          <button
+            onClick={() => {
+              const el = document.getElementById('pricing')
+              if (el) el.scrollIntoView({ behavior: 'smooth' })
+              else navigate('/#pricing')
+            }}
+            className="text-sm text-text-muted hover:text-text-primary transition-colors relative group"
+          >
+            Pricing
+            <span className="absolute -bottom-1 left-0 w-0 h-0.5 bg-accent transition-all duration-300 group-hover:w-full" />
+          </button>
+          <Link to="/docs" className="text-sm text-text-muted hover:text-text-primary transition-colors relative group">
+            Docs
+            <span className="absolute -bottom-1 left-0 w-0 h-0.5 bg-accent transition-all duration-300 group-hover:w-full" />
+          </Link>
+        </div>
+
+        {/* Desktop Menu - Right */}
+        <div className="hidden md:flex items-center gap-6">
           {!isAuthenticated ? (
             <>
-              <Link to="/docs" className="text-sm text-dim hover:text-acid transition-colors">Documentation</Link>
-              <Link to="/login" className="text-sm text-dim hover:text-acid transition-colors">Sign in</Link>
+              <Link to="/login" className="text-sm text-text-muted hover:text-text-primary transition-colors">Sign in</Link>
               <Link to="/register">
-                <Button variant="primary" size="sm" className="px-6">Get Started</Button>
+                <button className="relative px-5 py-2 text-sm font-semibold text-text-primary rounded-xl overflow-hidden group">
+                  <div className="absolute inset-0 bg-gradient-to-r from-accent to-accent-secondary opacity-20 group-hover:opacity-100 transition-opacity duration-300"></div>
+                  <div className="absolute inset-[1px] bg-surface rounded-xl"></div>
+                  <div className="absolute inset-0 bg-gradient-to-r from-accent to-accent-secondary blur-md opacity-0 group-hover:opacity-40 transition-opacity duration-300"></div>
+                  <span className="relative z-10 group-hover:gradient-text transition-all">Get Started</span>
+                </button>
               </Link>
             </>
           ) : (
             <>
-              <span className="text-sm text-dim">{user?.email}</span>
-              <span className="px-4 py-1.5 rounded-full bg-surface border border-border text-xs font-bold text-muted">
-                {user?.plan?.type?.toUpperCase() || 'FREE'}
-              </span>
-              <button onClick={handleLogout} className="text-muted hover:text-danger transition-colors hover:bg-danger/5 p-2 rounded-xl">
+              <span className="text-sm text-text-muted">{user?.email}</span>
+              <button onClick={handleLogout} className="text-text-muted hover:text-danger transition-colors p-2 rounded-xl">
                 <LogOut size={18} />
               </button>
             </>
@@ -51,25 +88,27 @@ export default function Navbar({ isAuthenticated }) {
         </div>
 
         {/* Mobile Menu Button */}
-        <button onClick={() => setMobileOpen(!mobileOpen)} className="md:hidden text-text">
+        <button onClick={() => setMobileOpen(!mobileOpen)} className="md:hidden text-text-primary">
           {mobileOpen ? <X size={24} /> : <Menu size={24} />}
         </button>
       </div>
 
       {/* Mobile Menu */}
       {mobileOpen && (
-        <div className="md:hidden border-t border-border/40 bg-surface/50 backdrop-blur-lg">
+        <div className="md:hidden border-t border-border bg-surface glass">
           <div className="px-6 py-4 space-y-4">
             {!isAuthenticated ? (
               <>
-                <Link to="/docs" className="block text-sm text-dim hover:text-text">Docs</Link>
-                <Link to="/login" className="block text-sm text-dim hover:text-text">Sign in</Link>
-                <Link to="/register" className="btn-primary w-full text-center">Get Started</Link>
+                <button onClick={() => { const el = document.getElementById('features'); if (el) el.scrollIntoView({ behavior: 'smooth' }); else navigate('/#features'); setMobileOpen(false) }} className="block text-sm text-text-muted hover:text-text-primary w-full text-left">Features</button>
+                <button onClick={() => { const el = document.getElementById('pricing'); if (el) el.scrollIntoView({ behavior: 'smooth' }); else navigate('/#pricing'); setMobileOpen(false) }} className="block text-sm text-text-muted hover:text-text-primary w-full text-left">Pricing</button>
+                <Link to="/docs" onClick={() => setMobileOpen(false)} className="block text-sm text-text-muted hover:text-text-primary">Docs</Link>
+                <Link to="/login" onClick={() => setMobileOpen(false)} className="block text-sm text-text-muted hover:text-text-primary">Sign in</Link>
+                <Link to="/register" onClick={() => setMobileOpen(false)} className="block w-full text-center py-2 bg-accent rounded-lg text-white font-semibold">Get Started</Link>
               </>
             ) : (
               <>
-                <div className="text-sm text-dim mb-2">{user?.email}</div>
-                <button onClick={handleLogout} className="w-full text-left text-sm text-danger hover:bg-danger/10 p-2 rounded-lg transition-colors">
+                <div className="text-sm text-text-muted mb-2">{user?.email}</div>
+                <button onClick={() => { handleLogout(); setMobileOpen(false) }} className="w-full text-left text-sm text-danger p-2 rounded-lg transition-colors">
                   Sign out
                 </button>
               </>

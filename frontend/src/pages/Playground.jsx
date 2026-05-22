@@ -1,52 +1,101 @@
 import { useState, useRef, useEffect, useCallback } from 'react'
-import { useParams, Link } from 'react-router-dom'
+import { useParams, Link, useNavigate } from 'react-router-dom'
 import { motion, AnimatePresence } from 'framer-motion'
-import { Send, ArrowLeft, Bot, User, Loader2, RefreshCw, AlertCircle } from 'lucide-react'
+import {
+  Send, Bot, User, Loader2, RefreshCw, AlertCircle, Settings,
+  Maximize2, Minimize2, Paperclip, ChevronRight, FileText, Database, Clock, Terminal, ChevronLeft,
+  ChevronDown, MessageSquare
+} from 'lucide-react'
 import api from '../utils/api'
 import toast from 'react-hot-toast'
 
+// Formats timestamp like "10:42 AM"
+const formatTime = (date) => {
+  return new Intl.DateTimeFormat('en-US', { hour: 'numeric', minute: 'numeric' }).format(date)
+}
+
 export default function Playground() {
   const { id } = useParams()
-  const [chatbot, setChatbot]   = useState(null)
-  const [messages, setMessages] = useState([])
-  const [input, setInput]       = useState('')
+  const navigate = useNavigate()
+  
+  // Data State
+  const [chatbots, setChatbots] = useState([])
+  const [chatbot, setChatbot] = useState(null)
   const [pageLoading, setPageLoading] = useState(true)
-  const [botLoading, setBotLoading]   = useState(false)
   const [error, setError] = useState(null)
+  
+  // Chat State
+  const [messages, setMessages] = useState([])
+  const [input, setInput] = useState('')
+  const [botLoading, setBotLoading] = useState(false)
+  const [isStreaming, setIsStreaming] = useState(false)
+  
+  // UI State
+  const [rightPanelOpen, setRightPanelOpen] = useState(true)
+  const [isFullscreen, setIsFullscreen] = useState(false)
+  const [mockMetrics, setMockMetrics] = useState({ tokens: 0, ms: 0, chunks: [] })
+  
   const messagesEndRef = useRef(null)
   const sessionId = useRef(`playground_${Date.now()}`)
-  const abortRef  = useRef(null)
+  const abortRef = useRef(null)
+  const textareaRef = useRef(null)
 
-  const loadChatbot = useCallback(async () => {
+  const loadData = useCallback(async () => {
     try {
-      const { data } = await api.get(`/chatbots/${id}`)
-      setChatbot(data.chatbot)
-      setMessages([{
-        role: 'assistant',
-        content: data.chatbot.widget?.welcomeMessage || `Hi! I'm ${data.chatbot.name}. How can I help?`,
-      }])
+      // Load all bots for sidebar
+      const botsRes = await api.get('/chatbots')
+      setChatbots(botsRes.data.chatbots)
+      
+      // Load current bot
+      const currentBotRes = await api.get(`/chatbots/${id}`)
+      setChatbot(currentBotRes.data.chatbot)
+      
+      setMessages([])
       setError(null)
     } catch {
-      setError('Failed to load chatbot')
+      setError('Failed to load playground data')
     } finally {
       setPageLoading(false)
     }
   }, [id])
 
-  useEffect(() => { loadChatbot() }, [loadChatbot])
+  useEffect(() => { loadData() }, [loadData])
   useEffect(() => { messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' }) }, [messages])
 
-  const sendMessage = async (e) => {
-    e.preventDefault()
-    if (!input.trim() || botLoading) return
+  // Auto-resize textarea
+  const handleInput = (e) => {
+    setInput(e.target.value)
+    if (textareaRef.current) {
+      textareaRef.current.style.height = 'auto'
+      textareaRef.current.style.height = `${Math.min(textareaRef.current.scrollHeight, 120)}px`
+    }
+  }
 
-    const userMsg = input.trim()
+  const handleKeyDown = (e) => {
+    if (e.key === 'Enter' && !e.shiftKey) {
+      e.preventDefault()
+      sendMessage(e)
+    }
+  }
+
+  const sendMessage = async (e, forcedMessage = null) => {
+    if (e) e.preventDefault()
+    const userMsg = forcedMessage || input.trim()
+    if (!userMsg || botLoading || isStreaming) return
+
     setInput('')
-    setMessages(p => [...p, { role: 'user', content: userMsg }])
+    if (textareaRef.current) textareaRef.current.style.height = 'auto'
+    
+    const newMsg = { role: 'user', content: userMsg, time: new Date() }
+    setMessages(p => [...p, newMsg])
     setBotLoading(true)
+    setIsStreaming(false)
 
     // Add placeholder bot message
-    setMessages(p => [...p, { role: 'assistant', content: '' }])
+    setMessages(p => [...p, { role: 'assistant', content: '', time: new Date() }])
+
+    // Mock response metrics
+    const startTime = Date.now()
 
     try {
       const apiBase = import.meta.env.VITE_API_URL || 'http://localhost:5000/api'
@@ -75,6 +124,9 @@ export default function Playground() {
         throw new Error(errData.message || `HTTP ${res.status}`)
       }
 
+      setBotLoading(false)
+      setIsStreaming(true)
+
       const reader  = res.body.getReader()
       const decoder = new TextDecoder()
       let full = ''
@@ -85,7 +137,7 @@ export default function Playground() {
         if (done) break
         buffer += decoder.decode(value, { stream: true })
         const lines = buffer.split('\n')
-        buffer = lines.pop() // keep incomplete line
+        buffer = lines.pop() 
 
         for (const line of lines) {
           if (!line.startsWith('data:')) continue
@@ -93,61 +145,61 @@ export default function Playground() {
             const data = JSON.parse(line.slice(5).trim())
             if (data.error) {
               full += "\n\n**Error:** `" + data.error + "`"
-              setMessages(p => {
-                const copy = [...p]
-                copy[copy.length - 1] = { role: 'assistant', content: full }
-                return copy
-              })
+              updateLastMessage(full)
             }
             if (data.delta) {
               full += data.delta
-              setMessages(p => {
-                const copy = [...p]
-                copy[copy.length - 1] = { role: 'assistant', content: full }
-                return copy
-              })
+              updateLastMessage(full)
             }
           } catch {}
         }
       }
 
       if (!full) {
-        setMessages(p => {
-          const copy = [...p]
-          copy[copy.length - 1] = { role: 'assistant', content: 'Sorry, I could not generate a response.' }
-          return copy
-        })
+        updateLastMessage('Sorry, I could not generate a response.')
       }
+
+      // Update mock metrics for debug panel
+      setMockMetrics({
+        tokens: Math.floor(full.length / 4) + Math.floor(userMsg.length / 4),
+        ms: Date.now() - startTime,
+        chunks: [
+          { file: 'getting-started.pdf', score: 0.89, text: 'To embed the widget, copy the script tag and paste it into your HTML body.' },
+          { file: 'api-reference.txt', score: 0.74, text: 'The chat endpoint accepts POST requests with a message and sessionId.' }
+        ]
+      })
 
     } catch (err) {
       if (err.name === 'AbortError') return
       console.error('[Chat]', err)
-      setMessages(p => {
-        const copy = [...p]
-        copy[copy.length - 1] = {
-          role: 'assistant',
-          content: `⚠️ ${err.message || 'Something went wrong. Please try again.'}`,
-        }
-        return copy
-      })
+      updateLastMessage(`⚠️ ${err.message || 'Something went wrong. Please try again.'}`)
     } finally {
       setBotLoading(false)
+      setIsStreaming(false)
       abortRef.current = null
     }
   }
 
+  const updateLastMessage = (content) => {
+    setMessages(p => {
+      const copy = [...p]
+      copy[copy.length - 1] = { ...copy[copy.length - 1], content }
+      return copy
+    })
+  }
+
   if (pageLoading) return (
-    <div className="min-h-screen bg-void flex items-center justify-center">
-      <Loader2 className="animate-spin text-acid" size={32} />
+    <div className="min-h-screen bg-background flex items-center justify-center">
+      <Loader2 className="animate-spin text-accent" size={32} />
     </div>
   )
 
   if (error) return (
-    <div className="min-h-screen bg-void flex items-center justify-center">
+    <div className="min-h-screen bg-background flex items-center justify-center">
       <div className="text-center space-y-4">
-        <AlertCircle className="mx-auto text-danger" size={40} />
-        <p className="text-dim">{error}</p>
-        <button onClick={loadChatbot} className="btn-ghost flex items-center gap-2 mx-auto">
+        <AlertCircle className="mx-auto text-red-500" size={40} />
+        <p className="text-text-muted">{error}</p>
+        <button onClick={loadData} className="px-6 py-2 bg-surface border border-border rounded-xl text-text-primary hover:bg-surface-elevated transition-colors flex items-center gap-2 mx-auto">
           <RefreshCw size={14} /> Retry
         </button>
       </div>
@@ -155,107 +207,276 @@ export default function Playground() {
   )
 
   const isReady = chatbot?.status === 'ready'
+  const accentColor = chatbot?.settings?.accentColor || '#6C63FF'
 
   return (
-    <div className="min-h-screen bg-void flex flex-col">
-      {/* Nav */}
-      <nav className="flex items-center gap-4 px-6 py-4 border-b border-border bg-white/80 backdrop-blur-sm sticky top-0 z-10">
-        <Link to={`/chatbot/${id}`} className="text-muted hover:text-text transition-colors p-2 rounded-lg hover:bg-surface">
-          <ArrowLeft size={18} />
-        </Link>
-        <div className="w-8 h-8 rounded-xl bg-gradient-to-br from-acid to-violet flex items-center justify-center">
-          <Bot className="text-white" size={16} />
+    <div className="h-screen bg-background text-text-primary font-inter flex overflow-hidden selection:bg-accent/30">
+      
+      {/* ─── LEFT PANEL: Bot Selector ─── */}
+      <div className="w-[260px] bg-surface border-r border-border flex flex-col shrink-0">
+        <div className="p-4 border-b border-border flex items-center gap-3">
+          <Link to="/dashboard" className="p-2 -ml-2 rounded-lg hover:bg-surface-elevated text-text-muted hover:text-text-primary transition-colors">
+            <ChevronLeft size={20} />
+          </Link>
+          <h2 className="font-bold text-text-primary">Playground</h2>
         </div>
-        <div className="flex-1 min-w-0">
-          <h1 className="font-semibold text-text text-sm truncate">{chatbot?.name} — Playground</h1>
-          <p className="text-xs text-muted">Testing environment</p>
-        </div>
-        <span className={`badge ${isReady ? 'badge-success' : 'badge-secondary'}`}>
-          <span className={`w-1.5 h-1.5 rounded-full ${isReady ? 'bg-success animate-pulse' : 'bg-warning animate-pulse'}`} />
-          {chatbot?.status}
-        </span>
-      </nav>
-
-      {/* Not ready banner */}
-      {!isReady && (
-        <div className="bg-warning/10 border-b border-warning/20 px-6 py-3 flex items-center gap-3">
-          <Loader2 size={14} className="text-warning animate-spin shrink-0" />
-          <p className="text-sm text-warning font-medium">
-            Bot is still {chatbot?.status === 'training' ? 'training on your documents' : 'in draft mode'}.
-            {chatbot?.status === 'draft' && ' Add documents to start training.'}
-          </p>
-          {chatbot?.status === 'training' && (
-            <button onClick={loadChatbot} className="ml-auto text-xs text-warning hover:text-warning/80 flex items-center gap-1">
-              <RefreshCw size={12} /> Refresh
-            </button>
-          )}
-        </div>
-      )}
-
-      {/* Messages */}
-      <div className="flex-1 overflow-y-auto px-4 py-6">
-        <div className="max-w-3xl mx-auto space-y-4">
-          <AnimatePresence initial={false}>
-            {messages.map((msg, i) => (
-              <motion.div
-                key={i}
-                initial={{ opacity: 0, y: 10 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.2 }}
-                className={`flex gap-3 ${msg.role === 'user' ? 'flex-row-reverse' : ''}`}
+        
+        <div className="p-4 flex-1 overflow-y-auto">
+          <p className="text-xs font-bold text-text-muted uppercase tracking-wider mb-4">Select Chatbot</p>
+          <div className="space-y-2">
+            {chatbots.map(b => (
+              <button
+                key={b._id}
+                onClick={() => navigate(`/chatbot/${b._id}/playground`)}
+                className={`w-full text-left p-3 rounded-xl border transition-all ${
+                  b._id === id 
+                    ? 'bg-accent/10 border-accent/30 shadow-[0_0_15px_rgba(108,99,255,0.05)]' 
+                    : 'bg-transparent border-transparent hover:bg-surface-elevated hover:border-border'
+                }`}
               >
-                <div className={`w-8 h-8 rounded-xl flex items-center justify-center shrink-0 ${
-                  msg.role === 'user'
-                    ? 'bg-gradient-to-br from-acid to-violet'
-                    : 'bg-white border border-border shadow-sm'
-                }`}>
-                  {msg.role === 'user'
-                    ? <User size={14} className="text-white" />
-                    : <Bot size={14} className="text-acid" />
-                  }
+                <div className="flex items-center justify-between mb-1">
+                  <h3 className={`font-semibold truncate pr-2 ${b._id === id ? 'text-accent' : 'text-text-primary'}`}>
+                    {b.name}
+                  </h3>
+                  <div className={`w-2 h-2 rounded-full shrink-0 ${b.status === 'ready' ? 'bg-green-500' : 'bg-yellow-500'}`} />
                 </div>
-                <div className={`max-w-[75%] px-4 py-3 rounded-2xl text-sm leading-relaxed shadow-sm ${
-                  msg.role === 'user'
-                    ? 'bg-gradient-to-br from-acid to-violet text-white rounded-tr-sm'
-                    : 'bg-white border border-border text-text rounded-tl-sm'
-                }`}>
-                  {msg.content || (botLoading && i === messages.length - 1
-                    ? <span className="flex gap-1 py-1">
-                        {[0, 1, 2].map(j => (
-                          <span key={j} className="w-2 h-2 bg-muted/50 rounded-full animate-bounce"
-                            style={{ animationDelay: `${j * 0.15}s` }} />
-                        ))}
-                      </span>
-                    : null
-                  )}
+                <div className="flex items-center gap-3 text-xs text-text-muted">
+                  <span className="flex items-center gap-1"><FileText size={10} /> {b.documents?.length || 0}</span>
+                  <span className="flex items-center gap-1"><MessageSquare size={10} /> {b.stats?.totalMessages || 0}</span>
                 </div>
-              </motion.div>
+              </button>
             ))}
-          </AnimatePresence>
-          <div ref={messagesEndRef} />
+          </div>
         </div>
       </div>
 
-      {/* Input */}
-      <div className="border-t border-border px-4 py-4 bg-white/80 backdrop-blur-sm">
-        <form onSubmit={sendMessage} className="max-w-3xl mx-auto flex gap-3">
-          <input
-            className="input flex-1"
-            placeholder={isReady ? 'Type a message to test your bot…' : 'Bot is not ready yet…'}
-            value={input}
-            onChange={e => setInput(e.target.value)}
-            disabled={botLoading}
-            autoFocus
-          />
-          <button
-            type="submit"
-            className="btn-primary px-4 py-3 aspect-square"
-            disabled={!input.trim() || botLoading}
-          >
-            {botLoading ? <Loader2 size={16} className="animate-spin" /> : <Send size={16} />}
-          </button>
-        </form>
+      {/* ─── CENTER PANEL: Chat Window ─── */}
+      <div className="flex-1 flex flex-col relative bg-background min-w-0">
+        <div className="absolute inset-0 pointer-events-none opacity-[0.02] noise-bg" />
+
+        {/* Chat Header */}
+        <div className="h-16 border-b border-border bg-surface/50 backdrop-blur-md flex items-center justify-between px-6 shrink-0 relative z-10">
+          <div className="flex items-center gap-3">
+            <div className="relative">
+              <div className="w-10 h-10 rounded-full flex items-center justify-center text-white shadow-md" style={{ backgroundColor: accentColor }}>
+                <Bot size={20} />
+              </div>
+              <div className="absolute -bottom-0.5 -right-0.5 w-3 h-3 bg-background rounded-full flex items-center justify-center">
+                <div className={`w-2 h-2 rounded-full ${isReady ? 'bg-green-500 animate-pulse' : 'bg-yellow-500'}`} />
+              </div>
+            </div>
+            <div>
+              <h2 className="font-bold text-text-primary leading-tight">{chatbot?.name}</h2>
+              <p className="text-xs text-text-muted font-medium">{isReady ? 'Online' : 'Training...'}</p>
+            </div>
+          </div>
+          
+          <div className="flex items-center gap-2">
+            <button onClick={() => { setMessages([]); setMockMetrics({ tokens: 0, ms: 0, chunks: [] }) }} className="p-2 text-text-muted hover:text-text-primary hover:bg-surface-elevated rounded-lg transition-colors" title="Clear Chat">
+              <RefreshCw size={18} />
+            </button>
+            <Link to={`/chatbot/${id}`} className="p-2 text-text-muted hover:text-text-primary hover:bg-surface-elevated rounded-lg transition-colors" title="Settings">
+              <Settings size={18} />
+            </Link>
+            <button
+              onClick={() => setIsFullscreen(f => !f)}
+              className="p-2 text-text-muted hover:text-text-primary hover:bg-surface-elevated rounded-lg transition-colors hidden sm:block"
+              title={isFullscreen ? 'Exit fullscreen' : 'Fullscreen'}
+            >
+              {isFullscreen ? <Minimize2 size={18} /> : <Maximize2 size={18} />}
+            </button>
+            <button onClick={() => setRightPanelOpen(!rightPanelOpen)} className="p-2 text-text-muted hover:text-text-primary hover:bg-surface-elevated rounded-lg transition-colors" title="Toggle Debug Panel">
+              <Terminal size={18} />
+            </button>
+          </div>
+        </div>
+
+        {!isReady && (
+          <div className="bg-yellow-500/10 border-b border-yellow-500/20 px-6 py-3 flex items-center gap-3 shrink-0 relative z-10">
+            <Loader2 size={14} className="text-yellow-500 animate-spin shrink-0" />
+            <p className="text-sm text-yellow-600 font-medium">
+              Bot is {chatbot?.status === 'training' ? 'training on your documents' : 'in draft mode'}. Responses may be unavailable.
+            </p>
+          </div>
+        )}
+
+        {/* Messages Area */}
+        <div className="flex-1 overflow-y-auto px-4 py-8 relative z-10">
+          <div className="max-w-3xl mx-auto w-full">
+            {messages.length === 0 ? (
+              <div className="h-full flex flex-col items-center justify-center pt-20">
+                <div className="w-20 h-20 rounded-2xl flex items-center justify-center text-white shadow-xl shadow-accent/20 mb-6" style={{ backgroundColor: accentColor }}>
+                  <Bot size={40} />
+                </div>
+                <h3 className="text-2xl font-bold text-text-primary mb-2">Ask me anything</h3>
+                <p className="text-text-muted mb-10">Test your chatbot's knowledge base in real-time.</p>
+                
+                <div className="flex flex-col gap-3 w-full max-w-md">
+                  {['What is this document about?', 'Can you summarize the key points?', 'How do I get started?'].map((q, i) => (
+                    <button
+                      key={i}
+                      onClick={() => sendMessage(null, q)}
+                      className="px-4 py-3 bg-surface border border-border hover:border-accent hover:text-accent rounded-xl text-sm font-medium text-text-primary transition-all text-left flex items-center justify-between group"
+                    >
+                      {q} <ChevronRight size={16} className="opacity-0 group-hover:opacity-100 transition-opacity" />
+                    </button>
+                  ))}
+                </div>
+              </div>
+            ) : (
+              <div className="space-y-6">
+                <AnimatePresence initial={false}>
+                  {messages.map((msg, i) => {
+                    const isBot = msg.role === 'assistant'
+                    const isLastBotMsg = isBot && i === messages.length - 1
+                    
+                    return (
+                      <motion.div
+                        key={i}
+                        initial={{ opacity: 0, y: 12 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        className={`flex gap-4 ${!isBot ? 'flex-row-reverse' : ''}`}
+                      >
+                        <div className={`w-8 h-8 rounded-full flex items-center justify-center shrink-0 mt-1 shadow-sm ${!isBot ? 'bg-gradient-to-br from-accent to-accent-secondary' : ''}`} style={isBot ? { backgroundColor: accentColor } : {}}>
+                          {!isBot ? <User size={14} className="text-white" /> : <Bot size={14} className="text-white" />}
+                        </div>
+                        
+                        <div className={`flex flex-col ${!isBot ? 'items-end' : 'items-start'} max-w-[80%]`}>
+                          <div className={`px-5 py-3.5 text-sm leading-relaxed shadow-sm ${
+                            !isBot 
+                              ? 'bg-gradient-to-r from-accent to-accent-secondary text-white rounded-2xl rounded-tr-sm' 
+                              : 'bg-surface border border-border text-text-primary rounded-2xl rounded-tl-sm'
+                          }`}>
+                            {msg.content || (
+                              botLoading && isLastBotMsg ? (
+                                <span className="flex items-center gap-1.5 h-5 px-1">
+                                  <span className="w-1.5 h-1.5 bg-text-muted rounded-full animate-bounce" style={{ animationDelay: '0ms' }} />
+                                  <span className="w-1.5 h-1.5 bg-text-muted rounded-full animate-bounce" style={{ animationDelay: '150ms' }} />
+                                  <span className="w-1.5 h-1.5 bg-text-muted rounded-full animate-bounce" style={{ animationDelay: '300ms' }} />
+                                </span>
+                              ) : null
+                            )}
+                            {isStreaming && isLastBotMsg && <span className="inline-block w-1.5 h-4 ml-1 align-middle bg-text-primary animate-pulse" />}
+                          </div>
+                          <span className="text-[10px] text-text-muted font-medium mt-1.5 px-1">
+                            {msg.time ? formatTime(msg.time) : formatTime(new Date())}
+                          </span>
+                        </div>
+                      </motion.div>
+                    )
+                  })}
+                </AnimatePresence>
+                <div ref={messagesEndRef} className="h-4" />
+              </div>
+            )}
+          </div>
+        </div>
+
+        {/* Input Area */}
+        <div className="p-4 bg-surface/50 backdrop-blur-md border-t border-border shrink-0 relative z-10">
+          <div className="max-w-3xl mx-auto">
+            <form onSubmit={sendMessage} className="relative flex items-end gap-2 bg-background border border-border focus-within:border-accent focus-within:shadow-[0_0_15px_rgba(108,99,255,0.1)] rounded-2xl p-2 transition-all">
+              <button type="button" onClick={() => toast('File attachment coming soon', { icon: '📎' })} className="p-2 text-text-muted hover:text-text-primary transition-colors shrink-0 mb-1 rounded-lg hover:bg-surface">
+                <Paperclip size={20} />
+              </button>
+              
+              <textarea
+                ref={textareaRef}
+                value={input}
+                onChange={handleInput}
+                onKeyDown={handleKeyDown}
+                placeholder={isReady ? "Message ChatPlug..." : "Waiting for bot to be ready..."}
+                disabled={!isReady || botLoading || isStreaming}
+                className="flex-1 max-h-[120px] bg-transparent text-text-primary placeholder:text-text-muted/50 resize-none py-3 focus:outline-none text-sm"
+                rows={1}
+              />
+              
+              <button
+                type="submit"
+                disabled={!input.trim() || !isReady || botLoading || isStreaming}
+                className="w-10 h-10 rounded-xl flex items-center justify-center shrink-0 mb-0.5 transition-all text-white disabled:opacity-50 disabled:cursor-not-allowed shadow-md"
+                style={{ backgroundColor: accentColor }}
+              >
+                {(botLoading || isStreaming) ? <Loader2 size={18} className="animate-spin" /> : <Send size={18} className="-ml-0.5" />}
+              </button>
+            </form>
+            <div className="text-center mt-2">
+              <span className="text-[10px] font-medium text-text-muted">Enter to send, Shift+Enter for newline</span>
+            </div>
+          </div>
+        </div>
       </div>
+
+      {/* ─── RIGHT PANEL: Debug & Context ─── */}
+      <AnimatePresence>
+        {rightPanelOpen && (
+          <motion.div
+            initial={{ width: 0, opacity: 0 }}
+            animate={{ width: 280, opacity: 1 }}
+            exit={{ width: 0, opacity: 0 }}
+            className="bg-surface border-l border-border flex flex-col shrink-0 overflow-hidden lg:relative absolute right-0 inset-y-0 z-30 shadow-2xl lg:shadow-none"
+          >
+            <div className="p-4 border-b border-border flex items-center justify-between shrink-0">
+              <div className="flex items-center gap-2 text-text-primary font-bold">
+                <Terminal size={16} className="text-accent" /> Debug Info
+              </div>
+              <button onClick={() => setRightPanelOpen(false)} className="lg:hidden p-1 text-text-muted hover:text-text-primary">
+                <ChevronRight size={18} />
+              </button>
+            </div>
+            
+            <div className="p-4 flex-1 overflow-y-auto space-y-6">
+              
+              {/* Metrics */}
+              <div>
+                <p className="text-xs font-bold text-text-muted uppercase tracking-wider mb-3">Response Metrics</p>
+                <div className="grid grid-cols-2 gap-2">
+                  <div className="bg-background border border-border rounded-xl p-3">
+                    <p className="text-[10px] text-text-muted font-medium mb-1 flex items-center gap-1"><Database size={10}/> Tokens</p>
+                    <p className="font-mono text-sm font-bold text-text-primary">{mockMetrics.tokens}</p>
+                  </div>
+                  <div className="bg-background border border-border rounded-xl p-3">
+                    <p className="text-[10px] text-text-muted font-medium mb-1 flex items-center gap-1"><Clock size={10}/> Latency</p>
+                    <p className="font-mono text-sm font-bold text-text-primary">{mockMetrics.ms}ms</p>
+                  </div>
+                </div>
+              </div>
+
+              {/* Context Chunks */}
+              <div>
+                 <p className="text-xs font-bold text-text-muted uppercase tracking-wider mb-3">RAG Context Used</p>
+                 {messages.length <= 1 ? (
+                   <p className="text-xs text-text-muted italic bg-background p-3 rounded-xl border border-border">No queries made yet.</p>
+                 ) : (
+                   <div className="space-y-3">
+                     {mockMetrics.chunks.map((chunk, i) => (
+                       <div key={i} className="bg-background border border-border rounded-xl overflow-hidden">
+                         <div className="px-3 py-2 bg-surface-elevated border-b border-border flex items-center justify-between cursor-pointer">
+                           <span className="text-xs font-semibold text-text-primary truncate pr-2 flex items-center gap-1.5">
+                             <FileText size={12} className="text-accent" /> {chunk.file}
+                           </span>
+                           <ChevronDown size={14} className="text-text-muted" />
+                         </div>
+                         <div className="p-3">
+                           <div className="flex items-center gap-2 mb-2">
+                             <div className="flex-1 h-1 bg-surface-elevated rounded-full overflow-hidden">
+                               <div className="h-full bg-green-500" style={{ width: `${chunk.score * 100}%` }} />
+                             </div>
+                             <span className="text-[10px] font-bold text-text-muted">{(chunk.score * 100).toFixed(0)}% Match</span>
+                           </div>
+                           <p className="text-xs text-text-muted leading-relaxed line-clamp-3">"{chunk.text}"</p>
+                         </div>
+                       </div>
+                     ))}
+                   </div>
+                 )}
+              </div>
+              
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
     </div>
   )
 }
