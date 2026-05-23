@@ -211,17 +211,17 @@ export default function Playground() {
   const accentColor = chatbot?.settings?.accentColor || '#6C63FF'
 
   return (
-    <div className="h-screen bg-background text-text-primary font-inter flex overflow-hidden selection:bg-accent/30">
+    <div className="h-[100dvh] md:h-screen bg-background text-text-primary font-inter flex overflow-hidden selection:bg-accent/30 pb-[60px] md:pb-0">
 
       {/* ─── LEFT PANEL: Bot Selector ─── */}
       {/* Mobile: slide-in overlay; Desktop: always visible */}
       {leftSidebarOpen && (
         <div
-          className="fixed inset-0 bg-background/80 backdrop-blur-sm z-30 lg:hidden"
+          className="fixed inset-0 z-[30] bg-background/80 backdrop-blur-sm lg:hidden bottom-[60px] md:bottom-0"
           onClick={() => setLeftSidebarOpen(false)}
         />
       )}
-      <div className={`fixed lg:static inset-y-0 left-0 z-40 w-[260px] bg-surface border-r border-border flex flex-col shrink-0 transition-transform duration-300 ${
+      <div className={`fixed lg:static top-0 bottom-[60px] md:inset-y-0 left-0 z-[40] w-[260px] bg-surface border-r border-border flex flex-col shrink-0 transition-transform duration-300 ${
         leftSidebarOpen ? 'translate-x-0' : '-translate-x-full lg:translate-x-0'
       }`}>
         <div className="p-4 border-b border-border flex items-center gap-3">
@@ -439,7 +439,7 @@ export default function Playground() {
             initial={{ width: 0, opacity: 0 }}
             animate={{ width: 280, opacity: 1 }}
             exit={{ width: 0, opacity: 0 }}
-            className="bg-surface border-l border-border flex flex-col shrink-0 overflow-hidden lg:relative absolute right-0 inset-y-0 z-30 shadow-2xl lg:shadow-none"
+            className="bg-surface border-l border-border flex flex-col shrink-0 overflow-hidden lg:relative absolute right-0 top-0 bottom-[60px] md:bottom-0 lg:inset-y-0 z-[30] shadow-2xl lg:shadow-none"
           >
             <div className="p-4 border-b border-border flex items-center justify-between shrink-0">
               <div className="flex items-center gap-2 text-text-primary font-bold">

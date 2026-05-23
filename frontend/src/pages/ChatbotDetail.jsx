@@ -158,7 +158,7 @@ export default function ChatbotDetail() {
   }
 
   return (
-    <div className="min-h-screen bg-background text-text-primary font-inter flex flex-col selection:bg-accent/30 selection:text-text-primary overflow-x-hidden relative">
+    <div className="min-h-screen bg-background text-text-primary font-inter flex flex-col selection:bg-accent/30 selection:text-text-primary overflow-x-hidden relative pb-[60px] md:pb-0">
       {/* ─── NAV ─── */}
       <nav className="flex items-center justify-between px-4 sm:px-8 py-3 sm:py-4 border-b border-border bg-surface sticky top-0 z-40 shadow-sm">
         <div className="flex items-center gap-4">

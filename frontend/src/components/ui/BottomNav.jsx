@@ -20,7 +20,7 @@ export default function BottomNav() {
 
   return (
     <nav
-      className="fixed bottom-0 left-0 right-0 z-50 md:hidden"
+      className="fixed bottom-0 left-0 right-0 z-[100] md:hidden"
       style={{
         background: '#0f0f1a',
         borderTop: '1px solid #1e1e30',

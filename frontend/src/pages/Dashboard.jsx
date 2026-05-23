@@ -436,7 +436,7 @@ export default function Dashboard() {
       {/* ─── CREATE MODAL ─── */}
       <AnimatePresence>
         {showModal && (
-          <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center p-0 sm:p-4">
+          <div className="fixed inset-0 z-[50] flex items-end sm:items-center justify-center p-0 sm:p-4">
             <motion.div
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
@@ -448,7 +448,7 @@ export default function Dashboard() {
               initial={{ scale: 0.95, opacity: 0, y: 40 }}
               animate={{ scale: 1, opacity: 1, y: 0 }}
               exit={{ scale: 0.95, opacity: 0, y: 40 }}
-              className="relative w-full sm:max-w-md bg-surface border border-border rounded-t-3xl sm:rounded-3xl p-6 sm:p-8 shadow-2xl"
+              className="relative z-[51] w-full sm:max-w-md bg-surface border border-border rounded-t-3xl sm:rounded-3xl p-6 sm:p-8 shadow-2xl max-h-[calc(100dvh-60px)] sm:max-h-[90vh] overflow-y-auto mb-[60px] sm:mb-0"
             >
               {/* Drag handle for mobile */}
               <div className="sm:hidden w-10 h-1 bg-border rounded-full mx-auto mb-6" />
