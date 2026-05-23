@@ -8,6 +8,7 @@ import {
 } from 'lucide-react'
 import { useAuthStore } from '../store/authStore'
 import toast from 'react-hot-toast'
+import api from '../utils/api'
 
 const TABS = [
   { id: 'profile',       label: 'Profile',       icon: User },
@@ -219,12 +220,47 @@ function APIKeysTab() {
   )
 }
 
-function BillingTab() {
+function BillingTab({ user, setUser }) {
   const plans = [
-    { name: 'Free', price: '$0', period: '/mo', features: ['3 Chatbots', '50 queries/day', 'Standard support'], current: true, color: 'border-border' },
-    { name: 'Pro',  price: '$49', period: '/mo', features: ['20 Chatbots', '2000 queries/day', 'Priority support', 'Remove branding'], current: false, color: 'border-accent', highlight: true },
-    { name: 'Enterprise', price: 'Custom', period: '', features: ['Unlimited chatbots', 'Custom volume', '24/7 support', 'Dedicated manager'], current: false, color: 'border-border' },
+    { name: 'Free', price: '$0', period: '/mo', features: ['3 Chatbots', '50 queries/day', 'Standard support'], current: user?.plan?.type === 'free', color: 'border-border' },
+    { name: 'Pro',  price: '$49', period: '/mo', features: ['20 Chatbots', '2000 queries/day', 'Priority support', 'Remove branding'], current: user?.plan?.type === 'pro', color: 'border-accent', highlight: true },
+    { name: 'Enterprise', price: 'Custom', period: '', features: ['Unlimited chatbots', 'Custom volume', '24/7 support', 'Dedicated manager'], current: user?.plan?.type === 'enterprise', color: 'border-border' },
   ]
+
+  const handleUpgrade = async () => {
+    try {
+      const { data } = await api.post('/payment/create-order', { plan: 'pro' });
+      
+      const options = {
+        key: import.meta.env.VITE_RAZORPAY_KEY_ID,
+        amount: data.amount,
+        currency: 'INR',
+        name: 'ChatPlug',
+        description: 'Pro Plan',
+        order_id: data.id,
+        handler: async (response) => {
+          try {
+            const verify = await api.post('/payment/verify', response);
+            if (verify.data.success) {
+              toast.success('Upgraded to Pro!');
+              const updatedUser = { ...user, plan: { type: 'pro' } };
+              setUser(updatedUser);
+              localStorage.setItem('user', JSON.stringify(updatedUser));
+            }
+          } catch (err) {
+            toast.error('Payment verification failed');
+          }
+        },
+        prefill: { name: user?.name, email: user?.email },
+        theme: { color: '#7c3aed' }
+      };
+      
+      const rzp = new window.Razorpay(options);
+      rzp.open();
+    } catch (err) {
+      toast.error('Failed to initiate payment');
+    }
+  };
 
   return (
     <div className="space-y-6">
@@ -284,8 +320,7 @@ function BillingTab() {
               onClick={() => {
                 if (plan.current) toast('You are already on this plan', { icon: '✅' })
                 else if (plan.name === 'Enterprise') toast('Contact sales coming soon', { icon: '📞' })
-                else toast('Plan upgrade coming soon', { icon: '⚡' })
-                // Auth to be implemented later
+                else handleUpgrade()
               }}
               className={`w-full py-2.5 rounded-xl text-sm font-semibold transition-colors ${
                 plan.current
@@ -308,14 +343,14 @@ export default function Settings() {
   const [searchParams] = useSearchParams()
   const defaultTab     = searchParams.get('tab') || 'profile'
   const [activeTab, setActiveTab] = useState(TABS.find(t => t.id === defaultTab)?.id || 'profile')
-  const { user } = useAuthStore()
+  const { user, setUser } = useAuthStore()
   const navigate   = useNavigate()
 
   const ActiveComp = {
     profile:       <ProfileTab user={user} />,
     notifications: <NotificationsTab />,
     api:           <APIKeysTab />,
-    billing:       <BillingTab />,
+    billing:       <BillingTab user={user} setUser={setUser} />,
   }[activeTab]
 
   return (

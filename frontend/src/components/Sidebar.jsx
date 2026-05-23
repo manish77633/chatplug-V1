@@ -31,7 +31,7 @@ export default function Sidebar({ isOpen, onClose }) {
 
   return (
     <>
-      <aside className={`fixed lg:static inset-y-0 left-0 z-40 w-64 bg-[#0d0d1a] border-r border-[#1a1a2e] transform transition-transform duration-300 ease-in-out ${isOpen ? 'translate-x-0' : '-translate-x-full lg:translate-x-0'} flex flex-col h-screen`}>
+      <aside className={`fixed lg:static inset-y-0 left-0 z-[110] w-64 bg-[#0d0d1a] border-r border-[#1a1a2e] transform transition-transform duration-300 ease-in-out ${isOpen ? 'translate-x-0' : '-translate-x-full lg:translate-x-0'} flex flex-col h-screen`}>
         {/* User Profile */}
         <div className="p-5 flex items-center gap-3 border-b border-[#1a1a2e]">
           <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-accent to-accent-secondary flex items-center justify-center text-white font-bold text-base shadow-lg shrink-0">
@@ -104,7 +104,7 @@ export default function Sidebar({ isOpen, onClose }) {
       
       {/* Overlay for mobile sidebar */}
       {isOpen && (
-        <div className="fixed inset-0 bg-background/80 backdrop-blur-sm z-30 lg:hidden" onClick={onClose} />
+        <div className="fixed inset-0 bg-background/80 backdrop-blur-sm z-[100] lg:hidden" onClick={onClose} />
       )}
     </>
   )

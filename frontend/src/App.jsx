@@ -17,6 +17,7 @@ import DocsGuides    from './pages/DocsGuides'
 import Settings      from './pages/Settings'
 import Profile       from './pages/Profile'
 import AdminPanel    from './pages/AdminPanel'
+import AuthCallback  from './pages/AuthCallback'
 import BottomNav     from './components/ui/BottomNav'
 import Layout        from './components/Layout'
 
@@ -45,23 +46,28 @@ export default function App() {
         <Route path="/"            element={<Landing />} />
         <Route path="/login"       element={<Login />} />
         <Route path="/register"    element={<Register />} />
+        <Route path="/auth/callback" element={<AuthCallback />} />
 
         {/* Protected */}
-        <Route path="/docs"                           element={<Protected><Layout><Docs /></Layout></Protected>} />
-        <Route path="/docs/api"                       element={<Protected><Layout><DocsApi /></Layout></Protected>} />
-        <Route path="/docs/guides"                    element={<Protected><Layout><DocsGuides /></Layout></Protected>} />
-        
-        <Route path="/dashboard"                      element={<Protected><Layout><Dashboard /></Layout></Protected>} />
-        <Route path="/chatbots"                       element={<Protected><Layout><Dashboard /></Layout></Protected>} />
-        <Route path="/settings"                       element={<Protected><Layout><Settings /></Layout></Protected>} />
-        <Route path="/profile"                        element={<Protected><Layout><Profile /></Layout></Protected>} />
-        <Route path="/chatbot/:id"                    element={<Protected><Layout><ChatbotDetail /></Layout></Protected>} />
-        <Route path="/chatbot/:id/playground"         element={<Protected><Layout><Playground /></Layout></Protected>} />
-        <Route path="/chatbot/:id/analytics"          element={<Protected><Layout><Analytics /></Layout></Protected>} />
-        <Route path="/analytics"                      element={<Protected><Layout><Analytics /></Layout></Protected>} />
+        <Route element={<Protected><Layout /></Protected>}>
+          <Route path="/docs"                           element={<Docs />} />
+          <Route path="/docs/api"                       element={<DocsApi />} />
+          <Route path="/docs/guides"                    element={<DocsGuides />} />
+          
+          <Route path="/dashboard"                      element={<Dashboard />} />
+          <Route path="/chatbots"                       element={<Dashboard />} />
+          <Route path="/settings"                       element={<Settings />} />
+          <Route path="/profile"                        element={<Profile />} />
+          <Route path="/chatbot/:id"                    element={<ChatbotDetail />} />
+          <Route path="/chatbot/:id/playground"         element={<Playground />} />
+          <Route path="/chatbot/:id/analytics"          element={<Analytics />} />
+          <Route path="/analytics"                      element={<Analytics />} />
+        </Route>
 
         {/* Admin */}
-        <Route path="/admin" element={<Protected><AdminRoute><Layout><AdminPanel /></Layout></AdminRoute></Protected>} />
+        <Route element={<Protected><AdminRoute><Layout /></AdminRoute></Protected>}>
+          <Route path="/admin" element={<AdminPanel />} />
+        </Route>
 
         <Route path="*" element={<Navigate to="/" replace />} />
       </Routes>

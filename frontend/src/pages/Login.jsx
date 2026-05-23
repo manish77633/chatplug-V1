@@ -206,7 +206,7 @@ export default function Login() {
           </div>
 
           {/* OAuth */}
-          <button type="button" onClick={() => toast('Coming soon', { icon: '🚧' })} className="w-full py-3.5 bg-background hover:bg-surface-elevated border border-border rounded-xl flex items-center justify-center gap-3 transition-colors text-sm font-medium text-text-primary active:scale-[0.98]">
+          <button type="button" onClick={() => window.location.href = 'http://localhost:5000/api/auth/google'} className="w-full py-3.5 bg-background hover:bg-surface-elevated border border-border rounded-xl flex items-center justify-center gap-3 transition-colors text-sm font-medium text-text-primary active:scale-[0.98]">
             <GoogleIcon />
             Google
           </button>

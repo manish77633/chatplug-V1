@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { Link, useNavigate } from 'react-router-dom'
+import { Link, useNavigate, Outlet } from 'react-router-dom'
 import { Menu, Zap, Bell, LogOut } from 'lucide-react'
 import Sidebar from './Sidebar'
 import { useAuthStore } from '../store/authStore'
@@ -46,7 +46,7 @@ export default function Layout({ children }) {
 
         {/* Main Content Area */}
         <div className="flex-1 overflow-y-auto pb-[72px] md:pb-0 relative">
-          {children}
+          {children || <Outlet />}
         </div>
       </div>
     </div>

@@ -67,7 +67,21 @@ export default function Dashboard() {
       toast.success('Chatbot created! 🎉')
       navigate(`/chatbot/${data.chatbot._id}`)
     } catch (err) {
-      toast.error(err.response?.data?.message || 'Failed to create')
+      if (err.response?.status === 403) {
+        toast((t) => (
+          <div className="flex flex-col gap-2">
+            <span className="text-sm font-medium">{err.response?.data?.message || 'Plan limit reached'}</span>
+            <button 
+              onClick={() => { toast.dismiss(t.id); navigate('/settings?tab=billing'); }}
+              className="px-3 py-1.5 bg-accent text-white text-xs font-bold rounded-lg self-start"
+            >
+              Upgrade to Pro
+            </button>
+          </div>
+        ), { duration: 5000 });
+      } else {
+        toast.error(err.response?.data?.message || 'Failed to create')
+      }
     } finally { setCreating(false) }
   }
 

@@ -6,6 +6,8 @@ const helmet = require('helmet');
 const morgan = require('morgan');
 
 const app = express();
+const passport = require('passport');
+require('./config/passport');
 
 // ─── Middleware ───────────────────────────────────────────────────────────────
 app.use(helmet());
@@ -13,6 +15,7 @@ app.use(cors({
   origin: true, // Allow all origins to support external widget embeds
   credentials: true,
 }));
+app.use(passport.initialize());
 app.use(morgan(process.env.NODE_ENV === 'production' ? 'combined' : 'dev'));
 app.use(express.json({ limit: '50mb' }));
 app.use(express.urlencoded({ extended: true }));
@@ -29,6 +32,7 @@ app.use('/api/chat',      require('./routes/chat'));
 app.use('/api/admin',     require('./routes/admin'));
 app.use('/api/webhooks',  require('./routes/webhooks'));
 app.use('/api/analytics', require('./routes/analytics'));
+app.use('/api/payment',   require('./routes/payment'));
 
 // ─── Embed Script (Vanilla JS - ultra light) ──────────────────────────────────
 app.get('/embed/:botId/widget.js', require('./controllers/embedController').serveWidget);

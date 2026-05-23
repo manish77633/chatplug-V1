@@ -5,6 +5,15 @@ const { deleteNamespace } = require('../services/embeddingService');
 exports.create = async (req, res, next) => {
   try {
     const { name, description } = req.body;
+    
+    // Enforce limits
+    const currentCount = await Chatbot.countDocuments({ owner: req.user._id });
+    const limit = req.user.limits?.maxChatbots || 3;
+    
+    if (currentCount >= limit) {
+      return res.status(403).json({ success: false, message: 'Upgrade to Pro to create more chatbots' });
+    }
+
     const chatbot = await Chatbot.create({ owner: req.user._id, name, description });
     res.status(201).json({ success: true, chatbot });
   } catch (err) { next(err); }
