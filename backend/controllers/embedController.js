@@ -45,8 +45,10 @@ exports.serveWidget = async (req, res, next) => {
     ".eiq-msg{max-width:80%;padding:10px 14px;border-radius:12px;font-size:14px;line-height:1.5;}",
     ".eiq-user{background:" + CFG.primaryColor + ";color:#fff;align-self:flex-end;border-bottom-right-radius:4px;}",
     ".eiq-bot{background:#f3f4f6;color:#111;align-self:flex-start;border-bottom-left-radius:4px;}",
-    "#eiq-input-row{display:flex;padding:10px;border-top:1px solid #e5e7eb;gap:8px;}",
-    "#eiq-input{flex:1;border:1px solid #e5e7eb;border-radius:8px;padding:8px 12px;font-size:14px;outline:none;}",
+    "#eiq-input-row{display:flex;padding:10px;border-top:1px solid #e5e7eb;gap:8px;isolation:isolate;}",
+    "#eiq-input{flex:1;border:1px solid #e5e7eb;border-radius:8px;padding:8px 12px;font-size:14px;outline:none;color:#111!important;background:#fff!important;-webkit-text-fill-color:#111!important;}",
+    "#eiq-input::placeholder{color:#9ca3af!important;opacity:1!important;}",
+    "#eiq-input::-webkit-input-placeholder{color:#9ca3af!important;}",
     "#eiq-send{background:" + CFG.primaryColor + ";color:#fff;border:none;border-radius:8px;padding:8px 14px;cursor:pointer;font-size:14px;}",
   ].join("");
   document.head.appendChild(style);
