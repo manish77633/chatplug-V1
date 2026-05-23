@@ -10,6 +10,7 @@ import { useAuthStore } from '../store/authStore'
 import api from '../utils/api'
 import toast from 'react-hot-toast'
 import FAB from '../components/ui/FAB'
+import useDashboardStore from '../store/dashboardStore'
 
 // CountUp component for animating numbers
 function CountUp({ end }) {
@@ -33,27 +34,17 @@ function CountUp({ end }) {
 
 export default function Dashboard() {
   const { user, logout } = useAuthStore()
+  const token = useAuthStore(s => s.token) || localStorage.getItem('token')
   const navigate = useNavigate()
-  const [chatbots, setChatbots] = useState([])
-  const [loading, setLoading] = useState(true)
+  const { chatbots, isLoading: loading, fetchDashboard, invalidate } = useDashboardStore()
   const [creating, setCreating] = useState(false)
   const [newName, setNewName] = useState('')
   const [newNameError, setNewNameError] = useState('')
   const [showModal, setShowModal] = useState(false)
 
   useEffect(() => {
-    setChatbots([]);
-    setLoading(true);
-    fetchChatbots();
+    fetchDashboard(token)
   }, [user?._id])
-
-  const fetchChatbots = async () => {
-    try {
-      const { data } = await api.get('/chatbots')
-      setChatbots(data.chatbots)
-    } catch { toast.error('Failed to load chatbots') }
-    finally { setLoading(false) }
-  }
 
   const createChatbot = async (e) => {
     e.preventDefault()
@@ -65,7 +56,8 @@ export default function Dashboard() {
     setCreating(true)
     try {
       const { data } = await api.post('/chatbots', { name: newName, description: '' })
-      setChatbots(p => [data.chatbot, ...p])
+      invalidate()
+      fetchDashboard(token, true)
       setNewName('')
       setShowModal(false)
       toast.success('Chatbot created! 🎉')
@@ -94,7 +86,8 @@ export default function Dashboard() {
     e.stopPropagation()
     try {
       await api.delete(`/chatbots/${id}`)
-      setChatbots(p => p.filter(c => c._id !== id))
+      invalidate()
+      fetchDashboard(token, true)
       toast.success('Chatbot deleted')
     } catch { toast.error('Delete failed') }
   }
