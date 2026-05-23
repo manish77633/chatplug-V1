@@ -79,9 +79,9 @@ export default function Navbar({ isAuthenticated }) {
             </>
           ) : (
             <>
-              <span className="text-sm text-text-muted">{user?.email}</span>
-              <button onClick={handleLogout} className="text-text-muted hover:text-danger transition-colors p-2 rounded-xl">
-                <LogOut size={18} />
+              <Link to="/dashboard" className="text-sm text-text-primary hover:text-accent transition-colors font-medium">Dashboard</Link>
+              <button onClick={handleLogout} className="text-sm text-text-muted hover:text-danger transition-colors font-medium ml-2 border border-border px-3 py-1.5 rounded-lg hover:bg-red-500/10">
+                Logout
               </button>
             </>
           )}
@@ -107,9 +107,9 @@ export default function Navbar({ isAuthenticated }) {
               </>
             ) : (
               <>
-                <div className="text-sm text-text-muted mb-2">{user?.email}</div>
-                <button onClick={() => { handleLogout(); setMobileOpen(false) }} className="w-full text-left text-sm text-danger p-2 rounded-lg transition-colors">
-                  Sign out
+                <Link to="/dashboard" onClick={() => setMobileOpen(false)} className="block w-full text-center py-2 bg-surface-elevated rounded-lg text-text-primary font-semibold mb-2">Dashboard</Link>
+                <button onClick={() => { handleLogout(); setMobileOpen(false) }} className="w-full text-center text-sm text-danger py-2 bg-red-500/10 rounded-lg transition-colors font-medium">
+                  Logout
                 </button>
               </>
             )}

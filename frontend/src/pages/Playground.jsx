@@ -59,29 +59,7 @@ export default function Playground() {
   const abortRef = useRef(null)
   const textareaRef = useRef(null)
 
-  // Load History on Mount
-  useEffect(() => {
-    try {
-      const stored = localStorage.getItem(storageKey)
-      if (stored) {
-        const parsed = JSON.parse(stored)
-        setSessions(parsed)
-        if (parsed.length > 0) {
-          setCurrentSessionId(parsed[0].id)
-          setMessages(parsed[0].messages || [])
-        } else {
-          startNewSession()
-        }
-      } else {
-        startNewSession()
-      }
-    } catch {
-      startNewSession()
-    }
-    setHasLoadedHistory(true)
-  }, [storageKey])
-
-  // Save History to LocalStorage
+  // Update History Local State (Backend saves it automatically during chat)
   useEffect(() => {
     if (!hasLoadedHistory || !currentSessionId) return
     setSessions(prev => {
@@ -89,7 +67,6 @@ export default function Playground() {
       const existingIdx = updated.findIndex(s => s.id === currentSessionId)
       
       if (existingIdx >= 0) {
-        // Only update if there are messages, otherwise it's an empty session we might want to keep at top
         updated[existingIdx] = {
           ...updated[existingIdx],
           messages,
@@ -102,16 +79,9 @@ export default function Playground() {
           updatedAt: Date.now()
         })
       }
-      
-      // Auto-delete oldest if > 20
-      if (updated.length > 20) {
-        updated = updated.slice(0, 20)
-      }
-
-      localStorage.setItem(storageKey, JSON.stringify(updated))
       return updated
     })
-  }, [messages, currentSessionId, hasLoadedHistory, storageKey])
+  }, [messages, currentSessionId, hasLoadedHistory])
 
   const startNewSession = () => {
     const newId = `session_${Date.now()}`
@@ -129,26 +99,35 @@ export default function Playground() {
     }
   }
 
-  const deleteSession = (e, sessionId) => {
+  const deleteSession = async (e, sessionId) => {
     e.stopPropagation()
-    const updated = sessions.filter(s => s.id !== sessionId)
-    setSessions(updated)
-    localStorage.setItem(storageKey, JSON.stringify(updated))
-    if (currentSessionId === sessionId) {
-      if (updated.length > 0) {
-        loadSession(updated[0].id)
-      } else {
-        startNewSession()
+    try {
+      await api.delete(`/analytics/sessions/${sessionId}`)
+      const updated = sessions.filter(s => s.id !== sessionId)
+      setSessions(updated)
+      if (currentSessionId === sessionId) {
+        if (updated.length > 0) {
+          loadSession(updated[0].id)
+        } else {
+          startNewSession()
+        }
       }
+      toast.success('Session deleted')
+    } catch {
+      toast.error('Failed to delete session')
     }
   }
 
-  const clearHistory = () => {
+  const clearHistory = async () => {
     if (window.confirm('Are you sure you want to clear all chat history for this bot?')) {
-      localStorage.removeItem(storageKey)
-      setSessions([])
-      startNewSession()
-      toast.success('Chat history cleared')
+      try {
+        await api.delete(`/analytics/chatbot/${id}/sessions`)
+        setSessions([])
+        startNewSession()
+        toast.success('Chat history cleared')
+      } catch {
+        toast.error('Failed to clear history')
+      }
     }
   }
 
@@ -174,12 +153,34 @@ export default function Playground() {
       const currentBotRes = await api.get(`/chatbots/${id}`)
       setChatbot(currentBotRes.data.chatbot)
       
-      setMessages([])
+      // Load History from DB
+      try {
+        const histRes = await api.get(`/analytics/chatbot/${id}/sessions?limit=50`)
+        if (histRes.data.success) {
+          const sortedSessions = histRes.data.sessions.map(s => ({
+            id: s.sessionId,
+            messages: s.messages,
+            updatedAt: s.updatedAt || s.createdAt
+          }))
+          setSessions(sortedSessions)
+          if (sortedSessions.length > 0) {
+            setCurrentSessionId(sortedSessions[0].id)
+            setMessages(sortedSessions[0].messages || [])
+          } else {
+            startNewSession()
+          }
+        }
+      } catch (e) {
+        console.error('Failed to load history', e)
+        startNewSession()
+      }
+      
       setError(null)
     } catch {
       setError('Failed to load playground data')
     } finally {
       setPageLoading(false)
+      setHasLoadedHistory(true)
     }
   }, [id])
 

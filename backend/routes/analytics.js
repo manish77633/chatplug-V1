@@ -37,4 +37,23 @@ router.get('/sessions/:sessionId', async (req, res, next) => {
   } catch (err) { next(err); }
 });
 
+// Delete a specific session
+router.delete('/sessions/:sessionId', async (req, res, next) => {
+  try {
+    const session = await ChatSession.findOneAndDelete({ sessionId: req.params.sessionId });
+    if (!session) return res.status(404).json({ success: false, message: 'Session not found' });
+    res.json({ success: true });
+  } catch (err) { next(err); }
+});
+
+// Delete all sessions for a chatbot
+router.delete('/chatbot/:chatbotId/sessions', async (req, res, next) => {
+  try {
+    const chatbot = await Chatbot.findOne({ _id: req.params.chatbotId, owner: req.user._id });
+    if (!chatbot) return res.status(404).json({ success: false, message: 'Not found' });
+    await ChatSession.deleteMany({ chatbot: chatbot._id });
+    res.json({ success: true });
+  } catch (err) { next(err); }
+});
+
 module.exports = router;

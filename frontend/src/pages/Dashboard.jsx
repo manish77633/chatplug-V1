@@ -275,7 +275,7 @@ export default function Dashboard() {
           </button>
           <div className="flex items-center gap-2">
             <Zap size={18} className="text-accent" />
-            <span className="font-bold tracking-tight gradient-text">ChatPlug</span>
+            <Link to="/" className="font-bold tracking-tight gradient-text">ChatPlug</Link>
           </div>
           <div className="flex items-center gap-2">
             <button className="p-2 text-text-muted hover:text-text-primary rounded-xl hover:bg-surface-elevated transition-colors min-w-[36px] min-h-[36px] flex items-center justify-center">

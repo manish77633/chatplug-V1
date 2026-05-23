@@ -9,6 +9,7 @@ import {
   Github, Twitter, Linkedin
 } from 'lucide-react'
 import Navbar from '../components/ui/Navbar'
+import { useAuthStore } from '../store/authStore'
 
 const features = [
   {
@@ -96,10 +97,11 @@ const itemVariants = {
 
 export default function Landing() {
   const heroRef = useRef(null)
+  const token = useAuthStore(s => s.token) || localStorage.getItem('token')
 
   return (
     <div className="min-h-screen bg-background text-text-primary selection:bg-accent/30 selection:text-text-primary">
-      <Navbar isAuthenticated={false} />
+      <Navbar isAuthenticated={!!token} />
 
       {/* ─── Hero ─── */}
       <section ref={heroRef} className="relative min-h-screen flex items-center justify-center pt-24 pb-16 px-4 overflow-hidden noise-bg">
@@ -148,18 +150,18 @@ export default function Landing() {
               </p>
             </motion.div>
 
-            <motion.div variants={itemVariants} className="flex flex-row gap-3 flex-wrap justify-center lg:justify-start mt-6 mb-8">
-              <Link to="/register">
-                <button className="px-8 py-4 bg-accent hover:bg-accent/90 text-white rounded-xl font-medium transition-all shadow-lg hover:shadow-accent/25 hover:-translate-y-0.5 flex items-center gap-2 whitespace-nowrap">
-                  Start for Free <ArrowRight size={18} />
+            <motion.div variants={itemVariants} className="flex flex-row gap-3 justify-center lg:justify-start mt-6 mb-8 w-full">
+              <Link to="/register" className="flex-1 sm:flex-none">
+                <button className="w-full px-4 sm:px-8 py-3 sm:py-4 bg-accent hover:bg-accent/90 text-white rounded-xl text-sm sm:text-base font-medium transition-all shadow-lg hover:shadow-accent/25 hover:-translate-y-0.5 flex items-center justify-center gap-1.5 sm:gap-2 whitespace-nowrap">
+                  Start Free <ArrowRight size={16} className="sm:w-[18px] sm:h-[18px]" />
                 </button>
               </Link>
               <button
                 onClick={() => document.getElementById('features')?.scrollIntoView({ behavior: 'smooth' })}
-                className="px-8 py-4 bg-surface-elevated hover:bg-surface-elevated/80 text-text-primary border border-border rounded-xl font-medium transition-all flex items-center gap-2 hover:-translate-y-0.5 whitespace-nowrap"
+                className="flex-1 sm:flex-none px-4 sm:px-8 py-3 sm:py-4 bg-surface-elevated hover:bg-surface-elevated/80 text-text-primary border border-border rounded-xl text-sm sm:text-base font-medium transition-all flex items-center justify-center gap-1.5 sm:gap-2 hover:-translate-y-0.5 whitespace-nowrap"
               >
-                <Play size={18} className="text-accent" />
-                See Features
+                <Play size={16} className="text-accent sm:w-[18px] sm:h-[18px]" />
+                Features
               </button>
             </motion.div>
 

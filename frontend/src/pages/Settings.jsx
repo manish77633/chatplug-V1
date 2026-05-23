@@ -322,7 +322,7 @@ export default function Settings() {
     <div className="min-h-screen bg-background text-text-primary font-inter selection:bg-accent/30 pb-24 md:pb-8">
       {/* Header */}
       <div className="border-b border-border bg-surface/80 backdrop-blur-md sticky top-0 z-40">
-        <div className="w-full px-4 md:max-w-2xl md:mx-auto py-3 flex items-center gap-3">
+        <div className="w-full px-4 lg:max-w-5xl lg:mx-auto py-3 flex items-center gap-3">
           <button
             id="settings-back"
             onClick={() => navigate('/dashboard')}
@@ -370,8 +370,8 @@ export default function Settings() {
         </div>
       </div>
 
-      <div className="w-full px-4 py-6 md:max-w-2xl md:mx-auto">
-        <div className="flex flex-col lg:flex-row gap-6">
+      <div className="w-full px-4 py-6 lg:max-w-5xl lg:mx-auto">
+        <div className="flex flex-col lg:flex-row gap-8">
           {/* Tab Sidebar — desktop only */}
           <aside className="hidden lg:block lg:w-52 shrink-0">
             <div className="flex flex-col gap-1">
