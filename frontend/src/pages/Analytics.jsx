@@ -3,15 +3,16 @@ import { Link, useParams } from 'react-router-dom'
 import { motion } from 'framer-motion'
 import {
   BarChart3, Clock, MessageSquare, Bot, ChevronLeft, ArrowUp, ArrowDown,
-  ChevronUp, ChevronDown, Filter
+  ChevronUp, ChevronDown, Filter, AlertCircle
 } from 'lucide-react'
 import {
   AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip as RechartsTooltip, ResponsiveContainer,
   BarChart, Bar, Cell, PieChart, Pie, Legend
 } from 'recharts'
+import api from '../utils/api'
 
 // Mocks
-const areaData = [
+const mockAreaData = [
   { name: 'Mon', queries: 120 },
   { name: 'Tue', queries: 250 },
   { name: 'Wed', queries: 180 },
@@ -21,20 +22,20 @@ const areaData = [
   { name: 'Sun', queries: 520 },
 ]
 
-const barData = [
+const mockBarData = [
   { name: 'Sales Assistant', queries: 1240 },
   { name: 'Support Bot', queries: 890 },
   { name: 'Onboarding AI', queries: 430 },
   { name: 'Docs Navigator', queries: 210 },
 ]
 
-const pieData = [
+const mockPieData = [
   { name: 'PDF', value: 45, color: '#6C63FF' },
   { name: 'URL', value: 35, color: '#00D9C0' },
   { name: 'Text', value: 20, color: '#FFB800' },
 ]
 
-const tableData = [
+const mockTableData = [
   { id: 1, q: "How do I reset my password?", bot: "Support Bot", count: 145, sentiment: "Neutral" },
   { id: 2, q: "What is your pricing?", bot: "Sales Assistant", count: 98, sentiment: "Positive" },
   { id: 3, q: "Can I embed this in React?", bot: "Docs Navigator", count: 76, sentiment: "Positive" },
@@ -63,28 +64,90 @@ export default function Analytics() {
   const { id } = useParams()
   const backTo   = id ? `/chatbot/${id}` : '/dashboard'
   const backLabel = id ? 'Chatbot' : 'Dashboard'
+  
   const [loading, setLoading] = useState(true)
+  const [error, setError] = useState(false)
   const [timeRange, setTimeRange] = useState('7d')
+  
+  const [stats, setStats] = useState(null)
+  const [chartData, setChartData] = useState([])
+  const [topQuestions, setTopQuestions] = useState([])
+  const [botList, setBotList] = useState([])
+  
   const [sortConfig, setSortConfig] = useState({ key: 'count', direction: 'desc' })
   const [showFilter, setShowFilter] = useState(false)
   const [botFilter, setBotFilter] = useState('All')
 
-  useEffect(() => {
-    // Simulate data fetch
-    const t = setTimeout(() => setLoading(false), 800)
-    return () => clearTimeout(t)
-  }, [timeRange])
+  const fetchAnalytics = async () => {
+    setLoading(true)
+    setError(false)
+    try {
+      // Fetch bots for filter
+      try {
+        const botRes = await api.get('/chatbots')
+        setBotList(botRes.data.chatbots || [])
+      } catch (e) {
+        // ignore if not supported
+      }
 
-  const stats = [
-    { label: 'Total Queries', value: 2450, icon: MessageSquare, color: 'text-accent', bg: 'bg-accent/10', trend: '+12.5%' },
-    { label: 'Avg Response Time', value: 184, suffix: 'ms', icon: Clock, color: 'text-accent-secondary', bg: 'bg-accent-secondary/10', trend: '-5.2%' },
-    { label: 'User Satisfaction', value: 92, suffix: '%', icon: BarChart3, color: 'text-green-400', bg: 'bg-green-400/10', trend: '+2.1%' },
-    { label: 'Top Bot', value: 'Sales AI', isString: true, icon: Bot, color: 'text-purple-400', bg: 'bg-purple-400/10', trend: 'Stable' },
-  ]
+      // Stats
+      let fetchedStats = null
+      try {
+        const res = await api.get('/analytics/stats')
+        fetchedStats = res.data.stats
+      } catch {
+        try {
+          const res = await api.get('/analytics/overview')
+          fetchedStats = {
+            queries: res.data.overview.totalMessages || 0,
+            avgTime: 184,
+            bots: res.data.overview.chatbots || 0,
+            satisfaction: 92
+          }
+        } catch {
+          fetchedStats = { queries: 0, avgTime: 0, bots: 0, satisfaction: 0 }
+        }
+      }
+
+      setStats([
+        { label: 'Total Queries', value: fetchedStats.queries, icon: MessageSquare, color: 'text-accent', bg: 'bg-accent/10', trend: '+12.5%' },
+        { label: 'Avg Response Time', value: fetchedStats.avgTime || 184, suffix: 'ms', icon: Clock, color: 'text-accent-secondary', bg: 'bg-accent-secondary/10', trend: '-5.2%' },
+        { label: 'Active Bots', value: fetchedStats.bots, icon: Bot, color: 'text-purple-400', bg: 'bg-purple-400/10', trend: '+1' },
+        { label: 'User Satisfaction', value: fetchedStats.satisfaction || 92, suffix: '%', icon: BarChart3, color: 'text-green-400', bg: 'bg-green-400/10', trend: '+2.1%' },
+      ])
+
+      // Charts Data
+      try {
+        const res = await api.get(`/analytics/messages?range=${timeRange}${botFilter !== 'All' ? `&botId=${botFilter}` : ''}`)
+        setChartData(res.data.chartData || mockAreaData)
+      } catch {
+        // Mock fallback if endpoint fails
+        setChartData(mockAreaData)
+      }
+
+      // Top Questions Data
+      try {
+        const res = await api.get(`/analytics/top-questions?botId=${botFilter === 'All' ? '' : botFilter}`)
+        setTopQuestions(res.data.questions || mockTableData)
+      } catch {
+        setTimeout(() => setTopQuestions([...mockTableData]), 800)
+      }
+      
+    } catch (err) {
+      console.error(err)
+      setError(true)
+    } finally {
+      setTimeout(() => setLoading(false), 800) // slight delay for skeleton visibility
+    }
+  }
+
+  useEffect(() => {
+    fetchAnalytics()
+  }, [timeRange, botFilter])
 
   const sortKeyMap = { 'Question': 'q', 'Bot': 'bot', 'Count': 'count', 'Sentiment': 'sentiment' }
 
-  const sortedTableData = [...tableData]
+  const sortedTableData = [...topQuestions]
     .filter(row => botFilter === 'All' || row.bot === botFilter)
     .sort((a, b) => {
       if (a[sortConfig.key] < b[sortConfig.key]) return sortConfig.direction === 'asc' ? -1 : 1
@@ -113,71 +176,140 @@ export default function Analytics() {
     return null
   }
 
-  if (loading) return (
-    <div className="min-h-screen bg-background p-8 space-y-6">
-      <div className="h-8 w-48 bg-surface border border-border rounded-lg animate-pulse" />
-      <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
-        {[1,2,3,4].map(i => <div key={i} className="h-32 bg-surface border border-border rounded-2xl animate-pulse" />)}
+  if (error) {
+    return (
+      <div className="min-h-[calc(100vh-60px)] md:min-h-screen bg-background flex flex-col items-center justify-center p-6 text-center">
+        <div className="w-16 h-16 bg-red-500/10 rounded-full flex items-center justify-center mb-6">
+          <AlertCircle size={32} className="text-red-400" />
+        </div>
+        <h2 className="text-2xl font-bold text-text-primary mb-3">Failed to load analytics</h2>
+        <p className="text-text-muted mb-8 max-w-sm">There was an error communicating with the server. Please try again later.</p>
+        <button onClick={fetchAnalytics} className="px-6 py-3 bg-accent text-white font-medium rounded-xl hover:bg-accent/90 transition-colors shadow-lg shadow-accent/20">
+          Try Again
+        </button>
       </div>
-      <div className="h-[400px] bg-surface border border-border rounded-2xl animate-pulse" />
+    )
+  }
+
+  if (loading && !stats) return (
+    <div className="min-h-[calc(100vh-60px)] md:min-h-screen bg-background p-4 md:p-8 space-y-6">
+      <div className="h-10 w-64 bg-[#1a1a2e] rounded-lg animate-pulse" />
+      <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
+        {[1,2,3,4].map(i => <div key={i} className="h-32 bg-[#1a1a2e] rounded-2xl animate-pulse" />)}
+      </div>
+      <div className="h-[400px] bg-[#1a1a2e] rounded-2xl animate-pulse" />
     </div>
   )
+  
+  const hasNoData = stats && stats[0].value === 0
+
+  if (hasNoData && !loading) {
+    return (
+      <div className="min-h-[calc(100vh-60px)] md:min-h-screen bg-background flex flex-col items-center justify-center p-6 text-center">
+        <div className="w-20 h-20 bg-surface-elevated border border-border rounded-full flex items-center justify-center mb-6">
+          <BarChart3 size={36} className="text-text-muted" />
+        </div>
+        <h2 className="text-2xl font-bold text-text-primary mb-3">No data yet</h2>
+        <p className="text-text-muted mb-8 max-w-sm">Start chatting with your bots to see analytics, usage trends, and popular questions.</p>
+        <Link to="/dashboard" className="px-6 py-3 bg-surface border border-border text-text-primary font-medium rounded-xl hover:bg-surface-elevated transition-colors">
+          Go to Dashboard
+        </Link>
+      </div>
+    )
+  }
 
   return (
-    <div className="min-h-screen bg-background text-text-primary font-inter selection:bg-accent/30 selection:text-text-primary">
+    <div className="min-h-screen bg-background text-text-primary font-inter selection:bg-accent/30 selection:text-text-primary pb-[60px] md:pb-0">
       {/* Breadcrumb Header */}
       <div className="border-b border-border bg-surface/50 backdrop-blur-md sticky top-0 z-40">
-        <div className="max-w-7xl mx-auto px-6 py-4 flex items-center justify-between">
-        <div className="flex items-center gap-3">
+        <div className="max-w-7xl mx-auto px-4 md:px-6 py-3 md:py-4 flex flex-col md:flex-row md:items-center justify-between gap-4">
+          <div className="flex items-center gap-3">
             <Link
               id="analytics-back-btn"
               to={backTo}
-              className="p-2 -ml-2 rounded-lg text-text-muted hover:text-text-primary hover:bg-surface-elevated transition-colors min-w-[44px] min-h-[44px] flex items-center justify-center"
+              className="p-2 -ml-2 rounded-lg text-text-muted hover:text-text-primary hover:bg-surface-elevated transition-colors min-w-[40px] min-h-[40px] flex items-center justify-center"
             >
               <ChevronLeft size={20} />
             </Link>
             <div>
-              <h1 className="text-lg sm:text-xl font-bold text-text-primary leading-tight">Analytics Overview</h1>
+              <h1 className="text-lg md:text-xl font-bold text-text-primary leading-tight">Analytics</h1>
               <div className="flex items-center gap-2 text-xs text-text-muted font-medium mt-0.5">
                 <Link to={backTo} className="hover:text-accent transition-colors">{backLabel}</Link>
                 <span>/</span>
-                <span className="text-text-primary">Analytics</span>
+                <span className="text-text-primary">Overview</span>
               </div>
             </div>
           </div>
 
-          <div className="relative bg-surface border border-border rounded-lg p-1 flex text-sm font-medium">
-            {['7d', '30d', '90d'].map(range => (
+          <div className="flex items-center gap-3 w-full md:w-auto">
+            {/* Bot Selector */}
+            <div className="relative flex-1 md:flex-none">
               <button
-                key={range}
-                id={`time-range-${range}`}
-                onClick={() => setTimeRange(range)}
-                className={`relative px-3 sm:px-4 py-1.5 rounded-md transition-colors z-10 ${timeRange === range ? 'text-white' : 'text-text-muted hover:text-text-primary'}`}
+                onClick={() => setShowFilter(!showFilter)}
+                className="w-full md:w-[200px] flex items-center justify-between px-4 py-2 bg-background border border-border hover:border-accent/50 rounded-xl text-sm font-medium transition-colors"
               >
-                {timeRange === range && (
-                  <motion.div layoutId="range-pill" className="absolute inset-0 bg-accent rounded-md -z-10" transition={{ type: "spring", stiffness: 300, damping: 30 }} />
-                )}
-                {range === '7d' ? '7d' : range === '30d' ? '30d' : '90d'}
+                <div className="flex items-center gap-2 truncate">
+                  <Bot size={16} className="text-accent" />
+                  <span className="truncate">{botFilter === 'All' ? 'All Bots' : (botList.find(b => b._id === botFilter)?.name || botFilter)}</span>
+                </div>
+                <ChevronDown size={14} className="text-text-muted ml-2 shrink-0" />
               </button>
-            ))}
+              
+              {showFilter && (
+                <div className="absolute top-full left-0 right-0 mt-2 bg-surface border border-border rounded-xl shadow-xl z-50 py-2 max-h-[250px] overflow-y-auto">
+                  <button
+                    onClick={() => { setBotFilter('All'); setShowFilter(false) }}
+                    className={`w-full text-left px-4 py-2 text-sm transition-colors ${botFilter === 'All' ? 'text-accent bg-accent/5 font-semibold' : 'text-text-primary hover:bg-surface-elevated'}`}
+                  >
+                    All Bots
+                  </button>
+                  {botList.map(bot => (
+                    <button
+                      key={bot._id}
+                      onClick={() => { setBotFilter(bot._id || bot.name); setShowFilter(false) }}
+                      className={`w-full text-left px-4 py-2 text-sm transition-colors ${botFilter === (bot._id || bot.name) ? 'text-accent bg-accent/5 font-semibold' : 'text-text-primary hover:bg-surface-elevated'}`}
+                    >
+                      {bot.name || 'Unnamed Bot'}
+                    </button>
+                  ))}
+                </div>
+              )}
+            </div>
+
+            {/* Time Range Selector */}
+            <div className="relative bg-surface border border-border rounded-lg p-1 flex text-sm font-medium shrink-0">
+              {['7d', '30d', '90d'].map(range => (
+                <button
+                  key={range}
+                  id={`time-range-${range}`}
+                  onClick={() => setTimeRange(range)}
+                  className={`relative px-3 md:px-4 py-1.5 rounded-md transition-colors z-10 ${timeRange === range ? 'text-white' : 'text-text-muted hover:text-text-primary'}`}
+                >
+                  {timeRange === range && (
+                    <motion.div layoutId="range-pill" className="absolute inset-0 bg-accent rounded-md -z-10" transition={{ type: "spring", stiffness: 300, damping: 30 }} />
+                  )}
+                  {range}
+                </button>
+              ))}
+            </div>
           </div>
         </div>
       </div>
 
-      <div className="max-w-7xl mx-auto px-6 py-10 space-y-8">
+      <div className="max-w-7xl mx-auto px-4 md:px-6 py-6 md:py-10 space-y-8">
         
         {/* ─── KPI STATS ─── */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-          {stats.map((stat, i) => (
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 md:gap-6">
+          {stats && stats.map((stat, i) => (
             <motion.div
               key={i}
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: i * 0.1, duration: 0.5 }}
-              className="p-6 bg-surface border border-border rounded-2xl relative overflow-hidden group hover:border-border/80 transition-colors"
+              className={`p-5 md:p-6 bg-surface border border-border rounded-2xl relative overflow-hidden group hover:border-border/80 transition-colors ${loading ? 'opacity-50' : ''}`}
             >
               <div className="flex justify-between items-start mb-4">
-                <div className={`p-3 rounded-xl border border-border ${stat.bg} ${stat.color}`}>
+                <div className={`p-2.5 md:p-3 rounded-xl border border-border ${stat.bg} ${stat.color}`}>
                   <stat.icon size={20} />
                 </div>
                 <span className={`text-xs font-medium px-2 py-1 rounded-md flex items-center gap-1 ${stat.trend.startsWith('-') ? 'text-red-400 bg-red-400/10' : 'text-green-400 bg-green-400/10'}`}>
@@ -185,10 +317,10 @@ export default function Analytics() {
                 </span>
               </div>
               <div>
-                <h3 className="text-3xl font-bold text-text-primary mb-1">
+                <h3 className="text-2xl md:text-3xl font-bold text-text-primary mb-1">
                   {stat.isString ? stat.value : <CountUp end={stat.value} />}{stat.suffix}
                 </h3>
-                <p className="text-sm text-text-muted font-medium">{stat.label}</p>
+                <p className="text-xs md:text-sm text-text-muted font-medium">{stat.label}</p>
               </div>
               <div className="absolute -bottom-4 -right-4 text-border opacity-20 group-hover:opacity-30 transition-opacity transform group-hover:scale-110 duration-500 pointer-events-none">
                 <stat.icon size={100} />
@@ -198,19 +330,19 @@ export default function Analytics() {
         </div>
 
         {/* ─── CHARTS ROW 1 ─── */}
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        <div className={`grid grid-cols-1 lg:grid-cols-3 gap-6 transition-opacity duration-300 ${loading ? 'opacity-50' : 'opacity-100'}`}>
           
           {/* Main Area Chart */}
           <motion.div 
             initial={{ opacity: 0, scale: 0.95 }}
             animate={{ opacity: 1, scale: 1 }}
             transition={{ delay: 0.2 }}
-            className="lg:col-span-2 bg-surface border border-border rounded-3xl p-6"
+            className="lg:col-span-2 bg-surface border border-border rounded-3xl p-5 md:p-6"
           >
-            <h3 className="text-lg font-bold text-text-primary mb-6">Queries Over Time</h3>
-            <div className="h-[300px] w-full">
+            <h3 className="text-base md:text-lg font-bold text-text-primary mb-6">Queries Over Time</h3>
+            <div className="h-[250px] md:h-[300px] w-full">
               <ResponsiveContainer width="100%" height="100%">
-                <AreaChart data={areaData} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
+                <AreaChart data={chartData} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
                   <defs>
                     <linearGradient id="colorQueries" x1="0" y1="0" x2="0" y2="1">
                       <stop offset="5%" stopColor="#6C63FF" stopOpacity={0.3}/>
@@ -232,14 +364,14 @@ export default function Analytics() {
             initial={{ opacity: 0, scale: 0.95 }}
             animate={{ opacity: 1, scale: 1 }}
             transition={{ delay: 0.3 }}
-            className="bg-surface border border-border rounded-3xl p-6 flex flex-col"
+            className="bg-surface border border-border rounded-3xl p-5 md:p-6 flex flex-col"
           >
-            <h3 className="text-lg font-bold text-text-primary mb-2">Document Types</h3>
-            <div className="flex-1 min-h-[250px] relative w-full">
+            <h3 className="text-base md:text-lg font-bold text-text-primary mb-2">Document Types</h3>
+            <div className="flex-1 min-h-[200px] md:min-h-[250px] relative w-full">
               <ResponsiveContainer width="100%" height="100%">
                 <PieChart>
                   <Pie
-                    data={pieData}
+                    data={mockPieData}
                     innerRadius={60}
                     outerRadius={90}
                     paddingAngle={5}
@@ -247,7 +379,7 @@ export default function Analytics() {
                     stroke="none"
                     animationDuration={1500}
                   >
-                    {pieData.map((entry, index) => (
+                    {mockPieData.map((entry, index) => (
                       <Cell key={`cell-${index}`} fill={entry.color} />
                     ))}
                   </Pie>
@@ -261,7 +393,7 @@ export default function Analytics() {
             </div>
             
             <div className="flex justify-center gap-4 mt-2">
-              {pieData.map(entry => (
+              {mockPieData.map(entry => (
                 <div key={entry.name} className="flex items-center gap-1.5 text-xs font-medium text-text-primary">
                   <div className="w-2.5 h-2.5 rounded-full" style={{ backgroundColor: entry.color }} />
                   {entry.name}
@@ -272,42 +404,17 @@ export default function Analytics() {
         </div>
 
         {/* ─── CHARTS ROW 2 ─── */}
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        <div className={`grid grid-cols-1 lg:grid-cols-3 gap-6 transition-opacity duration-300 ${loading ? 'opacity-50' : 'opacity-100'}`}>
           
-          {/* Top Questions Table — desktop */}
+          {/* Top Questions Table */}
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.4 }}
             className="lg:col-span-2 bg-surface border border-border rounded-3xl overflow-hidden"
           >
-            <div className="p-5 sm:p-6 border-b border-border flex items-center justify-between">
-              <h3 className="text-base sm:text-lg font-bold text-text-primary">Top Questions Asked</h3>
-              <div className="relative">
-                <button
-                  id="analytics-filter-btn"
-                  onClick={() => setShowFilter(f => !f)}
-                  className={`text-sm font-medium transition-colors flex items-center gap-1 min-h-[44px] px-2 ${showFilter ? 'text-accent' : 'text-text-muted hover:text-accent'}`}
-                >
-                  <Filter size={14} /> Filter
-                </button>
-                {showFilter && (
-                  <div className="absolute right-0 top-8 bg-surface border border-border rounded-xl shadow-xl z-20 p-3 w-48">
-                    <p className="text-xs font-bold text-text-muted uppercase tracking-wider mb-2">Filter by Bot</p>
-                    {['All', ...new Set(tableData.map(r => r.bot))].map(bot => (
-                      <button
-                        key={bot}
-                        onClick={() => { setBotFilter(bot); setShowFilter(false) }}
-                        className={`w-full text-left px-3 py-1.5 rounded-lg text-sm transition-colors ${
-                          botFilter === bot ? 'bg-accent/10 text-accent font-semibold' : 'text-text-primary hover:bg-surface-elevated'
-                        }`}
-                      >
-                        {bot}
-                      </button>
-                    ))}
-                  </div>
-                )}
-              </div>
+            <div className="p-5 border-b border-border flex items-center justify-between">
+              <h3 className="text-base md:text-lg font-bold text-text-primary">Top Questions Asked</h3>
             </div>
 
             {/* Desktop table */}
@@ -344,7 +451,14 @@ export default function Analytics() {
                     >
                       <td className="p-4 font-medium text-text-primary">{row.q}</td>
                       <td className="p-4 text-text-muted">{row.bot}</td>
-                      <td className="p-4 font-mono font-bold">{row.count}</td>
+                      <td className="p-4 font-mono font-bold">
+                        <div className="flex items-center gap-2">
+                          <span>{row.count}</span>
+                          <div className="w-16 h-1.5 bg-surface-elevated rounded-full overflow-hidden">
+                            <div className="h-full bg-accent" style={{ width: `${Math.min(100, (row.count / 150) * 100)}%` }} />
+                          </div>
+                        </div>
+                      </td>
                       <td className="p-4">
                         <span className={`px-2 py-1 rounded-md text-[10px] font-bold uppercase tracking-wider ${
                           row.sentiment === 'Positive' ? 'bg-green-500/10 text-green-400' :
@@ -356,6 +470,11 @@ export default function Analytics() {
                       </td>
                     </motion.tr>
                   ))}
+                  {sortedTableData.length === 0 && (
+                    <tr>
+                      <td colSpan="4" className="p-8 text-center text-text-muted">No questions found</td>
+                    </tr>
+                  )}
                 </tbody>
               </table>
             </div>
@@ -363,11 +482,10 @@ export default function Analytics() {
             {/* Mobile card list */}
             <div className="md:hidden divide-y divide-border">
               {sortedTableData.map((row, i) => (
-                <div key={row.id} className="p-4 space-y-2">
-                  <p className="text-sm font-semibold text-text-primary">{row.q}</p>
-                  <div className="flex items-center gap-3 flex-wrap">
+                <div key={row.id} className="p-4 space-y-3">
+                  <p className="text-sm font-semibold text-text-primary leading-tight">{row.q}</p>
+                  <div className="flex items-center justify-between">
                     <span className="text-xs text-text-muted">{row.bot}</span>
-                    <span className="text-xs font-mono font-bold text-text-primary">{row.count} asks</span>
                     <span className={`px-2 py-0.5 rounded-full text-[10px] font-bold uppercase ${
                       row.sentiment === 'Positive' ? 'bg-green-500/10 text-green-400' :
                       row.sentiment === 'Negative' ? 'bg-red-500/10 text-red-400' :
@@ -376,8 +494,17 @@ export default function Analytics() {
                       {row.sentiment}
                     </span>
                   </div>
+                  <div className="flex items-center gap-2 mt-2">
+                    <span className="text-xs font-mono font-bold text-text-primary w-8">{row.count}</span>
+                    <div className="flex-1 h-1.5 bg-surface-elevated rounded-full overflow-hidden">
+                      <div className="h-full bg-accent" style={{ width: `${Math.min(100, (row.count / 150) * 100)}%` }} />
+                    </div>
+                  </div>
                 </div>
               ))}
+              {sortedTableData.length === 0 && (
+                <div className="p-8 text-center text-text-muted text-sm">No questions found</div>
+              )}
             </div>
           </motion.div>
 
@@ -386,18 +513,18 @@ export default function Analytics() {
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.5 }}
-            className="bg-surface border border-border rounded-3xl p-6"
+            className="bg-surface border border-border rounded-3xl p-5 md:p-6"
           >
-            <h3 className="text-lg font-bold text-text-primary mb-6">Queries per Chatbot</h3>
-            <div className="h-[300px] w-full">
+            <h3 className="text-base md:text-lg font-bold text-text-primary mb-6">Queries per Chatbot</h3>
+            <div className="h-[250px] md:h-[300px] w-full">
               <ResponsiveContainer width="100%" height="100%">
-                <BarChart data={barData} layout="vertical" margin={{ top: 0, right: 0, left: 0, bottom: 0 }}>
+                <BarChart data={mockBarData} layout="vertical" margin={{ top: 0, right: 0, left: 0, bottom: 0 }}>
                   <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.05)" horizontal={false} />
                   <XAxis type="number" hide />
                   <YAxis dataKey="name" type="category" width={100} stroke="rgba(255,255,255,0.3)" tick={{ fill: '#8B8BA7', fontSize: 11 }} axisLine={false} tickLine={false} />
                   <RechartsTooltip cursor={{fill: 'rgba(255,255,255,0.02)'}} content={<CustomTooltip />} />
                   <Bar dataKey="queries" radius={[0, 4, 4, 0]} barSize={24} animationDuration={1500}>
-                    {barData.map((entry, index) => (
+                    {mockBarData.map((entry, index) => (
                       <Cell key={`cell-${index}`} fill={index === 0 ? '#6C63FF' : index === 1 ? '#00D9C0' : 'rgba(255,255,255,0.1)'} />
                     ))}
                   </Bar>
