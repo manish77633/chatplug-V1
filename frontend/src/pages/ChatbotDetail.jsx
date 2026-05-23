@@ -85,7 +85,7 @@ export default function ChatbotDetail() {
       const formData = new FormData()
       formData.append('type', uploadType)
       if (uploadType === 'pdf') {
-        const file = e.target.querySelector('input[type=file]')?.files?.[0] || e.dataTransfer?.files?.[0]
+        const file = e.target?.files?.[0] || e.currentTarget?.querySelector('input[type=file]')?.files?.[0] || e.dataTransfer?.files?.[0]
         if (!file) { toast.error('Select a PDF'); return }
         formData.append('file', file)
       } else {
