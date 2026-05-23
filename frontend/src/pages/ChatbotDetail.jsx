@@ -45,10 +45,6 @@ export default function ChatbotDetail() {
       setPersonality(st.personality || 'Helpful')
       setAccentColor(st.accentColor || '#6C63FF')
       setPosition(st.position || 'right')
-
-      // Logic to resume step
-      if ((data.chatbot.status === 'ready' || data.chatbot.status === 'active') && step === 0) setStep(3)
-      else if (data.chatbot.documents?.length > 0 && step === 0) setStep(2)
       
     } catch {
       toast.error('Failed to load chatbot')
@@ -58,6 +54,17 @@ export default function ChatbotDetail() {
   }, [id])
 
   useEffect(() => { fetchChatbot() }, [fetchChatbot])
+
+  // Auto-resume step based on chatbot state (only when step should be advanced)
+  useEffect(() => {
+    if (chatbot && step === 0) {
+      if (chatbot.status === 'ready' || chatbot.status === 'active') {
+        setStep(3)
+      } else if (chatbot.documents?.length > 0) {
+        setStep(2)
+      }
+    }
+  }, [chatbot])
 
   // Auto-poll when training
   useEffect(() => {
