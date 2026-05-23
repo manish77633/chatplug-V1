@@ -1,4 +1,4 @@
-import { Routes, Route, Navigate } from 'react-router-dom'
+import { Routes, Route, Navigate, useLocation } from 'react-router-dom'
 import { useAuthStore } from './store/authStore'
 import { Toaster } from 'react-hot-toast'
 
@@ -13,7 +13,9 @@ import Docs          from './pages/Docs'
 import DocsApi       from './pages/DocsApi'
 import DocsGuides    from './pages/DocsGuides'
 import Settings      from './pages/Settings'
+import Profile       from './pages/Profile'
 import AdminPanel    from './pages/AdminPanel'
+import BottomNav     from './components/ui/BottomNav'
 
 const Protected = ({ children }) => {
   const { token } = useAuthStore()
@@ -40,10 +42,10 @@ export default function App() {
         {/* Protected */}
         <Route path="/dashboard"                      element={<Protected><Dashboard /></Protected>} />
         <Route path="/settings"                       element={<Protected><Settings /></Protected>} />
+        <Route path="/profile"                        element={<Protected><Profile /></Protected>} />
         <Route path="/chatbot/:id"                    element={<Protected><ChatbotDetail /></Protected>} />
         <Route path="/chatbot/:id/playground"         element={<Protected><Playground /></Protected>} />
         <Route path="/chatbot/:id/analytics"          element={<Protected><Analytics /></Protected>} />
-        {/* Global analytics overview (no bot id) */}
         <Route path="/analytics"                      element={<Protected><Analytics /></Protected>} />
 
         {/* Admin */}
@@ -51,6 +53,10 @@ export default function App() {
 
         <Route path="*" element={<Navigate to="/" replace />} />
       </Routes>
+
+      {/* Global bottom nav — auto-hides on /login, /register, / */}
+      <BottomNav />
+
       <Toaster
         position="bottom-right"
         toastOptions={{

@@ -1,16 +1,14 @@
-// src/pages/Dashboard.jsx
 import { useState, useEffect } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import { motion, AnimatePresence } from 'framer-motion'
 import {
   Plus, Bot, Trash2, Play, BarChart3, Settings, Zap, Calendar,
   Menu, X, LayoutDashboard, FileText, Globe, MessageSquare,
-  Sparkles, Code, LogOut, ChevronRight
+  Sparkles, Code, LogOut, ChevronRight, Bell
 } from 'lucide-react'
 import { useAuthStore } from '../store/authStore'
 import api from '../utils/api'
 import toast from 'react-hot-toast'
-import MobileNav from '../components/ui/MobileNav'
 import FAB from '../components/ui/FAB'
 
 // CountUp component for animating numbers
@@ -187,8 +185,8 @@ export default function Dashboard() {
       <main className="flex-1 flex flex-col min-w-0 h-screen overflow-y-auto relative bg-background">
         <div className="absolute inset-0 pointer-events-none opacity-[0.02] noise-bg" />
 
-        {/* Mobile Header — max 56px */}
-        <div className="lg:hidden flex items-center justify-between px-4 py-3 border-b border-border bg-surface sticky top-0 z-20" style={{ minHeight: 56, maxHeight: 56 }}>
+        {/* Mobile Header — 56px */}
+        <div className="lg:hidden flex items-center justify-between px-4 border-b border-border bg-surface sticky top-0 z-20" style={{ minHeight: 56, maxHeight: 56 }}>
           <button
             id="mobile-menu-btn"
             onClick={() => setSidebarOpen(true)}
@@ -200,11 +198,16 @@ export default function Dashboard() {
             <Zap size={18} className="text-accent" />
             <span className="font-bold tracking-tight gradient-text">ChatPlug</span>
           </div>
-          <div
-            className="w-8 h-8 rounded-full bg-gradient-to-br from-accent to-accent-secondary text-white flex items-center justify-center font-bold text-sm cursor-pointer"
-            onClick={() => navigate('/settings?tab=profile')}
-          >
-            {userName?.charAt(0)?.toUpperCase() || 'U'}
+          <div className="flex items-center gap-2">
+            <button className="p-2 text-text-muted hover:text-text-primary rounded-xl hover:bg-surface-elevated transition-colors min-w-[36px] min-h-[36px] flex items-center justify-center">
+              <Bell size={18} />
+            </button>
+            <div
+              className="w-8 h-8 rounded-full bg-gradient-to-br from-accent to-accent-secondary text-white flex items-center justify-center font-bold text-sm cursor-pointer"
+              onClick={() => navigate('/profile')}
+            >
+              {userName?.charAt(0)?.toUpperCase() || 'U'}
+            </div>
           </div>
         </div>
 
@@ -427,10 +430,7 @@ export default function Dashboard() {
         </div>
       </main>
 
-      {/* ─── MOBILE BOTTOM NAV ─── */}
-      <MobileNav onAnalyticsClick={() => navigate('/analytics')} />
-
-      {/* ─── FLOATING ACTION BUTTON (mobile only) ─── */}
+      {/* ─── FLOATING ACTION BUTTON (mobile only, above bottom nav) ─── */}
       <FAB onClick={() => setShowModal(true)} />
 
       {/* ─── CREATE MODAL ─── */}

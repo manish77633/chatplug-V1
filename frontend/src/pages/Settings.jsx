@@ -10,10 +10,10 @@ import { useAuthStore } from '../store/authStore'
 import toast from 'react-hot-toast'
 
 const TABS = [
-  { id: 'profile',       label: 'Profile',        icon: User },
-  { id: 'notifications', label: 'Notifications',  icon: Bell },
-  { id: 'api',           label: 'API Keys',        icon: Key },
-  { id: 'billing',       label: 'Billing',         icon: CreditCard },
+  { id: 'profile',       label: 'Profile',       icon: User },
+  { id: 'notifications', label: 'Notifications', icon: Bell },
+  { id: 'api',           label: 'API Keys',      icon: Key },
+  { id: 'billing',       label: 'Billing',       icon: CreditCard },
 ]
 
 function ProfileTab({ user }) {
@@ -319,10 +319,10 @@ export default function Settings() {
   }[activeTab]
 
   return (
-    <div className="min-h-screen bg-background text-text-primary font-inter selection:bg-accent/30 pb-24 lg:pb-8">
+    <div className="min-h-screen bg-background text-text-primary font-inter selection:bg-accent/30 pb-24 md:pb-8">
       {/* Header */}
       <div className="border-b border-border bg-surface/80 backdrop-blur-md sticky top-0 z-40">
-        <div className="max-w-5xl mx-auto px-4 sm:px-6 py-4 flex items-center gap-4">
+        <div className="w-full px-4 md:max-w-2xl md:mx-auto py-3 flex items-center gap-3">
           <button
             id="settings-back"
             onClick={() => navigate('/dashboard')}
@@ -331,30 +331,58 @@ export default function Settings() {
             <ArrowLeft size={20} />
           </button>
           <div>
-            <h1 className="text-lg font-bold text-text-primary leading-tight">Settings</h1>
-            <div className="flex items-center gap-2 text-xs text-text-muted font-medium mt-0.5">
+            <h1 className="text-base font-bold text-text-primary leading-tight">Settings</h1>
+            <div className="flex items-center gap-1.5 text-xs text-text-muted font-medium mt-0.5">
               <Link to="/dashboard" className="hover:text-accent transition-colors">Dashboard</Link>
               <span>/</span>
-              <span className="text-text-primary capitalize">{activeTab}</span>
+              <span className="text-text-primary capitalize">{TABS.find(t => t.id === activeTab)?.label}</span>
             </div>
+          </div>
+        </div>
+
+        {/* Mobile icon-only tab bar — full width, no scroll */}
+        <div className="lg:hidden w-full border-t border-border">
+          <div className="flex w-full">
+            {TABS.map(tab => {
+              const Icon = tab.icon
+              const active = activeTab === tab.id
+              return (
+                <button
+                  key={tab.id}
+                  id={`settings-tab-${tab.id}`}
+                  onClick={() => setActiveTab(tab.id)}
+                  title={tab.label}
+                  className={`flex-1 flex flex-col items-center justify-center gap-0.5 py-3 transition-all relative ${
+                    active
+                      ? 'text-accent bg-accent/10'
+                      : 'text-text-muted hover:text-text-primary hover:bg-surface-elevated'
+                  }`}
+                >
+                  {active && (
+                    <span className="absolute top-0 left-0 right-0 h-0.5 bg-accent rounded-b" />
+                  )}
+                  <Icon size={20} />
+                  <span className="text-[10px] font-semibold">{tab.label}</span>
+                </button>
+              )
+            })}
           </div>
         </div>
       </div>
 
-      <div className="max-w-5xl mx-auto px-4 sm:px-6 py-8">
+      <div className="w-full px-4 py-6 md:max-w-2xl md:mx-auto">
         <div className="flex flex-col lg:flex-row gap-6">
-          {/* Tab Sidebar */}
-          <aside className="lg:w-52 shrink-0">
-            {/* Mobile: horizontal scroll tabs */}
-            <div className="flex lg:flex-col gap-1 overflow-x-auto lg:overflow-visible pb-2 lg:pb-0 -mx-1 px-1 lg:mx-0 lg:px-0">
+          {/* Tab Sidebar — desktop only */}
+          <aside className="hidden lg:block lg:w-52 shrink-0">
+            <div className="flex flex-col gap-1">
               {TABS.map(tab => {
                 const Icon = tab.icon
                 return (
                   <button
                     key={tab.id}
-                    id={`settings-tab-${tab.id}`}
+                    id={`settings-tab-desk-${tab.id}`}
                     onClick={() => setActiveTab(tab.id)}
-                    className={`flex items-center gap-3 px-4 py-3 rounded-xl font-medium text-sm transition-all whitespace-nowrap shrink-0 lg:shrink lg:w-full min-h-[44px] ${
+                    className={`flex items-center gap-3 px-4 py-3 rounded-xl font-medium text-sm transition-all w-full min-h-[44px] ${
                       activeTab === tab.id
                         ? 'bg-accent/10 text-accent border border-accent/20'
                         : 'text-text-muted hover:text-text-primary hover:bg-surface-elevated'
@@ -362,7 +390,7 @@ export default function Settings() {
                   >
                     <Icon size={16} className={activeTab === tab.id ? 'text-accent' : 'text-text-muted'} />
                     {tab.label}
-                    {activeTab === tab.id && <ChevronRight size={14} className="ml-auto hidden lg:block" />}
+                    {activeTab === tab.id && <ChevronRight size={14} className="ml-auto" />}
                   </button>
                 )
               })}
@@ -374,16 +402,16 @@ export default function Settings() {
             <AnimatePresence mode="wait">
               <motion.div
                 key={activeTab}
-                initial={{ opacity: 0, y: 12 }}
+                initial={{ opacity: 0, y: 10 }}
                 animate={{ opacity: 1, y: 0 }}
-                exit={{ opacity: 0, y: -12 }}
-                transition={{ duration: 0.2 }}
-                className="bg-surface border border-border rounded-3xl p-6 sm:p-8"
+                exit={{ opacity: 0, y: -10 }}
+                transition={{ duration: 0.18 }}
+                className="w-full bg-surface border border-border rounded-2xl p-4 sm:p-6"
               >
-                <h2 className="text-xl font-bold text-text-primary mb-6 flex items-center gap-2">
+                <h2 className="text-base md:text-xl font-bold text-text-primary mb-5 flex items-center gap-2">
                   {(() => {
                     const t = TABS.find(t => t.id === activeTab)
-                    return t ? <t.icon size={20} className="text-accent" /> : null
+                    return t ? <t.icon size={18} className="text-accent" /> : null
                   })()}
                   {TABS.find(t => t.id === activeTab)?.label}
                 </h2>
