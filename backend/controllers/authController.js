@@ -14,7 +14,7 @@ exports.register = async (req, res, next) => {
     await user.save();
 
     const token = signToken(user._id);
-    res.status(201).json({ success: true, token, user: { id: user._id, name, email, plan: user.plan, role: user.role } });
+    res.status(201).json({ success: true, token, user: { _id: user._id, name, email, plan: user.plan, role: user.role, avatar: user.avatar } });
   } catch (err) { next(err); }
 };
 
@@ -29,7 +29,7 @@ exports.login = async (req, res, next) => {
     await user.save({ validateBeforeSave: false });
 
     const token = signToken(user._id);
-    res.json({ success: true, token, user: { id: user._id, name: user.name, email, plan: user.plan, role: user.role } });
+    res.json({ success: true, token, user: { _id: user._id, name: user.name, email, plan: user.plan, role: user.role, avatar: user.avatar } });
   } catch (err) { next(err); }
 };
 
