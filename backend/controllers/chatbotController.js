@@ -14,7 +14,7 @@ exports.create = async (req, res, next) => {
       return res.status(403).json({ success: false, message: 'Upgrade to Pro to create more chatbots' });
     }
 
-    const chatbot = await Chatbot.create({ owner: req.user._id, name, description, status: 'active' });
+    const chatbot = await Chatbot.create({ owner: req.user._id, name, description, status: 'draft' });
     res.status(201).json({ success: true, chatbot });
   } catch (err) { next(err); }
 };

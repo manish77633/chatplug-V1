@@ -57,10 +57,10 @@ export default function ChatbotDetail() {
 
   // Auto-resume step based on chatbot state (only when step should be advanced)
   useEffect(() => {
-    if (chatbot && step === 0) {
+    if (chatbot && step === 0 && chatbot.documents?.length > 0) {
       if (chatbot.status === 'ready' || chatbot.status === 'active') {
         setStep(3)
-      } else if (chatbot.documents?.length > 0) {
+      } else {
         setStep(2)
       }
     }
@@ -355,14 +355,14 @@ export default function ChatbotDetail() {
                           {chatbot.documents.map(doc => (
                             <div key={doc._id} className="p-4 bg-background border border-border rounded-xl flex items-center justify-between group">
                               <div className="flex items-center gap-4 flex-1">
-                                <div className={`p-2 rounded-lg ${doc.status === 'ready' ? 'bg-green-500/10' : 'bg-yellow-500/10'}`}>
-                                  {doc.status === 'ready' ? <Check size={16} className="text-green-500" /> : <Loader2 size={16} className="text-yellow-500 animate-spin" />}
+                                <div className={`p-2 rounded-lg ${doc.status === 'completed' ? 'bg-green-500/10' : doc.status === 'failed' ? 'bg-red-500/10' : 'bg-yellow-500/10'}`}>
+                                  {doc.status === 'completed' ? <Check size={16} className="text-green-500" /> : doc.status === 'failed' ? <Check size={16} className="text-red-500" /> : <Loader2 size={16} className="text-yellow-500 animate-spin" />}
                                 </div>
                                 <div className="flex-1 min-w-0">
                                   <p className="text-sm font-semibold text-text-primary truncate">{doc.name}</p>
                                   <div className="flex items-center gap-2 mt-1">
                                     <div className="flex-1 h-1 bg-surface-elevated rounded-full overflow-hidden">
-                                      <div className={`h-full ${doc.status === 'ready' ? 'bg-green-500 w-full' : 'bg-yellow-500 w-2/3 animate-pulse'}`} />
+                                      <div className={`h-full ${doc.status === 'completed' ? 'bg-green-500 w-full' : doc.status === 'failed' ? 'bg-red-500 w-full' : 'bg-yellow-500 w-2/3 animate-pulse'}`} />
                                     </div>
                                     <span className="text-[10px] font-bold uppercase text-text-muted">{doc.status}</span>
                                   </div>
