@@ -1,10 +1,10 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import { motion, AnimatePresence } from 'framer-motion'
 import {
   Plus, Bot, Trash2, Play, BarChart3, Settings, Zap, Calendar,
   Menu, X, LayoutDashboard, FileText, Globe, MessageSquare,
-  Sparkles, Code, LogOut, ChevronRight, Bell
+  Sparkles, Code, LogOut, ChevronRight, Bell, User
 } from 'lucide-react'
 import { useAuthStore } from '../store/authStore'
 import api from '../utils/api'
@@ -28,6 +28,85 @@ function CountUp({ end }) {
   }, [end])
   return <span>{count}</span>
 }
+
+function ProfileDropdown({ user, logout, navigate }) {
+  const [isOpen, setIsOpen] = useState(false)
+  const dropdownRef = useRef(null)
+
+  useEffect(() => {
+    const handleClickOutside = (e) => {
+      if (dropdownRef.current && !dropdownRef.current.contains(e.target)) {
+        setIsOpen(false)
+      }
+    }
+    document.addEventListener('mousedown', handleClickOutside)
+    return () => document.removeEventListener('mousedown', handleClickOutside)
+  }, [])
+
+  const userName = user?.name || user?.email?.split('@')[0] || 'User'
+  const initial = userName.charAt(0).toUpperCase()
+  const plan = user?.plan?.type || 'Free'
+
+  return (
+    <div className="relative" ref={dropdownRef}>
+      <button
+        onClick={() => setIsOpen(!isOpen)}
+        className="w-[34px] h-[34px] rounded-full bg-[#1e1e30] border border-[#2a2a45] hover:bg-[#252540] flex items-center justify-center text-sm font-medium text-gray-200 transition-colors"
+      >
+        {initial}
+      </button>
+
+      <AnimatePresence>
+        {isOpen && (
+          <motion.div
+            initial={{ opacity: 0, scale: 0.95 }}
+            animate={{ opacity: 1, scale: 1 }}
+            exit={{ opacity: 0, scale: 0.95 }}
+            transition={{ duration: 0.15, ease: 'easeOut' }}
+            className="absolute top-full right-0 mt-2 w-[220px] bg-[#111120] border border-[#1e1e35] rounded-2xl shadow-2xl shadow-black/60 p-1 origin-top-right z-50"
+          >
+            {/* USER INFO */}
+            <div className="px-3 py-2.5 mb-1 border-b border-[#1e1e35]">
+              <div className="flex justify-between items-start mb-0.5">
+                <p className="text-sm font-semibold text-white truncate pr-2">{userName}</p>
+                <span className="inline-block text-[10px] bg-purple-500/20 text-purple-400 px-2 py-0.5 rounded-full border border-purple-500/30 shrink-0 capitalize">
+                  {plan}
+                </span>
+              </div>
+              <p className="text-xs text-gray-500 truncate">{user?.email || 'user@example.com'}</p>
+            </div>
+
+            {/* MENU ITEMS */}
+            <div className="flex flex-col">
+              <button
+                onClick={() => { setIsOpen(false); navigate('/profile') }}
+                className="group flex items-center gap-2.5 px-3 py-2 rounded-xl cursor-pointer text-sm text-gray-300 hover:bg-[#1a1a2e] hover:text-white transition-colors duration-150 w-full text-left"
+              >
+                <User size={16} className="text-gray-500 group-hover:text-gray-300 transition-colors" /> Profile
+              </button>
+              <button
+                onClick={() => { setIsOpen(false); navigate('/settings') }}
+                className="group flex items-center gap-2.5 px-3 py-2 rounded-xl cursor-pointer text-sm text-gray-300 hover:bg-[#1a1a2e] hover:text-white transition-colors duration-150 w-full text-left"
+              >
+                <Settings size={16} className="text-gray-500 group-hover:text-gray-300 transition-colors" /> Settings
+              </button>
+              
+              <div className="my-1 border-t border-[#1e1e35]" />
+              
+              <button
+                onClick={() => { setIsOpen(false); logout(); navigate('/') }}
+                className="group flex items-center gap-2.5 px-3 py-2 rounded-xl cursor-pointer text-sm text-red-400 hover:bg-red-500/10 hover:text-red-300 transition-colors duration-150 w-full text-left"
+              >
+                <LogOut size={16} className="text-red-400 group-hover:text-red-300 transition-colors" /> Logout
+              </button>
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+    </div>
+  )
+}
+
 
 export default function Dashboard() {
   const { user, logout } = useAuthStore()
@@ -202,12 +281,7 @@ export default function Dashboard() {
             <button className="p-2 text-text-muted hover:text-text-primary rounded-xl hover:bg-surface-elevated transition-colors min-w-[36px] min-h-[36px] flex items-center justify-center">
               <Bell size={18} />
             </button>
-            <div
-              className="w-8 h-8 rounded-full bg-gradient-to-br from-accent to-accent-secondary text-white flex items-center justify-center font-bold text-sm cursor-pointer"
-              onClick={() => navigate('/profile')}
-            >
-              {userName?.charAt(0)?.toUpperCase() || 'U'}
-            </div>
+            <ProfileDropdown user={user} logout={logout} navigate={navigate} />
           </div>
         </div>
 
