@@ -10,6 +10,8 @@ import {
   BarChart, Bar, Cell, PieChart, Pie, Legend
 } from 'recharts'
 import api from '../utils/api'
+import useAnalyticsStore from '../store/analyticsStore'
+import { useAuthStore } from '../store/authStore'
 
 // Mocks
 const mockAreaData = [
@@ -65,85 +67,71 @@ export default function Analytics() {
   const backTo   = id ? `/chatbot/${id}` : '/dashboard'
   const backLabel = id ? 'Chatbot' : 'Dashboard'
   
-  const [loading, setLoading] = useState(true)
+  const { stats: storeStats, isLoading, fetchAnalytics } = useAnalyticsStore()
+  const token = useAuthStore(s => s.token) || localStorage.getItem('token')
   const [error, setError] = useState(false)
   const [timeRange, setTimeRange] = useState('7d')
   
-  const [stats, setStats] = useState(null)
+  const stats = storeStats
+    ? [
+        { label: 'Total Queries', value: storeStats?.totalMessages ?? 0, icon: MessageSquare, color: 'text-accent', bg: 'bg-accent/10', trend: '+12.5%' },
+        { label: 'Avg Response Time', value: storeStats?.avgTime ?? 184, suffix: 'ms', icon: Clock, color: 'text-accent-secondary', bg: 'bg-accent-secondary/10', trend: '-5.2%' },
+        { label: 'Active Bots', value: storeStats?.totalSessions ?? 0, icon: Bot, color: 'text-purple-400', bg: 'bg-purple-400/10', trend: '+1' },
+        { label: 'User Satisfaction', value: storeStats?.satisfaction ?? 92, suffix: '%', icon: BarChart3, color: 'text-green-400', bg: 'bg-green-400/10', trend: '+2.1%' },
+      ]
+    : null
   const [chartData, setChartData] = useState([])
   const [topQuestions, setTopQuestions] = useState([])
   const [botList, setBotList] = useState([])
   
   const [sortConfig, setSortConfig] = useState({ key: 'count', direction: 'desc' })
+
+  useEffect(() => {
+    fetchAnalytics(token)
+  }, [])
+
   const [showFilter, setShowFilter] = useState(false)
   const [botFilter, setBotFilter] = useState('All')
-
-  const fetchAnalytics = async () => {
-    setLoading(true)
-    setError(false)
-    try {
-      // Fetch bots for filter
-      try {
-        const botRes = await api.get('/chatbots')
-        setBotList(botRes.data.chatbots || [])
-      } catch (e) {
-        // ignore if not supported
-      }
-
-      // Stats
-      let fetchedStats = null
-      try {
-        const res = await api.get('/analytics/stats')
-        fetchedStats = res.data.stats
-      } catch {
-        try {
-          const res = await api.get('/analytics/overview')
-          fetchedStats = {
-            queries: res.data.overview.totalMessages || 0,
-            avgTime: 184,
-            bots: res.data.overview.chatbots || 0,
-            satisfaction: 92
-          }
-        } catch {
-          fetchedStats = { queries: 0, avgTime: 0, bots: 0, satisfaction: 0 }
-        }
-      }
-
-      setStats([
-        { label: 'Total Queries', value: fetchedStats.queries, icon: MessageSquare, color: 'text-accent', bg: 'bg-accent/10', trend: '+12.5%' },
-        { label: 'Avg Response Time', value: fetchedStats.avgTime || 184, suffix: 'ms', icon: Clock, color: 'text-accent-secondary', bg: 'bg-accent-secondary/10', trend: '-5.2%' },
-        { label: 'Active Bots', value: fetchedStats.bots, icon: Bot, color: 'text-purple-400', bg: 'bg-purple-400/10', trend: '+1' },
-        { label: 'User Satisfaction', value: fetchedStats.satisfaction || 92, suffix: '%', icon: BarChart3, color: 'text-green-400', bg: 'bg-green-400/10', trend: '+2.1%' },
-      ])
-
-      // Charts Data
+  
+  // Charts Data
+  useEffect(() => {
+    const fetchCharts = async () => {
       try {
         const res = await api.get(`/analytics/messages?range=${timeRange}${botFilter !== 'All' ? `&botId=${botFilter}` : ''}`)
         setChartData(res.data.chartData || mockAreaData)
       } catch {
-        // Mock fallback if endpoint fails
         setChartData(mockAreaData)
       }
+    }
+    fetchCharts()
+  }, [timeRange, botFilter])
 
-      // Top Questions Data
+  // Top Questions Data
+  useEffect(() => {
+    const fetchQuestions = async () => {
       try {
         const res = await api.get(`/analytics/top-questions?botId=${botFilter === 'All' ? '' : botFilter}`)
         setTopQuestions(res.data.questions || mockTableData)
       } catch {
         setTimeout(() => setTopQuestions([...mockTableData]), 800)
       }
-      
-    } catch (err) {
-      console.error(err)
-      setError(true)
-    } finally {
-      setTimeout(() => setLoading(false), 800) // slight delay for skeleton visibility
     }
-  }
+    fetchQuestions()
+  }, [botFilter])
 
+  // Bot list
   useEffect(() => {
-    fetchAnalytics()
-  }, [timeRange, botFilter])
+    const fetchBots = async () => {
+      try {
+        const botRes = await api.get('/chatbots')
+        setBotList(botRes.data.chatbots || [])
+      } catch {
+        // ignore
+      }
+    }
+    fetchBots()
+  }, [])
+  
 
   const sortKeyMap = { 'Question': 'q', 'Bot': 'bot', 'Count': 'count', 'Sentiment': 'sentiment' }
 
@@ -184,26 +172,24 @@ export default function Analytics() {
         </div>
         <h2 className="text-2xl font-bold text-text-primary mb-3">Failed to load analytics</h2>
         <p className="text-text-muted mb-8 max-w-sm">There was an error communicating with the server. Please try again later.</p>
-        <button onClick={fetchAnalytics} className="px-6 py-3 bg-accent text-white font-medium rounded-xl hover:bg-accent/90 transition-colors shadow-lg shadow-accent/20">
+        <button onClick={() => fetchAnalytics(token)} className="px-6 py-3 bg-accent text-white font-medium rounded-xl hover:bg-accent/90 transition-colors shadow-lg shadow-accent/20">
           Try Again
         </button>
       </div>
     )
   }
 
-  if (loading && !stats) return (
-    <div className="min-h-[calc(100vh-60px)] md:min-h-screen bg-background p-4 md:p-8 space-y-6">
-      <div className="h-10 w-64 bg-[#1a1a2e] rounded-lg animate-pulse" />
-      <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
-        {[1,2,3,4].map(i => <div key={i} className="h-32 bg-[#1a1a2e] rounded-2xl animate-pulse" />)}
-      </div>
-      <div className="h-[400px] bg-[#1a1a2e] rounded-2xl animate-pulse" />
+  if (isLoading && !stats) return (
+    <div className="grid grid-cols-2 md:grid-cols-4 gap-4 p-6">
+      {[...Array(4)].map((_, i) => (
+        <div key={i} className="animate-pulse bg-surface rounded-2xl h-28" />
+      ))}
     </div>
   )
   
   const hasNoData = stats && stats[0].value === 0
 
-  if (hasNoData && !loading) {
+  if (hasNoData && !isLoading) {
     return (
       <div className="min-h-[calc(100vh-60px)] md:min-h-screen bg-background flex flex-col items-center justify-center p-6 text-center">
         <div className="w-20 h-20 bg-surface-elevated border border-border rounded-full flex items-center justify-center mb-6">
@@ -306,7 +292,7 @@ export default function Analytics() {
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: i * 0.1, duration: 0.5 }}
-              className={`p-5 md:p-6 bg-surface border border-border rounded-2xl relative overflow-hidden group hover:border-border/80 transition-colors ${loading ? 'opacity-50' : ''}`}
+              className={`p-5 md:p-6 bg-surface border border-border rounded-2xl relative overflow-hidden group hover:border-border/80 transition-colors ${isLoading ? 'opacity-50' : ''}`}
             >
               <div className="flex justify-between items-start mb-4">
                 <div className={`p-2.5 md:p-3 rounded-xl border border-border ${stat.bg} ${stat.color}`}>
@@ -330,7 +316,7 @@ export default function Analytics() {
         </div>
 
         {/* ─── CHARTS ROW 1 ─── */}
-        <div className={`grid grid-cols-1 lg:grid-cols-3 gap-6 transition-opacity duration-300 ${loading ? 'opacity-50' : 'opacity-100'}`}>
+        <div className={`grid grid-cols-1 lg:grid-cols-3 gap-6 transition-opacity duration-300 ${isLoading ? 'opacity-50' : 'opacity-100'}`}>
           
           {/* Main Area Chart */}
           <motion.div 
@@ -404,7 +390,7 @@ export default function Analytics() {
         </div>
 
         {/* ─── CHARTS ROW 2 ─── */}
-        <div className={`grid grid-cols-1 lg:grid-cols-3 gap-6 transition-opacity duration-300 ${loading ? 'opacity-50' : 'opacity-100'}`}>
+        <div className={`grid grid-cols-1 lg:grid-cols-3 gap-6 transition-opacity duration-300 ${isLoading ? 'opacity-50' : 'opacity-100'}`}>
           
           {/* Top Questions Table */}
           <motion.div
