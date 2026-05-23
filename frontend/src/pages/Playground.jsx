@@ -4,14 +4,27 @@ import { motion, AnimatePresence } from 'framer-motion'
 import {
   Send, Bot, User, Loader2, RefreshCw, AlertCircle, Settings,
   Maximize2, Minimize2, Paperclip, ChevronRight, FileText, Database, Clock, Terminal, ChevronLeft,
-  ChevronDown, MessageSquare, Menu, X
+  ChevronDown, MessageSquare, Menu, X, Plus, Trash2
 } from 'lucide-react'
 import api from '../utils/api'
 import toast from 'react-hot-toast'
 
 // Formats timestamp like "10:42 AM"
 const formatTime = (date) => {
-  return new Intl.DateTimeFormat('en-US', { hour: 'numeric', minute: 'numeric' }).format(date)
+  return new Intl.DateTimeFormat('en-US', { hour: 'numeric', minute: 'numeric' }).format(new Date(date))
+}
+
+const isToday = (date) => {
+  const d = new Date(date)
+  const today = new Date()
+  return d.getDate() === today.getDate() && d.getMonth() === today.getMonth() && d.getFullYear() === today.getFullYear()
+}
+
+const isYesterday = (date) => {
+  const d = new Date(date)
+  const y = new Date()
+  y.setDate(y.getDate() - 1)
+  return d.getDate() === y.getDate() && d.getMonth() === y.getMonth() && d.getFullYear() === y.getFullYear()
 }
 
 export default function Playground() {
@@ -36,10 +49,120 @@ export default function Playground() {
   const [isFullscreen, setIsFullscreen] = useState(false)
   const [mockMetrics, setMockMetrics] = useState({ tokens: 0, ms: 0, chunks: [] })
   
+  // History State
+  const storageKey = `chatplug_history_${id}`
+  const [sessions, setSessions] = useState([])
+  const [currentSessionId, setCurrentSessionId] = useState(null)
+  const [hasLoadedHistory, setHasLoadedHistory] = useState(false)
+  
   const messagesEndRef = useRef(null)
-  const sessionId = useRef(`playground_${Date.now()}`)
   const abortRef = useRef(null)
   const textareaRef = useRef(null)
+
+  // Load History on Mount
+  useEffect(() => {
+    try {
+      const stored = localStorage.getItem(storageKey)
+      if (stored) {
+        const parsed = JSON.parse(stored)
+        setSessions(parsed)
+        if (parsed.length > 0) {
+          setCurrentSessionId(parsed[0].id)
+          setMessages(parsed[0].messages || [])
+        } else {
+          startNewSession()
+        }
+      } else {
+        startNewSession()
+      }
+    } catch {
+      startNewSession()
+    }
+    setHasLoadedHistory(true)
+  }, [storageKey])
+
+  // Save History to LocalStorage
+  useEffect(() => {
+    if (!hasLoadedHistory || !currentSessionId) return
+    setSessions(prev => {
+      let updated = [...prev]
+      const existingIdx = updated.findIndex(s => s.id === currentSessionId)
+      
+      if (existingIdx >= 0) {
+        // Only update if there are messages, otherwise it's an empty session we might want to keep at top
+        updated[existingIdx] = {
+          ...updated[existingIdx],
+          messages,
+          updatedAt: Date.now()
+        }
+      } else {
+        updated.unshift({
+          id: currentSessionId,
+          messages,
+          updatedAt: Date.now()
+        })
+      }
+      
+      // Auto-delete oldest if > 20
+      if (updated.length > 20) {
+        updated = updated.slice(0, 20)
+      }
+
+      localStorage.setItem(storageKey, JSON.stringify(updated))
+      return updated
+    })
+  }, [messages, currentSessionId, hasLoadedHistory, storageKey])
+
+  const startNewSession = () => {
+    const newId = `session_${Date.now()}`
+    setCurrentSessionId(newId)
+    setMessages([])
+    setLeftSidebarOpen(false)
+  }
+
+  const loadSession = (sessionId) => {
+    const s = sessions.find(s => s.id === sessionId)
+    if (s) {
+      setCurrentSessionId(s.id)
+      setMessages(s.messages || [])
+      setLeftSidebarOpen(false)
+    }
+  }
+
+  const deleteSession = (e, sessionId) => {
+    e.stopPropagation()
+    const updated = sessions.filter(s => s.id !== sessionId)
+    setSessions(updated)
+    localStorage.setItem(storageKey, JSON.stringify(updated))
+    if (currentSessionId === sessionId) {
+      if (updated.length > 0) {
+        loadSession(updated[0].id)
+      } else {
+        startNewSession()
+      }
+    }
+  }
+
+  const clearHistory = () => {
+    if (window.confirm('Are you sure you want to clear all chat history for this bot?')) {
+      localStorage.removeItem(storageKey)
+      setSessions([])
+      startNewSession()
+      toast.success('Chat history cleared')
+    }
+  }
+
+  const groupSessions = () => {
+    const groups = { 'Today': [], 'Yesterday': [], 'Previous 7 Days': [], 'Older': [] }
+    sessions.forEach(s => {
+      if (s.messages.length === 0) return // Skip empty sessions
+      if (isToday(s.updatedAt)) groups['Today'].push(s)
+      else if (isYesterday(s.updatedAt)) groups['Yesterday'].push(s)
+      else if (Date.now() - s.updatedAt < 7 * 24 * 60 * 60 * 1000) groups['Previous 7 Days'].push(s)
+      else groups['Older'].push(s)
+    })
+    return groups
+  }
 
   const loadData = useCallback(async () => {
     try {
@@ -87,13 +210,13 @@ export default function Playground() {
     setInput('')
     if (textareaRef.current) textareaRef.current.style.height = 'auto'
     
-    const newMsg = { role: 'user', content: userMsg, time: new Date() }
+    const newMsg = { id: Date.now().toString(), role: 'user', content: userMsg, timestamp: Date.now() }
     setMessages(p => [...p, newMsg])
     setBotLoading(true)
     setIsStreaming(false)
 
     // Add placeholder bot message
-    setMessages(p => [...p, { role: 'assistant', content: '', time: new Date() }])
+    setMessages(p => [...p, { id: (Date.now()+1).toString(), role: 'assistant', content: '', timestamp: Date.now() }])
 
     // Mock response metrics
     const startTime = Date.now()
@@ -114,7 +237,7 @@ export default function Playground() {
         },
         body: JSON.stringify({
           message: userMsg,
-          sessionId: sessionId.current,
+          sessionId: currentSessionId,
           history: messages.slice(-6).map(m => ({ role: m.role, content: m.content })),
         }),
         signal: controller.signal,
@@ -213,7 +336,7 @@ export default function Playground() {
   return (
     <div className="h-[100dvh] md:h-screen bg-background text-text-primary font-inter flex overflow-hidden selection:bg-accent/30 pb-[60px] md:pb-0">
 
-      {/* ─── LEFT PANEL: Bot Selector ─── */}
+      {/* ─── LEFT PANEL: History Sidebar ─── */}
       {/* Mobile: slide-in overlay; Desktop: always visible */}
       {leftSidebarOpen && (
         <div
@@ -228,7 +351,14 @@ export default function Playground() {
           <Link to="/dashboard" id="playground-back-btn" className="p-2 -ml-2 rounded-lg hover:bg-surface-elevated text-text-muted hover:text-text-primary transition-colors min-w-[44px] min-h-[44px] flex items-center justify-center">
             <ChevronLeft size={20} />
           </Link>
-          <h2 className="font-bold text-text-primary flex-1">Playground</h2>
+          <h2 className="font-bold text-text-primary flex-1">History</h2>
+          <button
+            onClick={startNewSession}
+            className="p-2 text-text-muted hover:text-text-primary hover:bg-surface-elevated rounded-lg transition-colors"
+            title="New Chat"
+          >
+            <Plus size={18} />
+          </button>
           <button
             id="playground-close-sidebar"
             onClick={() => setLeftSidebarOpen(false)}
@@ -238,32 +368,49 @@ export default function Playground() {
           </button>
         </div>
         
-        <div className="p-4 flex-1 overflow-y-auto">
-          <p className="text-xs font-bold text-text-muted uppercase tracking-wider mb-4">Select Chatbot</p>
-          <div className="space-y-2">
-            {chatbots.map(b => (
-              <button
-                key={b._id}
-                onClick={() => navigate(`/chatbot/${b._id}/playground`)}
-                className={`w-full text-left p-3 rounded-xl border transition-all ${
-                  b._id === id 
-                    ? 'bg-accent/10 border-accent/30 shadow-[0_0_15px_rgba(108,99,255,0.05)]' 
-                    : 'bg-transparent border-transparent hover:bg-surface-elevated hover:border-border'
-                }`}
-              >
-                <div className="flex items-center justify-between mb-1">
-                  <h3 className={`font-semibold truncate pr-2 ${b._id === id ? 'text-accent' : 'text-text-primary'}`}>
-                    {b.name}
-                  </h3>
-                  <div className={`w-2 h-2 rounded-full shrink-0 ${b.status === 'ready' ? 'bg-green-500' : 'bg-yellow-500'}`} />
+        <div className="p-3 flex-1 overflow-y-auto space-y-4">
+          {Object.entries(groupSessions()).map(([groupName, groupSessions]) => {
+            if (groupSessions.length === 0) return null
+            return (
+              <div key={groupName}>
+                <p className="text-[10px] font-bold text-text-muted uppercase tracking-wider mb-2 px-1">{groupName}</p>
+                <div className="space-y-1">
+                  {groupSessions.map(s => {
+                    const firstMsg = s.messages.find(m => m.role === 'user')?.content || 'New Chat'
+                    const title = firstMsg.length > 40 ? firstMsg.substring(0, 40) + '...' : firstMsg
+                    const isActive = s.id === currentSessionId
+                    
+                    return (
+                      <div
+                        key={s.id}
+                        onClick={() => loadSession(s.id)}
+                        className={`group relative flex items-center justify-between p-2 rounded-lg cursor-pointer transition-colors ${
+                          isActive ? 'bg-[#252540] text-white' : 'bg-[#1a1a2e] text-gray-300 hover:bg-[#252540] hover:text-white'
+                        }`}
+                      >
+                        <div className="min-w-0 pr-6">
+                          <p className="text-sm font-medium truncate">{title}</p>
+                          <p className="text-[10px] text-gray-500 mt-0.5">{formatTime(s.updatedAt)}</p>
+                        </div>
+                        <button
+                          onClick={(e) => deleteSession(e, s.id)}
+                          className={`absolute right-2 p-1.5 text-gray-400 hover:text-red-400 hover:bg-red-500/10 rounded-md transition-colors opacity-0 group-hover:opacity-100 ${
+                            isActive ? 'opacity-100' : ''
+                          }`}
+                        >
+                          <Trash2 size={14} />
+                        </button>
+                      </div>
+                    )
+                  })}
                 </div>
-                <div className="flex items-center gap-3 text-xs text-text-muted">
-                  <span className="flex items-center gap-1"><FileText size={10} /> {b.documents?.length || 0}</span>
-                  <span className="flex items-center gap-1"><MessageSquare size={10} /> {b.stats?.totalMessages || 0}</span>
-                </div>
-              </button>
-            ))}
-          </div>
+              </div>
+            )
+          })}
+          
+          {sessions.filter(s => s.messages.length > 0).length === 0 && (
+            <p className="text-xs text-text-muted text-center py-4 italic">No chat history</p>
+          )}
         </div>
       </div>
 
@@ -274,13 +421,13 @@ export default function Playground() {
         {/* Chat Header */}
         <div className="h-14 border-b border-border bg-surface/50 backdrop-blur-md flex items-center justify-between px-4 sm:px-6 shrink-0 relative z-10">
           <div className="flex items-center gap-3">
-            {/* Mobile hamburger for left sidebar */}
+            {/* Mobile hamburger for left sidebar (History) */}
             <button
               id="playground-open-sidebar"
               onClick={() => setLeftSidebarOpen(true)}
               className="lg:hidden p-2 -ml-2 text-text-muted hover:text-text-primary hover:bg-surface-elevated rounded-lg transition-colors min-w-[44px] min-h-[44px] flex items-center justify-center"
             >
-              <Menu size={20} />
+              <Clock size={20} />
             </button>
             <div className="relative">
               <div className="w-10 h-10 rounded-full flex items-center justify-center text-white shadow-md" style={{ backgroundColor: accentColor }}>
@@ -297,8 +444,11 @@ export default function Playground() {
           </div>
           
           <div className="flex items-center gap-2">
-            <button onClick={() => { setMessages([]); setMockMetrics({ tokens: 0, ms: 0, chunks: [] }) }} className="p-2 text-text-muted hover:text-text-primary hover:bg-surface-elevated rounded-lg transition-colors" title="Clear Chat">
-              <RefreshCw size={18} />
+            <button onClick={clearHistory} className="p-2 text-text-muted hover:text-red-400 hover:bg-red-500/10 rounded-lg transition-colors" title="Clear History">
+              <Trash2 size={18} />
+            </button>
+            <button onClick={startNewSession} className="p-2 text-text-muted hover:text-text-primary hover:bg-surface-elevated rounded-lg transition-colors" title="New Chat">
+              <Plus size={18} />
             </button>
             <Link to={`/chatbot/${id}`} className="p-2 text-text-muted hover:text-text-primary hover:bg-surface-elevated rounded-lg transition-colors" title="Settings">
               <Settings size={18} />
@@ -384,7 +534,7 @@ export default function Playground() {
                             {isStreaming && isLastBotMsg && <span className="inline-block w-1.5 h-4 ml-1 align-middle bg-text-primary animate-pulse" />}
                           </div>
                           <span className="text-[10px] text-text-muted font-medium mt-1.5 px-1">
-                            {msg.time ? formatTime(msg.time) : formatTime(new Date())}
+                            {msg.timestamp ? formatTime(msg.timestamp) : formatTime(new Date())}
                           </span>
                         </div>
                       </motion.div>
