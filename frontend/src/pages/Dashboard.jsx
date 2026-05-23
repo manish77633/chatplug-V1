@@ -41,7 +41,11 @@ export default function Dashboard() {
   const [newNameError, setNewNameError] = useState('')
   const [showModal, setShowModal] = useState(false)
 
-  useEffect(() => { fetchChatbots() }, [])
+  useEffect(() => {
+    setChatbots([]);
+    setLoading(true);
+    fetchChatbots();
+  }, [user?._id])
 
   const fetchChatbots = async () => {
     try {

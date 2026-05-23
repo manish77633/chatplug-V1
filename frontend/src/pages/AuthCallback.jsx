@@ -16,6 +16,11 @@ export default function AuthCallback() {
 
     if (token && userStr) {
       try {
+        // Clear any previous session first to prevent data leak between accounts
+        localStorage.removeItem('token');
+        localStorage.removeItem('user');
+        delete api.defaults.headers.common['Authorization'];
+
         localStorage.setItem('token', token);
         localStorage.setItem('user', userStr);
         api.defaults.headers.common['Authorization'] = `Bearer ${token}`;
