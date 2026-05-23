@@ -2,7 +2,7 @@ import { create } from 'zustand'
 import api from '../utils/api'
 
 export const useAuthStore = create((set, get) => ({
-  user: null,
+  user: JSON.parse(localStorage.getItem('user') || 'null'),
   token: localStorage.getItem('token') || null,
   isHydrated: false,
 
@@ -13,6 +13,8 @@ export const useAuthStore = create((set, get) => ({
     if (token) api.defaults.headers.common['Authorization'] = `Bearer ${token}`
     set({ token, user, isHydrated: true })
   },
+  
+  syncAuth: () => get().hydrate(),
 
   login: async (email, password) => {
     const { data } = await api.post('/auth/login', { email, password })

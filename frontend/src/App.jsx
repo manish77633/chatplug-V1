@@ -20,29 +20,22 @@ import AdminPanel    from './pages/AdminPanel'
 import BottomNav     from './components/ui/BottomNav'
 
 const Protected = ({ children }) => {
-  const { token, isHydrated } = useAuthStore()
-  if (!isHydrated) {
-    return (
-      <div className="min-h-screen bg-background flex items-center justify-center">
-        <Loader2 className="animate-spin text-accent" size={32} />
-      </div>
-    )
-  }
-  return token ? children : <Navigate to="/login" replace />
+  const token = useAuthStore(s => s.token) || localStorage.getItem('token')
+  if (!token) return <Navigate to="/login" replace />
+  return children
 }
 
 const AdminRoute = ({ children }) => {
-  const { user, isHydrated } = useAuthStore()
-  if (!isHydrated) return null
+  const user = useAuthStore(s => s.user) || JSON.parse(localStorage.getItem('user') || 'null')
   return user?.role === 'admin' ? children : <Navigate to="/dashboard" replace />
 }
 
 export default function App() {
-  const { hydrate } = useAuthStore()
+  const { syncAuth } = useAuthStore()
 
   useEffect(() => {
-    hydrate()
-  }, [hydrate])
+    syncAuth()
+  }, [syncAuth])
 
   return (
     <>
@@ -57,6 +50,7 @@ export default function App() {
 
         {/* Protected */}
         <Route path="/dashboard"                      element={<Protected><Dashboard /></Protected>} />
+        <Route path="/chatbots"                       element={<Protected><Dashboard /></Protected>} />
         <Route path="/settings"                       element={<Protected><Settings /></Protected>} />
         <Route path="/profile"                        element={<Protected><Profile /></Protected>} />
         <Route path="/chatbot/:id"                    element={<Protected><ChatbotDetail /></Protected>} />
