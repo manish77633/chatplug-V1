@@ -98,7 +98,7 @@ export default function Landing() {
   const heroRef = useRef(null)
 
   return (
-    <div className="min-h-screen bg-background text-text-primary selection:bg-accent/30 selection:text-text-primary overflow-x-hidden">
+    <div className="min-h-screen bg-background text-text-primary selection:bg-accent/30 selection:text-text-primary">
       <Navbar isAuthenticated={false} />
 
       {/* ─── Hero ─── */}
@@ -148,15 +148,15 @@ export default function Landing() {
               </p>
             </motion.div>
 
-            <motion.div variants={itemVariants} className="flex flex-wrap items-center gap-4 mb-8">
+            <motion.div variants={itemVariants} className="flex flex-row gap-3 flex-wrap justify-center lg:justify-start mt-6 mb-8">
               <Link to="/register">
-                <button className="px-8 py-4 bg-accent hover:bg-accent/90 text-white rounded-xl font-medium transition-all shadow-lg hover:shadow-accent/25 hover:-translate-y-0.5 flex items-center gap-2">
+                <button className="px-8 py-4 bg-accent hover:bg-accent/90 text-white rounded-xl font-medium transition-all shadow-lg hover:shadow-accent/25 hover:-translate-y-0.5 flex items-center gap-2 whitespace-nowrap">
                   Start for Free <ArrowRight size={18} />
                 </button>
               </Link>
               <button
                 onClick={() => document.getElementById('features')?.scrollIntoView({ behavior: 'smooth' })}
-                className="px-8 py-4 bg-surface-elevated hover:bg-surface-elevated/80 text-text-primary border border-border rounded-xl font-medium transition-all flex items-center gap-2 hover:-translate-y-0.5"
+                className="px-8 py-4 bg-surface-elevated hover:bg-surface-elevated/80 text-text-primary border border-border rounded-xl font-medium transition-all flex items-center gap-2 hover:-translate-y-0.5 whitespace-nowrap"
               >
                 <Play size={18} className="text-accent" />
                 See Features
@@ -247,7 +247,7 @@ export default function Landing() {
       </section>
 
       {/* ─── How it works ─── */}
-      <section className="py-32 px-4 relative">
+      <section className="py-32 px-4 relative scroll-mt-16">
         <div className="container-md">
           <motion.div
             className="text-center mb-24"
@@ -309,7 +309,7 @@ export default function Landing() {
       </section>
 
       {/* ─── Features Grid ─── */}
-      <section className="py-32 px-4 bg-surface border-y border-border" id="features">
+      <section className="py-32 px-4 bg-surface border-y border-border scroll-mt-16" id="features">
         <div className="container-md">
           <motion.div
             className="text-center mb-20"
@@ -353,7 +353,7 @@ export default function Landing() {
       </section>
 
       {/* ─── Social Proof ─── */}
-      <section className="py-32 px-4 overflow-hidden">
+      <section className="py-32 px-4 overflow-hidden scroll-mt-16">
         <div className="container-md text-center">
           <motion.h3 
             initial={{ opacity: 0 }}
@@ -371,18 +371,18 @@ export default function Landing() {
             <div className="flex items-center w-[200%] animate-[shimmer_20s_linear_infinite]" style={{ backgroundPosition: '0 0' }}>
                <div className="flex items-center justify-around w-1/2 opacity-50 grayscale hover:grayscale-0 transition-all duration-300">
                   {/* Logos Placeholders */}
-                  <div className="text-2xl font-bold tracking-tighter">Vercel</div>
-                  <div className="text-2xl font-bold tracking-tighter">Stripe</div>
-                  <div className="text-2xl font-bold tracking-tighter">Linear</div>
-                  <div className="text-2xl font-bold tracking-tighter">Raycast</div>
-                  <div className="text-2xl font-bold tracking-tighter">Figma</div>
+                  <div className="text-2xl font-bold tracking-tighter text-gray-200">Vercel</div>
+                  <div className="text-2xl font-bold tracking-tighter text-gray-200">Stripe</div>
+                  <div className="text-2xl font-bold tracking-tighter text-gray-200">Linear</div>
+                  <div className="text-2xl font-bold tracking-tighter text-gray-200">Raycast</div>
+                  <div className="text-2xl font-bold tracking-tighter text-gray-200">Figma</div>
                </div>
                <div className="flex items-center justify-around w-1/2 opacity-50 grayscale hover:grayscale-0 transition-all duration-300">
-                  <div className="text-2xl font-bold tracking-tighter">Vercel</div>
-                  <div className="text-2xl font-bold tracking-tighter">Stripe</div>
-                  <div className="text-2xl font-bold tracking-tighter">Linear</div>
-                  <div className="text-2xl font-bold tracking-tighter">Raycast</div>
-                  <div className="text-2xl font-bold tracking-tighter">Figma</div>
+                  <div className="text-2xl font-bold tracking-tighter text-gray-200">Vercel</div>
+                  <div className="text-2xl font-bold tracking-tighter text-gray-200">Stripe</div>
+                  <div className="text-2xl font-bold tracking-tighter text-gray-200">Linear</div>
+                  <div className="text-2xl font-bold tracking-tighter text-gray-200">Raycast</div>
+                  <div className="text-2xl font-bold tracking-tighter text-gray-200">Figma</div>
                </div>
             </div>
           </div>
@@ -419,7 +419,7 @@ export default function Landing() {
       </section>
 
       {/* ─── Pricing ─── */}
-      <section className="py-32 px-4 bg-surface border-t border-border relative" id="pricing">
+      <section className="py-32 px-4 bg-surface border-t border-border relative scroll-mt-16" id="pricing">
         <div className="absolute inset-0 bg-background noise-bg" />
         <div className="container-md relative z-10">
            <motion.div
@@ -454,17 +454,12 @@ export default function Landing() {
             </motion.div>
 
             {/* Pro */}
-            <motion.div variants={itemVariants} className="p-8 bg-background rounded-3xl relative flex flex-col hover:shadow-[0_0_40px_rgba(108,99,255,0.15)] transition-all md:scale-105 z-10">
-              <div className="absolute inset-0 rounded-3xl bg-gradient-to-b from-accent to-accent-secondary opacity-20 pointer-events-none" style={{ padding: '2px' }}>
-                 <div className="w-full h-full bg-background rounded-[22px]" />
-              </div>
-              <div className="absolute inset-0 rounded-3xl border-2 border-transparent bg-gradient-to-b from-accent to-accent-secondary [background-clip:border-box] [-webkit-mask:linear-gradient(#fff_0_0)_padding-box,_linear-gradient(#fff_0_0)] [-webkit-mask-composite:destination-out] pointer-events-none" />
-              
-              <div className="absolute -top-4 left-1/2 -translate-x-1/2 px-3 py-1 bg-gradient-to-r from-accent to-accent-secondary rounded-full text-xs font-bold text-white shadow-lg">
+            <motion.div variants={itemVariants} className="relative rounded-2xl p-[1px] bg-gradient-to-b from-purple-500 to-blue-600 flex flex-col hover:shadow-[0_0_40px_rgba(108,99,255,0.15)] transition-all md:scale-105 z-10">
+              <div className="absolute -top-4 left-1/2 -translate-x-1/2 px-3 py-1 bg-gradient-to-r from-accent to-accent-secondary rounded-full text-xs font-bold text-white shadow-lg z-20">
                 MOST POPULAR
               </div>
-
-              <div className="relative z-10 flex flex-col flex-1">
+              
+              <div className="bg-[#0d0d1a] rounded-2xl p-6 h-full flex flex-col relative z-10">
                 <h3 className="text-xl font-medium text-text-primary mb-2">Pro</h3>
                 <div className="mb-6"><span className="text-4xl font-bold">$49</span><span className="text-text-muted">/mo</span></div>
                 <p className="text-sm text-text-muted mb-8">For growing startups and professional sites.</p>
