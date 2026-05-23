@@ -1,36 +1,26 @@
 const axios = require('axios');
 const cheerio = require('cheerio');
+const pdfParse = require('pdf-parse');
+const fs = require('fs');
 
 /**
- * Extract text from PDF buffer using pdfjs-dist (production-safe)
+ * Extract text from PDF buffer using pdf-parse
  */
 exports.extractFromPDF = async (buffer) => {
   try {
-    // Use pdfjs-dist which works reliably in production without test files
-    const pdfjsLib = require('pdfjs-dist/legacy/build/pdf.js');
-    pdfjsLib.GlobalWorkerOptions.workerSrc = false; // Disable worker for Node.js
-
-    const uint8Array = new Uint8Array(buffer);
-    const loadingTask = pdfjsLib.getDocument({ data: uint8Array, disableFontFace: true, verbosity: 0 });
-    const pdfDoc = await loadingTask.promise;
-
-    let fullText = '';
-    const pageCount = pdfDoc.numPages;
-
-    for (let i = 1; i <= pageCount; i++) {
-      const page = await pdfDoc.getPage(i);
-      const content = await page.getTextContent();
-      const pageText = content.items.map(item => item.str).join(' ');
-      fullText += pageText + '\n';
+    const data = await pdfParse(buffer);
+    
+    if (!data.text || data.text.trim().length === 0) {
+      throw new Error('PDF has no extractable text');
     }
 
     return {
-      text: fullText.trim(),
-      pageCount,
-      charCount: fullText.length,
+      text: data.text.trim(),
+      pageCount: data.numpages,
+      charCount: data.text.length,
     };
   } catch (err) {
-    console.error('[PDF] pdfjs-dist failed:', err.message);
+    console.error('[PDF] pdf-parse failed:', err.message);
     throw new Error('Could not extract text from PDF: ' + err.message);
   }
 };

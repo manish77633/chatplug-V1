@@ -38,7 +38,6 @@
     "passport": "^0.7.0",
     "passport-google-oauth20": "^2.0.0",
     "pdf-parse": "^1.1.1",
-    "pdfjs-dist": "^5.7.284",
     "puppeteer": "^22.8.0",
     "razorpay": "^2.9.6",
     "uuid": "^9.0.1"

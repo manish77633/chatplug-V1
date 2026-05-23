@@ -360,6 +360,10 @@ export default function ChatbotDetail() {
                                 </div>
                                 <div className="flex-1 min-w-0">
                                   <p className="text-sm font-semibold text-text-primary truncate">{doc.name}</p>
+                                  {/* Show error message when processing failed */}
+                                  {doc.status === 'failed' && doc.errorMessage && (
+                                    <p className="text-xs text-danger mt-2 truncate">{doc.errorMessage}</p>
+                                  )}
                                   <div className="flex items-center gap-2 mt-1">
                                     <div className="flex-1 h-1 bg-surface-elevated rounded-full overflow-hidden">
                                       <div className={`h-full ${doc.status === 'completed' ? 'bg-green-500 w-full' : doc.status === 'failed' ? 'bg-red-500 w-full' : 'bg-yellow-500 w-2/3 animate-pulse'}`} />
@@ -368,7 +372,7 @@ export default function ChatbotDetail() {
                                   </div>
                                 </div>
                               </div>
-                              <button onClick={() => deleteDoc(doc._id)} className="ml-4 p-2 text-text-muted hover:text-red-500 hover:bg-red-500/10 rounded-lg transition-colors opacity-0 group-hover:opacity-100">
+                              <button onClick={() => deleteDoc(doc._1d)} className="ml-4 p-2 text-text-muted hover:text-red-500 hover:bg-red-500/10 rounded-lg transition-colors opacity-0 group-hover:opacity-100">
                                 <Trash2 size={16} />
                               </button>
                             </div>
