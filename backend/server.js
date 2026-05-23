@@ -59,11 +59,12 @@ app.use((err, _req, res, _next) => {
 
 // ─── Boot ─────────────────────────────────────────────────────────────────────
 const PORT = process.env.PORT || 5000;
+const HOST = '0.0.0.0'; // Required for Render deployment
 mongoose
   .connect(process.env.MONGO_URI, { serverSelectionTimeoutMS: 5000 })
   .then(() => {
     console.log('✅ MongoDB connected');
-    app.listen(PORT, () => console.log(`🚀 ChatPlug API on :${PORT}`));
+    app.listen(PORT, HOST, () => console.log(`🚀 ChatPlug API on ${HOST}:${PORT}`));
   })
   .catch(err => { console.error('FATAL:', err.message); process.exit(1); });
 
