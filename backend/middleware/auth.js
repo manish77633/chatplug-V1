@@ -11,6 +11,13 @@ exports.protect = async (req, res, next) => {
     const decoded = jwt.verify(token, process.env.JWT_SECRET);
     const user = await User.findById(decoded.id).select('-password');
     if (!user) return res.status(401).json({ success: false, message: 'User not found' });
+    
+    // Ensure limits are always set (Google OAuth users may not have limits)
+    if (!user.limits || !user.limits.maxChatbots) {
+      user.applyPlanLimits();
+      await user.save({ validateBeforeSave: false });
+    }
+    
     req.user = user;
     next();
   } catch (err) {
@@ -28,9 +35,9 @@ exports.adminOnly = (req, res, next) => {
 exports.checkPlanLimit = (resource) => async (req, res, next) => {
   const user = req.user;
   const limits = {
-    chatbots:  user.limits?.maxChatbots || 2,
-    documents: user.limits?.maxDocuments || 10,
-    tokens:    user.limits?.maxTokens || 100000,
+    chatbots:  user.limits?.maxChatbots  || (user.plan?.type === 'pro' ? 20 : 3),
+    documents: user.limits?.maxDocuments || (user.plan?.type === 'pro' ? 100 : 10),
+    tokens:    user.limits?.maxTokens    || (user.plan?.type === 'pro' ? 1000000 : 100000),
   };
 
   let currentCount = 0;
