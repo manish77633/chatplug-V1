@@ -38,7 +38,7 @@ export default function App() {
   }, [syncAuth])
 
   return (
-    <>
+    <div className="min-h-screen pb-[72px] md:pb-0 flex flex-col">
       <Routes>
         {/* Public */}
         <Route path="/"            element={<Landing />} />
@@ -88,6 +88,6 @@ export default function App() {
           },
         }}
       />
-    </>
+    </div>
   )
 }

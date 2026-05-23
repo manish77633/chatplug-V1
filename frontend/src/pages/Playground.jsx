@@ -476,7 +476,7 @@ export default function Playground() {
         )}
 
         {/* Messages Area */}
-        <div className="flex-1 overflow-y-auto px-4 py-8 relative z-10">
+        <div className="flex-1 overflow-y-auto px-4 pt-8 pb-[72px] md:pb-8 relative z-10">
           <div className="max-w-3xl mx-auto w-full">
             {messages.length === 0 ? (
               <div className="h-full flex flex-col items-center justify-center pt-20">
@@ -548,7 +548,7 @@ export default function Playground() {
         </div>
 
         {/* Input Area */}
-        <div className="p-4 bg-surface/50 backdrop-blur-md border-t border-border shrink-0 relative z-10">
+        <div className="fixed bottom-[60px] md:static left-0 right-0 p-4 bg-surface/50 backdrop-blur-md border-t border-border shrink-0 z-20">
           <div className="max-w-3xl mx-auto">
             <form onSubmit={sendMessage} className="relative flex items-end gap-2 bg-background border border-border focus-within:border-accent focus-within:shadow-[0_0_15px_rgba(108,99,255,0.1)] rounded-2xl p-2 transition-all">
               <button type="button" onClick={() => toast('File attachment coming soon', { icon: '📎' })} className="p-2 text-text-muted hover:text-text-primary transition-colors shrink-0 mb-1 rounded-lg hover:bg-surface">

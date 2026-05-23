@@ -49,7 +49,7 @@ export default function Docs() {
   const step = STEPS[current]
 
   return (
-    <div className="min-h-screen bg-background text-text-primary font-inter selection:bg-accent/30">
+    <div className="min-h-screen bg-background text-text-primary font-inter selection:bg-accent/30 pb-[72px] md:pb-0">
       {/* Navbar */}
       <nav className="flex items-center justify-between px-4 md:px-10 py-3 border-b border-border bg-surface/80 backdrop-blur-md sticky top-0 z-40">
         <div className="flex items-center gap-2 min-w-0">
@@ -204,7 +204,7 @@ export default function Docs() {
         </div>
 
         {/* Footer CTA */}
-        <div className="mt-10 md:mt-16 text-center p-6 md:p-10 bg-surface border border-border rounded-2xl relative overflow-hidden">
+        <div className="mt-10 md:mt-16 mb-[72px] md:mb-0 text-center p-6 md:p-10 bg-surface border border-border rounded-2xl relative overflow-hidden">
           <div className="absolute inset-0 bg-gradient-to-br from-accent/5 to-accent-secondary/5 pointer-events-none" />
           <div className="relative z-10">
             <h3 className="text-lg md:text-2xl font-bold text-text-primary mb-2 md:mb-3">Ready to build your first chatbot?</h3>
