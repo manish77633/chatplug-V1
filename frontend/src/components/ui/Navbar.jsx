@@ -97,22 +97,25 @@ export default function Navbar({ isAuthenticated }) {
       {mobileOpen && (
         <div className="md:hidden border-t border-border bg-surface glass">
           <div className="px-6 py-4 space-y-4">
-            {!isAuthenticated ? (
-              <>
-                <button onClick={() => { const el = document.getElementById('features'); if (el) el.scrollIntoView({ behavior: 'smooth' }); else navigate('/#features'); setMobileOpen(false) }} className="block text-sm text-text-muted hover:text-text-primary w-full text-left">Features</button>
-                <button onClick={() => { const el = document.getElementById('pricing'); if (el) el.scrollIntoView({ behavior: 'smooth' }); else navigate('/#pricing'); setMobileOpen(false) }} className="block text-sm text-text-muted hover:text-text-primary w-full text-left">Pricing</button>
-                <Link to="/docs" onClick={() => setMobileOpen(false)} className="block text-sm text-text-muted hover:text-text-primary">Docs</Link>
-                <Link to="/login" onClick={() => setMobileOpen(false)} className="block text-sm text-text-muted hover:text-text-primary">Sign in</Link>
-                <Link to="/register" onClick={() => setMobileOpen(false)} className="block w-full text-center py-2 bg-accent rounded-lg text-white font-semibold">Get Started</Link>
-              </>
-            ) : (
-              <>
-                <Link to="/dashboard" onClick={() => setMobileOpen(false)} className="block w-full text-center py-2 bg-surface-elevated rounded-lg text-text-primary font-semibold mb-2">Dashboard</Link>
-                <button onClick={() => { handleLogout(); setMobileOpen(false) }} className="w-full text-center text-sm text-danger py-2 bg-red-500/10 rounded-lg transition-colors font-medium">
-                  Logout
-                </button>
-              </>
-            )}
+            <button onClick={() => { const el = document.getElementById('features'); if (el) el.scrollIntoView({ behavior: 'smooth' }); else navigate('/#features'); setMobileOpen(false) }} className="block text-sm text-text-muted hover:text-text-primary w-full text-left">Features</button>
+            <button onClick={() => { const el = document.getElementById('pricing'); if (el) el.scrollIntoView({ behavior: 'smooth' }); else navigate('/#pricing'); setMobileOpen(false) }} className="block text-sm text-text-muted hover:text-text-primary w-full text-left">Pricing</button>
+            <Link to="/docs" onClick={() => setMobileOpen(false)} className="block text-sm text-text-muted hover:text-text-primary mb-4">Docs</Link>
+            
+            <div className="border-t border-border pt-4 space-y-4">
+              {!isAuthenticated ? (
+                <>
+                  <Link to="/login" onClick={() => setMobileOpen(false)} className="block text-sm text-text-muted hover:text-text-primary">Sign in</Link>
+                  <Link to="/register" onClick={() => setMobileOpen(false)} className="block w-full text-center py-2 bg-accent rounded-lg text-white font-semibold">Get Started</Link>
+                </>
+              ) : (
+                <>
+                  <Link to="/dashboard" onClick={() => setMobileOpen(false)} className="block w-full text-center py-2 bg-surface-elevated rounded-lg text-text-primary font-semibold">Dashboard</Link>
+                  <button onClick={() => { handleLogout(); setMobileOpen(false) }} className="w-full text-center text-sm text-danger py-2 bg-red-500/10 rounded-lg transition-colors font-medium">
+                    Logout
+                  </button>
+                </>
+              )}
+            </div>
           </div>
         </div>
       )}
