@@ -84,9 +84,9 @@ export default function DocsGuides() {
   const navigate = useNavigate()
 
   return (
-    <div className="min-h-screen bg-background text-text-primary font-inter selection:bg-accent/30 overflow-x-hidden">
+    <div className="bg-background text-text-primary font-inter selection:bg-accent/30 overflow-x-hidden">
       {/* Navbar */}
-      <nav className="flex items-center justify-between px-4 sm:px-10 py-4 border-b border-border bg-surface/80 backdrop-blur-md sticky top-0 z-40">
+      <nav className="flex items-center justify-between px-2.5 sm:px-10 py-4 border-b border-border bg-surface/80 backdrop-blur-md sticky top-0 z-40">
         <div className="flex items-center gap-3">
           <button
             id="docs-guides-back"
@@ -110,7 +110,7 @@ export default function DocsGuides() {
         </Link>
       </nav>
 
-      <div className="max-w-5xl mx-auto px-4 sm:px-6 py-10 sm:py-16">
+      <div className="max-w-5xl mx-auto px-2.5 sm:px-6 py-10 sm:py-16">
         {/* Header */}
         <div className="text-center mb-12">
           <span className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-surface-elevated border border-border text-sm font-medium text-accent-secondary mb-6">

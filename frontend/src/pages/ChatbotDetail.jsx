@@ -158,9 +158,9 @@ export default function ChatbotDetail() {
   }
 
   return (
-    <div className="min-h-screen bg-background text-text-primary font-inter flex flex-col selection:bg-accent/30 selection:text-text-primary overflow-x-hidden relative pb-[60px] md:pb-0">
+    <div className="bg-background text-text-primary font-inter flex flex-col selection:bg-accent/30 selection:text-text-primary overflow-x-hidden relative">
       {/* ─── NAV ─── */}
-      <nav className="flex items-center justify-between px-4 sm:px-8 py-3 sm:py-4 border-b border-border bg-surface sticky top-0 z-40 shadow-sm">
+      <nav className="flex items-center justify-between px-2.5 sm:px-8 py-3 sm:py-4 border-b border-border bg-surface sticky top-0 z-40 shadow-sm">
         <div className="flex items-center gap-4">
           <Link to="/dashboard" id="chatbot-detail-back" className="p-2 rounded-lg text-text-muted hover:text-text-primary hover:bg-surface-elevated transition-colors min-w-[44px] min-h-[44px] flex items-center justify-center">
             <ArrowLeft size={20} />
@@ -181,7 +181,7 @@ export default function ChatbotDetail() {
       </nav>
 
       {/* ─── MAIN CONTENT ─── */}
-      <div className="flex-1 w-full max-w-7xl mx-auto px-4 sm:px-6 py-6 sm:py-12 relative z-10 flex flex-col">
+      <div className="flex-1 w-full max-w-7xl mx-auto px-2.5 sm:px-6 py-6 sm:py-12 relative z-10 flex flex-col">
         
         {/* ─── STEPPER HEADER ─── */}
         <div className="w-full max-w-4xl mx-auto mb-8 sm:mb-16 relative">

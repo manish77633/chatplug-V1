@@ -219,10 +219,10 @@ export default function Analytics() {
   }
 
   return (
-    <div className="min-h-screen bg-background text-text-primary font-inter selection:bg-accent/30 selection:text-text-primary pb-[60px] md:pb-0">
+    <div className="bg-background text-text-primary font-inter selection:bg-accent/30 selection:text-text-primary">
       {/* Breadcrumb Header */}
       <div className="border-b border-border bg-surface/50 backdrop-blur-md sticky top-0 z-40">
-        <div className="max-w-7xl mx-auto px-4 md:px-6 py-3 md:py-4 flex flex-col md:flex-row md:items-center justify-between gap-4">
+        <div className="max-w-7xl mx-auto px-2.5 md:px-6 py-3 md:py-4 flex flex-col md:flex-row md:items-center justify-between gap-4">
           <div className="flex items-center gap-3">
             <Link
               id="analytics-back-btn"
@@ -296,7 +296,7 @@ export default function Analytics() {
         </div>
       </div>
 
-      <div className="max-w-7xl mx-auto px-4 md:px-6 py-6 md:py-10 space-y-8">
+      <div className="max-w-7xl mx-auto px-2.5 md:px-6 py-6 md:py-10 space-y-8">
         
         {/* ─── KPI STATS ─── */}
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 md:gap-6">

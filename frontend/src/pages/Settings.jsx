@@ -319,10 +319,10 @@ export default function Settings() {
   }[activeTab]
 
   return (
-    <div className="min-h-screen bg-background text-text-primary font-inter selection:bg-accent/30 pb-24 md:pb-8">
+    <div className="bg-background text-text-primary font-inter selection:bg-accent/30">
       {/* Header */}
       <div className="border-b border-border bg-surface/80 backdrop-blur-md sticky top-0 z-40">
-        <div className="w-full px-4 lg:max-w-5xl lg:mx-auto py-3 flex items-center gap-3">
+        <div className="w-full px-2.5 sm:px-4 lg:max-w-5xl lg:mx-auto py-3 flex items-center gap-3">
           <button
             id="settings-back"
             onClick={() => navigate('/dashboard')}
@@ -331,11 +331,11 @@ export default function Settings() {
             <ArrowLeft size={20} />
           </button>
           <div>
-            <h1 className="text-base font-bold text-text-primary leading-tight">Settings</h1>
-            <div className="flex items-center gap-1.5 text-xs text-text-muted font-medium mt-0.5">
-              <Link to="/dashboard" className="hover:text-accent transition-colors">Dashboard</Link>
+            <h1 className="text-2xl font-semibold text-text-primary leading-tight">Settings</h1>
+            <div className="flex items-center gap-1.5 text-xs text-gray-500 font-medium mt-1">
+              <Link to="/dashboard" className="hover:text-white transition-colors">Dashboard</Link>
               <span>/</span>
-              <span className="text-text-primary capitalize">{TABS.find(t => t.id === activeTab)?.label}</span>
+              <span className="text-gray-300 capitalize">{TABS.find(t => t.id === activeTab)?.label}</span>
             </div>
           </div>
         </div>
@@ -370,42 +370,40 @@ export default function Settings() {
         </div>
       </div>
 
-      <div className="w-full px-4 py-6 lg:max-w-5xl lg:mx-auto">
-        <div className="flex flex-col lg:flex-row gap-8">
-          {/* Tab Sidebar — desktop only */}
-          <aside className="hidden lg:block lg:w-52 shrink-0">
-            <div className="flex flex-col gap-1">
-              {TABS.map(tab => {
-                const Icon = tab.icon
-                return (
-                  <button
-                    key={tab.id}
-                    id={`settings-tab-desk-${tab.id}`}
-                    onClick={() => setActiveTab(tab.id)}
-                    className={`flex items-center gap-3 px-4 py-3 rounded-xl font-medium text-sm transition-all w-full min-h-[44px] ${
-                      activeTab === tab.id
-                        ? 'bg-accent/10 text-accent border border-accent/20'
-                        : 'text-text-muted hover:text-text-primary hover:bg-surface-elevated'
-                    }`}
-                  >
-                    <Icon size={16} className={activeTab === tab.id ? 'text-accent' : 'text-text-muted'} />
-                    {tab.label}
-                    {activeTab === tab.id && <ChevronRight size={14} className="ml-auto" />}
-                  </button>
-                )
-              })}
-            </div>
-          </aside>
+      <div className="w-full px-2.5 sm:px-4 py-6 lg:max-w-5xl lg:mx-auto">
+        <div className="flex flex-col">
+          {/* Horizontal Tab Bar */}
+          <div className="hidden lg:flex flex-row items-center gap-1 border-b border-white/8 mb-6 overflow-x-auto">
+            {TABS.map(tab => {
+              const Icon = tab.icon
+              const isActive = activeTab === tab.id
+              return (
+                <button
+                  key={tab.id}
+                  id={`settings-tab-desk-${tab.id}`}
+                  onClick={() => setActiveTab(tab.id)}
+                  className={`px-4 py-2.5 text-sm cursor-pointer whitespace-nowrap transition-all duration-200 relative flex items-center gap-2 ${
+                    isActive
+                      ? 'bg-white/[0.08] text-white border-b-2 border-purple-500 rounded-t-xl'
+                      : 'text-gray-400 hover:text-white hover:bg-white/5 border-b-2 border-transparent rounded-t-xl'
+                  }`}
+                >
+                  <Icon size={18} className="shrink-0" />
+                  <span>{tab.label}</span>
+                </button>
+              )
+            })}
+          </div>
 
           {/* Tab Content */}
-          <main className="flex-1 min-w-0">
+          <main className="w-full min-w-0">
             <AnimatePresence mode="wait">
               <motion.div
                 key={activeTab}
-                initial={{ opacity: 0, y: 10 }}
+                initial={{ opacity: 0, y: 8 }}
                 animate={{ opacity: 1, y: 0 }}
-                exit={{ opacity: 0, y: -10 }}
-                transition={{ duration: 0.18 }}
+                exit={{ opacity: 0, y: -8 }}
+                transition={{ duration: 0.2 }}
                 className="w-full bg-surface border border-border rounded-2xl p-4 sm:p-6"
               >
                 <h2 className="text-base md:text-xl font-bold text-text-primary mb-5 flex items-center gap-2">

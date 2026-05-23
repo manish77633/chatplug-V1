@@ -6,6 +6,7 @@ import {
   Zap, ChevronLeft, Copy
 } from 'lucide-react'
 import toast from 'react-hot-toast'
+import { useAuthStore } from '../store/authStore'
 
 const STEPS = [
   {
@@ -47,11 +48,13 @@ export default function Docs() {
   const [current, setCurrent] = useState(0)
   const navigate = useNavigate()
   const step = STEPS[current]
+  const { user } = useAuthStore()
+  const targetRoute = user ? '/dashboard' : '/register'
 
   return (
-    <div className="min-h-screen bg-background text-text-primary font-inter selection:bg-accent/30 pb-[72px] md:pb-0">
+    <div className="bg-background text-text-primary font-inter selection:bg-accent/30">
       {/* Navbar */}
-      <nav className="flex items-center justify-between px-4 md:px-10 py-3 border-b border-border bg-surface/80 backdrop-blur-md sticky top-0 z-40">
+      <nav className="flex items-center justify-between px-2.5 md:px-10 py-3 border-b border-border bg-surface/80 backdrop-blur-md sticky top-0 z-40">
         <div className="flex items-center gap-2 min-w-0">
           <button
             onClick={() => navigate(-1)}
@@ -68,14 +71,14 @@ export default function Docs() {
           <span className="text-xs font-medium text-text-muted hidden sm:inline truncate">Quickstart Guide</span>
         </div>
         <Link
-          to="/register"
+          to={targetRoute}
           className="px-3 py-2 bg-accent hover:bg-accent/90 text-white rounded-xl text-xs sm:text-sm font-semibold transition-all flex items-center gap-1.5 shadow-lg shadow-accent/20 shrink-0 ml-2"
         >
-          Get Started <ArrowRight size={14} />
+          {user ? 'New Chatbot' : 'Get Started'} <ArrowRight size={14} />
         </Link>
       </nav>
 
-      <div className="w-full px-4 py-8 md:py-16 md:max-w-4xl md:mx-auto">
+      <div className="w-full px-2.5 md:px-4 py-8 md:py-16 md:max-w-4xl md:mx-auto">
         {/* Header */}
         <div className="text-center mb-8 md:mb-12">
           <span className="inline-block px-4 py-1.5 rounded-full bg-surface-elevated border border-border text-xs sm:text-sm font-medium text-accent-secondary mb-4 md:mb-6">
@@ -169,10 +172,10 @@ export default function Docs() {
                 </button>
               ) : (
                 <Link
-                  to="/register"
+                  to={targetRoute}
                   className="flex items-center gap-2 h-10 px-5 bg-gradient-to-r from-accent to-accent-secondary text-white rounded-xl font-semibold transition-all shadow-lg text-sm"
                 >
-                  Start Building <CheckCircle2 size={15} />
+                  {user ? 'New Chatbot' : 'Start Building'} <CheckCircle2 size={15} />
                 </Link>
               )}
             </div>
@@ -204,16 +207,16 @@ export default function Docs() {
         </div>
 
         {/* Footer CTA */}
-        <div className="mt-10 md:mt-16 mb-[72px] md:mb-0 text-center p-6 md:p-10 bg-surface border border-border rounded-2xl relative overflow-hidden">
+        <div className="mt-10 md:mt-16 text-center p-6 md:p-10 bg-surface border border-border rounded-2xl relative overflow-hidden">
           <div className="absolute inset-0 bg-gradient-to-br from-accent/5 to-accent-secondary/5 pointer-events-none" />
           <div className="relative z-10">
             <h3 className="text-lg md:text-2xl font-bold text-text-primary mb-2 md:mb-3">Ready to build your first chatbot?</h3>
             <p className="text-text-muted text-sm mb-5">Takes less than 5 minutes. No credit card required.</p>
             <Link
-              to="/register"
+              to={targetRoute}
               className="inline-flex items-center gap-2 px-6 py-3 bg-gradient-to-r from-accent to-accent-secondary text-white rounded-xl font-semibold shadow-lg hover:shadow-accent/30 transition-all text-sm"
             >
-              Start for Free <ArrowRight size={16} />
+              {user ? 'New Chatbot' : 'Start for Free'} <ArrowRight size={16} />
             </Link>
           </div>
         </div>

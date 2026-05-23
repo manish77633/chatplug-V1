@@ -18,6 +18,7 @@ import Settings      from './pages/Settings'
 import Profile       from './pages/Profile'
 import AdminPanel    from './pages/AdminPanel'
 import BottomNav     from './components/ui/BottomNav'
+import Layout        from './components/Layout'
 
 const Protected = ({ children }) => {
   const token = useAuthStore(s => s.token) || localStorage.getItem('token')
@@ -38,28 +39,29 @@ export default function App() {
   }, [syncAuth])
 
   return (
-    <div className="min-h-screen pb-[72px] md:pb-0 flex flex-col">
+    <div className="min-h-screen flex flex-col">
       <Routes>
         {/* Public */}
         <Route path="/"            element={<Landing />} />
         <Route path="/login"       element={<Login />} />
         <Route path="/register"    element={<Register />} />
-        <Route path="/docs"        element={<Docs />} />
-        <Route path="/docs/api"    element={<DocsApi />} />
-        <Route path="/docs/guides" element={<DocsGuides />} />
 
         {/* Protected */}
-        <Route path="/dashboard"                      element={<Protected><Dashboard /></Protected>} />
-        <Route path="/chatbots"                       element={<Protected><Dashboard /></Protected>} />
-        <Route path="/settings"                       element={<Protected><Settings /></Protected>} />
-        <Route path="/profile"                        element={<Protected><Profile /></Protected>} />
-        <Route path="/chatbot/:id"                    element={<Protected><ChatbotDetail /></Protected>} />
-        <Route path="/chatbot/:id/playground"         element={<Protected><Playground /></Protected>} />
-        <Route path="/chatbot/:id/analytics"          element={<Protected><Analytics /></Protected>} />
-        <Route path="/analytics"                      element={<Protected><Analytics /></Protected>} />
+        <Route path="/docs"                           element={<Protected><Layout><Docs /></Layout></Protected>} />
+        <Route path="/docs/api"                       element={<Protected><Layout><DocsApi /></Layout></Protected>} />
+        <Route path="/docs/guides"                    element={<Protected><Layout><DocsGuides /></Layout></Protected>} />
+        
+        <Route path="/dashboard"                      element={<Protected><Layout><Dashboard /></Layout></Protected>} />
+        <Route path="/chatbots"                       element={<Protected><Layout><Dashboard /></Layout></Protected>} />
+        <Route path="/settings"                       element={<Protected><Layout><Settings /></Layout></Protected>} />
+        <Route path="/profile"                        element={<Protected><Layout><Profile /></Layout></Protected>} />
+        <Route path="/chatbot/:id"                    element={<Protected><Layout><ChatbotDetail /></Layout></Protected>} />
+        <Route path="/chatbot/:id/playground"         element={<Protected><Layout><Playground /></Layout></Protected>} />
+        <Route path="/chatbot/:id/analytics"          element={<Protected><Layout><Analytics /></Layout></Protected>} />
+        <Route path="/analytics"                      element={<Protected><Layout><Analytics /></Layout></Protected>} />
 
         {/* Admin */}
-        <Route path="/admin" element={<Protected><AdminRoute><AdminPanel /></AdminRoute></Protected>} />
+        <Route path="/admin" element={<Protected><AdminRoute><Layout><AdminPanel /></Layout></AdminRoute></Protected>} />
 
         <Route path="*" element={<Navigate to="/" replace />} />
       </Routes>

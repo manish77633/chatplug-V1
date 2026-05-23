@@ -29,83 +29,6 @@ function CountUp({ end }) {
   return <span>{count}</span>
 }
 
-function ProfileDropdown({ user, logout, navigate }) {
-  const [isOpen, setIsOpen] = useState(false)
-  const dropdownRef = useRef(null)
-
-  useEffect(() => {
-    const handleClickOutside = (e) => {
-      if (dropdownRef.current && !dropdownRef.current.contains(e.target)) {
-        setIsOpen(false)
-      }
-    }
-    document.addEventListener('mousedown', handleClickOutside)
-    return () => document.removeEventListener('mousedown', handleClickOutside)
-  }, [])
-
-  const userName = user?.name || user?.email?.split('@')[0] || 'User'
-  const initial = userName.charAt(0).toUpperCase()
-  const plan = user?.plan?.type || 'Free'
-
-  return (
-    <div className="relative" ref={dropdownRef}>
-      <button
-        onClick={() => setIsOpen(!isOpen)}
-        className="w-[34px] h-[34px] rounded-full bg-[#1e1e30] border border-[#2a2a45] hover:bg-[#252540] flex items-center justify-center text-sm font-medium text-gray-200 transition-colors"
-      >
-        {initial}
-      </button>
-
-      <AnimatePresence>
-        {isOpen && (
-          <motion.div
-            initial={{ opacity: 0, scale: 0.95 }}
-            animate={{ opacity: 1, scale: 1 }}
-            exit={{ opacity: 0, scale: 0.95 }}
-            transition={{ duration: 0.15, ease: 'easeOut' }}
-            className="absolute top-full right-0 mt-2 w-[220px] bg-[#111120] border border-[#1e1e35] rounded-2xl shadow-2xl shadow-black/60 p-1 origin-top-right z-50"
-          >
-            {/* USER INFO */}
-            <div className="px-3 py-2.5 mb-1 border-b border-[#1e1e35]">
-              <div className="flex justify-between items-start mb-0.5">
-                <p className="text-sm font-semibold text-white truncate pr-2">{userName}</p>
-                <span className="inline-block text-[10px] bg-purple-500/20 text-purple-400 px-2 py-0.5 rounded-full border border-purple-500/30 shrink-0 capitalize">
-                  {plan}
-                </span>
-              </div>
-              <p className="text-xs text-gray-500 truncate">{user?.email || 'user@example.com'}</p>
-            </div>
-
-            {/* MENU ITEMS */}
-            <div className="flex flex-col">
-              <button
-                onClick={() => { setIsOpen(false); navigate('/profile') }}
-                className="group flex items-center gap-2.5 px-3 py-2 rounded-xl cursor-pointer text-sm text-gray-300 hover:bg-[#1a1a2e] hover:text-white transition-colors duration-150 w-full text-left"
-              >
-                <User size={16} className="text-gray-500 group-hover:text-gray-300 transition-colors" /> Profile
-              </button>
-              <button
-                onClick={() => { setIsOpen(false); navigate('/settings') }}
-                className="group flex items-center gap-2.5 px-3 py-2 rounded-xl cursor-pointer text-sm text-gray-300 hover:bg-[#1a1a2e] hover:text-white transition-colors duration-150 w-full text-left"
-              >
-                <Settings size={16} className="text-gray-500 group-hover:text-gray-300 transition-colors" /> Settings
-              </button>
-              
-              <div className="my-1 border-t border-[#1e1e35]" />
-              
-              <button
-                onClick={() => { setIsOpen(false); logout(); navigate('/') }}
-                className="group flex items-center gap-2.5 px-3 py-2 rounded-xl cursor-pointer text-sm text-red-400 hover:bg-red-500/10 hover:text-red-300 transition-colors duration-150 w-full text-left"
-              >
-                <LogOut size={16} className="text-red-400 group-hover:text-red-300 transition-colors" /> Logout
-              </button>
-            </div>
-          </motion.div>
-        )}
-      </AnimatePresence>
-    </div>
-  )
-}
 
 
 export default function Dashboard() {
@@ -117,13 +40,6 @@ export default function Dashboard() {
   const [newName, setNewName] = useState('')
   const [newNameError, setNewNameError] = useState('')
   const [showModal, setShowModal] = useState(false)
-  const [sidebarOpen, setSidebarOpen] = useState(false)
-
-  const handleLogout = () => {
-    // Auth to be implemented later
-    logout()
-    navigate('/')
-  }
 
   useEffect(() => { fetchChatbots() }, [])
 
@@ -190,102 +106,10 @@ export default function Dashboard() {
   }
 
   return (
-    <div className="min-h-screen bg-background text-text-primary font-inter flex selection:bg-accent/30 selection:text-text-primary">
-      {/* ─── SIDEBAR ─── */}
-      <aside className={`fixed lg:static inset-y-0 left-0 z-40 w-64 bg-surface border-r border-border transform transition-transform duration-300 ease-in-out ${sidebarOpen ? 'translate-x-0' : '-translate-x-full lg:translate-x-0'} flex flex-col`}>
-        {/* User Profile */}
-        <div className="p-5 flex items-center gap-3 border-b border-border">
-          <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-accent to-accent-secondary flex items-center justify-center text-white font-bold text-base shadow-lg shrink-0">
-            {userName?.charAt(0)?.toUpperCase() || 'U'}
-          </div>
-          <div className="flex-1 min-w-0">
-            <h3 className="font-semibold text-text-primary truncate text-sm">{userName}</h3>
-            <span className="px-2 py-0.5 rounded-md bg-accent/10 border border-accent/20 text-[10px] font-bold text-accent">
-              {user?.plan?.type?.toUpperCase() || 'FREE'}
-            </span>
-          </div>
-          <button onClick={() => setSidebarOpen(false)} className="lg:hidden text-text-muted hover:text-text-primary p-1">
-            <X size={18} />
-          </button>
-        </div>
+    <div className="min-h-full bg-background text-text-primary font-inter flex flex-col selection:bg-accent/30 selection:text-text-primary">
+      <div className="absolute inset-0 pointer-events-none opacity-[0.02] noise-bg" />
 
-        {/* Navigation */}
-        <nav className="flex-1 p-3 flex flex-col gap-1 overflow-y-auto">
-          {[
-            { name: 'Dashboard',   icon: LayoutDashboard, action: () => { navigate('/dashboard'); setSidebarOpen(false) },         active: true },
-            { name: 'My Chatbots', icon: Bot,             action: () => { document.getElementById('chatbots-section')?.scrollIntoView({ behavior: 'smooth' }); setSidebarOpen(false) }, active: false },
-            { name: 'Analytics',   icon: BarChart3,       action: () => { navigate('/analytics'); setSidebarOpen(false) },          active: false },
-            { name: 'Docs',        icon: FileText,        action: () => { navigate('/docs'); setSidebarOpen(false) },                active: false },
-            { name: 'Settings',    icon: Settings,        action: () => { navigate('/settings'); setSidebarOpen(false) },            active: false },
-          ].map((item) => (
-            <button
-              key={item.name}
-              id={`sidebar-nav-${item.name.toLowerCase().replace(' ', '-')}`}
-              onClick={item.action}
-              className={`flex items-center gap-3 px-3 py-2.5 rounded-xl transition-all duration-200 font-medium text-sm min-h-[44px] ${item.active ? 'bg-accent/10 text-accent' : 'text-text-muted hover:bg-surface-elevated hover:text-text-primary'}`}
-            >
-              <item.icon size={18} className={item.active ? 'text-accent' : 'text-text-muted'} />
-              {item.name}
-            </button>
-          ))}
-        </nav>
-
-        {/* Upgrade Card + Logout */}
-        <div className="p-3 mt-auto space-y-2">
-          <div className="p-4 rounded-2xl bg-gradient-to-b from-surface-elevated to-surface border border-accent/20 relative overflow-hidden group">
-            <div className="absolute inset-0 bg-accent/5 opacity-0 group-hover:opacity-100 transition-opacity" />
-            <Sparkles size={20} className="text-accent mb-2" />
-            <h4 className="font-semibold text-text-primary mb-0.5 text-sm">Upgrade to Pro</h4>
-            <p className="text-xs text-text-muted mb-3">Get unlimited queries & priority support.</p>
-            <button
-              id="sidebar-upgrade-btn"
-              onClick={() => navigate('/settings?tab=billing')}
-              className="w-full py-2 bg-background border border-border hover:border-accent/50 rounded-lg text-xs font-medium transition-colors"
-            >
-              View Plans
-            </button>
-          </div>
-          <button
-            id="sidebar-logout-btn"
-            onClick={handleLogout}
-            className="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-text-muted hover:text-red-400 hover:bg-red-400/5 transition-all text-sm font-medium min-h-[44px]"
-          >
-            <LogOut size={16} /> Sign out
-          </button>
-        </div>
-      </aside>
-
-      {/* Overlay for mobile sidebar */}
-      {sidebarOpen && (
-        <div className="fixed inset-0 bg-background/80 backdrop-blur-sm z-30 lg:hidden" onClick={() => setSidebarOpen(false)} />
-      )}
-
-      {/* ─── MAIN CONTENT ─── */}
-      <main className="flex-1 flex flex-col min-w-0 h-screen overflow-y-auto relative bg-background">
-        <div className="absolute inset-0 pointer-events-none opacity-[0.02] noise-bg" />
-
-        {/* Mobile Header — 56px */}
-        <div className="lg:hidden flex items-center justify-between px-4 border-b border-border bg-surface sticky top-0 z-20" style={{ minHeight: 56, maxHeight: 56 }}>
-          <button
-            id="mobile-menu-btn"
-            onClick={() => setSidebarOpen(true)}
-            className="p-2 -ml-2 text-text-muted hover:text-text-primary rounded-xl hover:bg-surface-elevated transition-colors min-w-[44px] min-h-[44px] flex items-center justify-center"
-          >
-            <Menu size={22} />
-          </button>
-          <div className="flex items-center gap-2">
-            <Zap size={18} className="text-accent" />
-            <Link to="/" className="font-bold tracking-tight gradient-text">ChatPlug</Link>
-          </div>
-          <div className="flex items-center gap-2">
-            <button className="p-2 text-text-muted hover:text-text-primary rounded-xl hover:bg-surface-elevated transition-colors min-w-[36px] min-h-[36px] flex items-center justify-center">
-              <Bell size={18} />
-            </button>
-            <ProfileDropdown user={user} logout={logout} navigate={navigate} />
-          </div>
-        </div>
-
-        <div className="p-4 sm:p-6 md:p-10 max-w-7xl mx-auto w-full relative z-10 pb-24 lg:pb-10">
+        <div className="px-2.5 py-4 sm:p-6 md:p-10 max-w-7xl mx-auto w-full relative z-10 pb-24 lg:pb-10">
           {/* Header Row */}
           <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-8 sm:mb-12">
             <motion.h1
@@ -310,7 +134,7 @@ export default function Dashboard() {
           {/* Stats Row — horizontal scroll snap on mobile, 4-col on desktop */}
           <div className="mb-8 sm:mb-12">
             {/* Mobile: snap scroll */}
-            <div className="flex gap-3 overflow-x-auto snap-x snap-mandatory pb-2 scrollbar-hide sm:hidden -mx-4 px-4">
+            <div className="flex gap-3 overflow-x-auto snap-x snap-mandatory pb-2 scrollbar-hide sm:hidden -mx-2.5 px-2.5">
               {stats.map((stat, i) => (
                 <motion.div
                   key={i}
@@ -502,7 +326,6 @@ export default function Dashboard() {
             </div>
           )}
         </div>
-      </main>
 
       {/* ─── FLOATING ACTION BUTTON (mobile only, above bottom nav) ─── */}
       <FAB onClick={() => setShowModal(true)} />

@@ -22,7 +22,7 @@ export default function Profile() {
   const initials = name.split(' ').map(n => n[0]).join('').toUpperCase().slice(0, 2)
 
   return (
-    <div className="min-h-screen bg-[#0a0a0f] text-white font-inter selection:bg-purple-500/30 pb-24 md:pb-0">
+    <div className="bg-background text-text-primary font-inter flex flex-col selection:bg-accent/30 selection:text-text-primary pb-24 md:pb-8">
       {/* Header */}
       <div className="sticky top-0 z-40 bg-[#111118]/80 backdrop-blur-md border-b border-white/5 px-4 py-3 flex items-center gap-3">
         <button

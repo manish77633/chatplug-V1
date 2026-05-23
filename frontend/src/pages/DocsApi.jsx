@@ -143,9 +143,9 @@ export default function DocsApi() {
   const [activeEndpoint, setActiveEndpoint] = useState(0)
 
   return (
-    <div className="min-h-screen bg-background text-text-primary font-inter selection:bg-accent/30 overflow-x-hidden">
+    <div className="bg-background text-text-primary font-inter selection:bg-accent/30 overflow-x-hidden">
       {/* Navbar */}
-      <nav className="flex items-center justify-between px-4 sm:px-10 py-4 border-b border-border bg-surface/80 backdrop-blur-md sticky top-0 z-40">
+      <nav className="flex items-center justify-between px-2.5 sm:px-10 py-4 border-b border-border bg-surface/80 backdrop-blur-md sticky top-0 z-40">
         <div className="flex items-center gap-3">
           <button
             id="docs-api-back"
@@ -169,7 +169,7 @@ export default function DocsApi() {
         </Link>
       </nav>
 
-      <div className="max-w-6xl mx-auto px-4 sm:px-6 py-8 sm:py-12 flex flex-col lg:flex-row gap-8">
+      <div className="max-w-6xl mx-auto px-2.5 sm:px-6 py-8 sm:py-12 flex flex-col lg:flex-row gap-8">
         {/* Left Sidebar — Endpoint list */}
         <aside className="lg:w-60 shrink-0">
           <p className="text-xs font-bold text-text-muted uppercase tracking-wider mb-3 px-3">Endpoints</p>

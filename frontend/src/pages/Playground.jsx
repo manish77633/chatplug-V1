@@ -335,17 +335,17 @@ export default function Playground() {
   const accentColor = chatbot?.settings?.accentColor || '#6C63FF'
 
   return (
-    <div className="h-[100dvh] md:h-screen bg-background text-text-primary font-inter flex overflow-hidden selection:bg-accent/30 pb-[60px] md:pb-0">
+    <div className="absolute top-0 left-0 right-0 bottom-[72px] md:bottom-0 bg-background text-text-primary font-inter flex overflow-hidden selection:bg-accent/30 z-10">
 
       {/* ─── LEFT PANEL: History Sidebar ─── */}
       {/* Mobile: slide-in overlay; Desktop: always visible */}
       {leftSidebarOpen && (
         <div
-          className="fixed inset-0 z-[30] bg-background/80 backdrop-blur-sm lg:hidden bottom-[60px] md:bottom-0"
+          className="fixed inset-0 z-[30] bg-background/80 backdrop-blur-sm lg:hidden bottom-[72px] md:bottom-0"
           onClick={() => setLeftSidebarOpen(false)}
         />
       )}
-      <div className={`fixed lg:static top-0 bottom-[60px] md:inset-y-0 left-0 z-[40] w-[260px] bg-surface border-r border-border flex flex-col shrink-0 transition-transform duration-300 ${
+      <div className={`fixed lg:static top-0 bottom-[72px] md:inset-y-0 left-0 z-[40] w-[260px] bg-surface border-r border-border flex flex-col shrink-0 transition-transform duration-300 ${
         leftSidebarOpen ? 'translate-x-0' : '-translate-x-full lg:translate-x-0'
       }`}>
         <div className="p-4 border-b border-border flex items-center gap-3">
@@ -420,7 +420,7 @@ export default function Playground() {
         <div className="absolute inset-0 pointer-events-none opacity-[0.02] noise-bg" />
 
         {/* Chat Header */}
-        <div className="h-14 border-b border-border bg-surface/50 backdrop-blur-md flex items-center justify-between px-4 sm:px-6 shrink-0 relative z-10">
+        <div className="h-14 border-b border-border bg-surface/50 backdrop-blur-md flex items-center justify-between px-2.5 sm:px-6 shrink-0 relative z-10">
           <div className="flex items-center gap-3">
             {/* Mobile hamburger for left sidebar (History) */}
             <button
@@ -468,7 +468,7 @@ export default function Playground() {
         </div>
 
         {!isReady && (
-          <div className="bg-yellow-500/10 border-b border-yellow-500/20 px-6 py-3 flex items-center gap-3 shrink-0 relative z-10">
+          <div className="bg-yellow-500/10 border-b border-yellow-500/20 px-2.5 sm:px-6 py-3 flex items-center gap-3 shrink-0 relative z-10">
             <Loader2 size={14} className="text-yellow-500 animate-spin shrink-0" />
             <p className="text-sm text-yellow-600 font-medium">
               Bot is {chatbot?.status === 'training' ? 'training on your documents' : 'in draft mode'}. Responses may be unavailable.
@@ -477,7 +477,7 @@ export default function Playground() {
         )}
 
         {/* Messages Area */}
-        <div className="flex-1 overflow-y-auto px-4 pt-8 pb-[72px] md:pb-8 relative z-10">
+        <div className="flex-1 overflow-y-auto px-2.5 sm:px-4 pt-8 pb-4 relative z-10">
           <div className="max-w-3xl mx-auto w-full">
             {messages.length === 0 ? (
               <div className="h-full flex flex-col items-center justify-center pt-20">
@@ -549,7 +549,7 @@ export default function Playground() {
         </div>
 
         {/* Input Area */}
-        <div className="fixed bottom-[60px] md:static left-0 right-0 p-4 bg-surface/50 backdrop-blur-md border-t border-border shrink-0 z-20">
+        <div className="px-2.5 py-4 sm:p-4 bg-surface/50 backdrop-blur-md border-t border-border shrink-0 z-20">
           <div className="max-w-3xl mx-auto">
             <form onSubmit={sendMessage} className="relative flex items-end gap-2 bg-background border border-border focus-within:border-accent focus-within:shadow-[0_0_15px_rgba(108,99,255,0.1)] rounded-2xl p-2 transition-all">
               <button type="button" onClick={() => toast('File attachment coming soon', { icon: '📎' })} className="p-2 text-text-muted hover:text-text-primary transition-colors shrink-0 mb-1 rounded-lg hover:bg-surface">
@@ -590,7 +590,7 @@ export default function Playground() {
             initial={{ width: 0, opacity: 0 }}
             animate={{ width: 280, opacity: 1 }}
             exit={{ width: 0, opacity: 0 }}
-            className="bg-surface border-l border-border flex flex-col shrink-0 overflow-hidden lg:relative absolute right-0 top-0 bottom-[60px] md:bottom-0 lg:inset-y-0 z-[30] shadow-2xl lg:shadow-none"
+            className="bg-surface border-l border-border flex flex-col shrink-0 overflow-hidden lg:relative absolute right-0 top-0 bottom-0 lg:inset-y-0 z-[30] shadow-2xl lg:shadow-none"
           >
             <div className="p-4 border-b border-border flex items-center justify-between shrink-0">
               <div className="flex items-center gap-2 text-text-primary font-bold">

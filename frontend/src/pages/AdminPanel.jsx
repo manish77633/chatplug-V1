@@ -46,7 +46,7 @@ export default function AdminPanel() {
   )
 
   if (loading) return (
-    <div className="min-h-screen bg-background p-8 space-y-6">
+    <div className="bg-background p-8 space-y-6">
       <div className="h-8 w-48 bg-surface border border-border rounded-lg animate-pulse" />
       <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
         {[1,2,3,4].map(i => <div key={i} className="h-32 bg-surface border border-border rounded-2xl animate-pulse" />)}
@@ -56,10 +56,10 @@ export default function AdminPanel() {
   )
 
   return (
-    <div className="min-h-screen bg-background text-text-primary font-inter selection:bg-accent/30 selection:text-text-primary pb-12">
+    <div className="bg-background text-text-primary font-inter selection:bg-accent/30 selection:text-text-primary pb-12">
       {/* Breadcrumb Header */}
       <div className="border-b border-border bg-surface/50 backdrop-blur-md sticky top-0 z-40">
-        <div className="max-w-7xl mx-auto px-6 py-4 flex items-center justify-between">
+        <div className="max-w-7xl mx-auto px-2.5 sm:px-6 py-4 flex items-center justify-between">
           <div className="flex items-center gap-4">
             <Link to="/dashboard" className="p-2 -ml-2 rounded-lg text-text-muted hover:text-text-primary hover:bg-surface-elevated transition-colors">
               <ChevronLeft size={20} />
@@ -76,7 +76,7 @@ export default function AdminPanel() {
         </div>
       </div>
 
-      <div className="max-w-7xl mx-auto px-6 py-10 space-y-8">
+      <div className="max-w-7xl mx-auto px-2.5 sm:px-6 py-10 space-y-8">
         
         {/* ─── STATS ROW ─── */}
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
