@@ -1,6 +1,8 @@
 import { Routes, Route, Navigate, useLocation } from 'react-router-dom'
+import { useEffect } from 'react'
 import { useAuthStore } from './store/authStore'
 import { Toaster } from 'react-hot-toast'
+import { Loader2 } from 'lucide-react'
 
 import Landing       from './pages/Landing'
 import Login         from './pages/Login'
@@ -18,16 +20,30 @@ import AdminPanel    from './pages/AdminPanel'
 import BottomNav     from './components/ui/BottomNav'
 
 const Protected = ({ children }) => {
-  const { token } = useAuthStore()
+  const { token, isHydrated } = useAuthStore()
+  if (!isHydrated) {
+    return (
+      <div className="min-h-screen bg-background flex items-center justify-center">
+        <Loader2 className="animate-spin text-accent" size={32} />
+      </div>
+    )
+  }
   return token ? children : <Navigate to="/login" replace />
 }
 
 const AdminRoute = ({ children }) => {
-  const { user } = useAuthStore()
+  const { user, isHydrated } = useAuthStore()
+  if (!isHydrated) return null
   return user?.role === 'admin' ? children : <Navigate to="/dashboard" replace />
 }
 
 export default function App() {
+  const { hydrate } = useAuthStore()
+
+  useEffect(() => {
+    hydrate()
+  }, [hydrate])
+
   return (
     <>
       <Routes>

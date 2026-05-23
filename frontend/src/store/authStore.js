@@ -1,37 +1,45 @@
 import { create } from 'zustand'
-import { persist } from 'zustand/middleware'
 import api from '../utils/api'
 
-export const useAuthStore = create(
-  persist(
-    (set, get) => ({
-      user:  null,
-      token: null,
+export const useAuthStore = create((set, get) => ({
+  user: null,
+  token: localStorage.getItem('token') || null,
+  isHydrated: false,
 
-      login: async (email, password) => {
-        const { data } = await api.post('/auth/login', { email, password })
-        set({ user: data.user, token: data.token })
-        api.defaults.headers.common['Authorization'] = `Bearer ${data.token}`
-        return data
-      },
+  hydrate: () => {
+    const token = localStorage.getItem('token')
+    const user = JSON.parse(localStorage.getItem('user') || 'null')
+    
+    if (token) api.defaults.headers.common['Authorization'] = `Bearer ${token}`
+    set({ token, user, isHydrated: true })
+  },
 
-      register: async (name, email, password) => {
-        const { data } = await api.post('/auth/register', { name, email, password })
-        set({ user: data.user, token: data.token })
-        api.defaults.headers.common['Authorization'] = `Bearer ${data.token}`
-        return data
-      },
+  login: async (email, password) => {
+    const { data } = await api.post('/auth/login', { email, password })
+    localStorage.setItem('token', data.token)
+    localStorage.setItem('user', JSON.stringify(data.user))
+    api.defaults.headers.common['Authorization'] = `Bearer ${data.token}`
+    set({ user: data.user, token: data.token })
+    return data
+  },
 
-      logout: () => {
-        set({ user: null, token: null })
-        delete api.defaults.headers.common['Authorization']
-      },
+  register: async (name, email, password) => {
+    const { data } = await api.post('/auth/register', { name, email, password })
+    localStorage.setItem('token', data.token)
+    localStorage.setItem('user', JSON.stringify(data.user))
+    api.defaults.headers.common['Authorization'] = `Bearer ${data.token}`
+    set({ user: data.user, token: data.token })
+    return data
+  },
 
-      init: () => {
-        const { token } = get()
-        if (token) api.defaults.headers.common['Authorization'] = `Bearer ${token}`
-      },
-    }),
-    { name: 'chatplug-auth', partialize: (s) => ({ user: s.user, token: s.token }) }
-  )
-)
+  logout: () => {
+    localStorage.removeItem('token')
+    localStorage.removeItem('user')
+    delete api.defaults.headers.common['Authorization']
+    set({ user: null, token: null })
+  },
+
+  init: () => {
+    get().hydrate()
+  },
+}))

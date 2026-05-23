@@ -1,5 +1,5 @@
 // src/components/ui/BottomNav.jsx
-import { useLocation, useNavigate } from 'react-router-dom'
+import { useLocation, Link } from 'react-router-dom'
 import { LayoutDashboard, Bot, BarChart3, FileText, Settings } from 'lucide-react'
 
 const TABS = [
@@ -12,7 +12,6 @@ const TABS = [
 
 export default function BottomNav() {
   const location = useLocation()
-  const navigate = useNavigate()
 
   // Hide on auth pages and landing
   const hidden = ['/', '/login', '/register']
@@ -34,10 +33,10 @@ export default function BottomNav() {
               ? location.pathname === '/dashboard'
               : location.pathname.startsWith(path)
           return (
-            <button
+            <Link
               key={path}
+              to={path}
               id={`bottom-nav-${label.toLowerCase()}`}
-              onClick={() => navigate(path)}
               className="flex flex-col items-center justify-center gap-0.5 flex-1 h-full transition-colors"
               aria-label={label}
             >
@@ -53,7 +52,7 @@ export default function BottomNav() {
               >
                 {label}
               </span>
-            </button>
+            </Link>
           )
         })}
       </div>
