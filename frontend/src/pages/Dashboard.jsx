@@ -113,11 +113,12 @@ export default function Dashboard() {
     { label: 'Total Chatbots', value: chatbots.length, icon: Bot, color: 'text-accent', border: 'border-l-accent', trend: '+2' },
     { label: 'Total Queries', value: chatbots.reduce((s, b) => s + (b.stats?.totalMessages || 0), 0), icon: MessageSquare, color: 'text-accent-secondary', border: 'border-l-accent-secondary', trend: '+14%' },
     { label: 'Docs Uploaded', value: chatbots.reduce((s, b) => s + (b.documents?.length || 0), 0), icon: FileText, color: 'text-purple-400', border: 'border-l-purple-400', trend: '+5' },
-    { label: 'Active Embeds', value: chatbots.filter(b => b.status === 'ready').length, icon: Globe, color: 'text-blue-400', border: 'border-l-blue-400', trend: 'Stable' },
+    { label: 'Active Embeds', value: chatbots.filter(b => b.status === 'ready' || b.status === 'active').length, icon: Globe, color: 'text-blue-400', border: 'border-l-blue-400', trend: 'Stable' },
   ]
 
   const statusColor = {
     ready:    { bg: 'bg-green-500/10',  text: 'text-green-500',  dot: 'bg-green-500',  label: 'Active' },
+    active:   { bg: 'bg-green-500/10',  text: 'text-green-500',  dot: 'bg-green-500',  label: 'Active' },
     training: { bg: 'bg-yellow-500/10', text: 'text-yellow-500', dot: 'bg-yellow-500', label: 'Training' },
     error:    { bg: 'bg-red-500/10',    text: 'text-red-500',    dot: 'bg-red-500',    label: 'Error' },
     draft:    { bg: 'bg-gray-500/10',   text: 'text-gray-400',   dot: 'bg-gray-400',   label: 'Draft' },
@@ -277,7 +278,7 @@ export default function Dashboard() {
                         <div className="flex-1">
                           <p className="text-[10px] font-bold text-text-muted uppercase tracking-wider mb-1">Status</p>
                           <div className={`inline-flex items-center gap-1.5 px-2 py-0.5 rounded-md ${colors.bg} ${colors.text} text-xs font-bold`}>
-                            <span className={`w-1.5 h-1.5 rounded-full ${colors.dot} ${bot.status === 'ready' ? 'animate-pulse' : ''}`} />
+                            <span className={`w-1.5 h-1.5 rounded-full ${colors.dot} ${(bot.status === 'ready' || bot.status === 'active') ? 'animate-pulse' : ''}`} />
                             {colors.label}
                           </div>
                         </div>

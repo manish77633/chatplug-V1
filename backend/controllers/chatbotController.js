@@ -14,8 +14,20 @@ exports.create = async (req, res, next) => {
       return res.status(403).json({ success: false, message: 'Upgrade to Pro to create more chatbots' });
     }
 
-    const chatbot = await Chatbot.create({ owner: req.user._id, name, description });
+    const chatbot = await Chatbot.create({ owner: req.user._id, name, description, status: 'active' });
     res.status(201).json({ success: true, chatbot });
+  } catch (err) { next(err); }
+};
+
+exports.activate = async (req, res, next) => {
+  try {
+    const chatbot = await Chatbot.findOneAndUpdate(
+      { _id: req.params.id, owner: req.user._id },
+      { status: 'active' },
+      { new: true, runValidators: true }
+    );
+    if (!chatbot) return res.status(404).json({ success: false, message: 'Chatbot not found' });
+    res.json({ success: true, chatbot });
   } catch (err) { next(err); }
 };
 

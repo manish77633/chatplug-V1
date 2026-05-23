@@ -47,7 +47,7 @@ export default function ChatbotDetail() {
       setPosition(st.position || 'right')
 
       // Logic to resume step
-      if (data.chatbot.status === 'ready' && step === 0) setStep(3)
+      if ((data.chatbot.status === 'ready' || data.chatbot.status === 'active') && step === 0) setStep(3)
       else if (data.chatbot.documents?.length > 0 && step === 0) setStep(2)
       
     } catch {
@@ -66,7 +66,7 @@ export default function ChatbotDetail() {
         try {
           const { data } = await api.get(`/chatbots/${id}`)
           setChatbot(data.chatbot)
-          if (data.chatbot.status === 'ready') {
+          if (data.chatbot.status === 'ready' || data.chatbot.status === 'active') {
             clearInterval(pollRef.current)
             toast.success('🎉 Training complete! Bot is ready.')
           }
@@ -172,8 +172,8 @@ export default function ChatbotDetail() {
             <div>
               <h1 className="font-bold text-text-primary text-lg leading-tight">{chatbot?.name || 'Setup Chatbot'}</h1>
               <div className="flex items-center gap-1.5 text-xs font-medium text-text-muted mt-0.5">
-                <span className={`w-1.5 h-1.5 rounded-full ${chatbot?.status === 'ready' ? 'bg-green-500 animate-pulse' : chatbot?.status === 'training' ? 'bg-yellow-500' : 'bg-gray-500'}`} />
-                {chatbot?.status === 'ready' ? 'Active' : chatbot?.status === 'training' ? 'Training...' : 'Draft'}
+                <span className={`w-1.5 h-1.5 rounded-full ${chatbot?.status === 'ready' || chatbot?.status === 'active' ? 'bg-green-500 animate-pulse' : chatbot?.status === 'training' ? 'bg-yellow-500' : 'bg-gray-500'}`} />
+                {chatbot?.status === 'ready' || chatbot?.status === 'active' ? 'Active' : chatbot?.status === 'training' ? 'Training...' : 'Draft'}
               </div>
             </div>
           </div>
@@ -475,9 +475,11 @@ export default function ChatbotDetail() {
                     </div>
 
                     <div className="flex gap-4 justify-center">
-                      <Link to={`/chatbot/${id}/playground`} className="px-6 py-3 bg-gradient-to-r from-accent to-accent-secondary text-white font-semibold rounded-xl hover:shadow-[0_0_20px_rgba(108,99,255,0.3)] transition-all flex items-center gap-2 hover:-translate-y-0.5">
-                        Test in Playground <ExternalLink size={16} />
-                      </Link>
+                      {(chatbot?.status === 'ready' || chatbot?.status === 'active') && (
+                        <Link to={`/chatbot/${id}/playground`} className="px-6 py-3 bg-gradient-to-r from-accent to-accent-secondary text-white font-semibold rounded-xl hover:shadow-[0_0_20px_rgba(108,99,255,0.3)] transition-all flex items-center gap-2 hover:-translate-y-0.5">
+                          Test in Playground <ExternalLink size={16} />
+                        </Link>
+                      )}
                       <button
                         onClick={() => {
                           const shareUrl = `${getEmbedUrl()}/chat/${chatbot?.embedId}`

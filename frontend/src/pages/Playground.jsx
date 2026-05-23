@@ -187,6 +187,14 @@ export default function Playground() {
   useEffect(() => { loadData() }, [loadData])
   useEffect(() => { messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' }) }, [messages])
 
+  useEffect(() => {
+    if (chatbot?.status === 'draft') {
+      api.patch(`/chatbots/${id}/activate`).then(({ data }) => {
+        setChatbot(prev => prev ? { ...prev, status: data.chatbot?.status || 'active' } : data.chatbot)
+      }).catch(() => {})
+    }
+  }, [chatbot, id])
+
   // Auto-resize textarea
   const handleInput = (e) => {
     setInput(e.target.value)
@@ -331,7 +339,8 @@ export default function Playground() {
     </div>
   )
 
-  const isReady = chatbot?.status === 'ready'
+  const isReady = chatbot?.status !== 'training' && chatbot?.status !== 'error'
+  const showStatusWarning = chatbot?.status === 'training' || chatbot?.status === 'draft'
   const accentColor = chatbot?.settings?.accentColor || '#6C63FF'
 
   return (
@@ -467,7 +476,7 @@ export default function Playground() {
           </div>
         </div>
 
-        {!isReady && (
+        {showStatusWarning && (
           <div className="bg-yellow-500/10 border-b border-yellow-500/20 px-2.5 sm:px-6 py-3 flex items-center gap-3 shrink-0 relative z-10">
             <Loader2 size={14} className="text-yellow-500 animate-spin shrink-0" />
             <p className="text-sm text-yellow-600 font-medium">

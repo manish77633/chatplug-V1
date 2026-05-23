@@ -7,6 +7,7 @@ const morgan = require('morgan');
 
 const app = express();
 const passport = require('passport');
+const Chatbot = require('./models/Chatbot');
 require('./config/passport');
 
 // ─── Middleware ───────────────────────────────────────────────────────────────
@@ -62,8 +63,18 @@ const PORT = process.env.PORT || 5000;
 const HOST = '0.0.0.0'; // Required for Render deployment
 mongoose
   .connect(process.env.MONGO_URI, { serverSelectionTimeoutMS: 5000 })
-  .then(() => {
+  .then(async () => {
     console.log('✅ MongoDB connected');
+
+    if (process.env.FIX_DRAFT_BOTS_ONCE === 'true') {
+      try {
+        const result = await Chatbot.updateMany({ status: 'draft' }, { $set: { status: 'active' } });
+        console.log(`Fixed draft bots: ${result.modifiedCount}`);
+      } catch (err) {
+        console.error('Failed to fix draft bots:', err.message);
+      }
+    }
+
     app.listen(PORT, HOST, () => console.log(`🚀 ChatPlug API on ${HOST}:${PORT}`));
   })
   .catch(err => { console.error('FATAL:', err.message); process.exit(1); });

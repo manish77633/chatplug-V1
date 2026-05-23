@@ -42,7 +42,7 @@ const chatbotSchema = new mongoose.Schema({
   allowedDomains: [{ type: String }],
 
   // Status
-  status:     { type: String, enum: ['training', 'ready', 'error', 'draft'], default: 'draft' },
+  status:     { type: String, enum: ['training', 'ready', 'active', 'error', 'draft'], default: 'active' },
   isPublic:   { type: Boolean, default: true },
   isArchived: { type: Boolean, default: false },
 

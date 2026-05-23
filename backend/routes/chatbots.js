@@ -7,6 +7,7 @@ router.use(protect, apiLimiter);
 
 router.get('/',    ctrl.getAll);
 router.post('/',   checkPlanLimit('chatbots'), ctrl.create);
+router.patch('/:id/activate', ctrl.activate);
 router.get('/:id', ctrl.getOne);
 router.put('/:id', ctrl.update);
 router.delete('/:id', ctrl.delete);

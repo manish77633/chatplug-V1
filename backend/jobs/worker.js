@@ -53,8 +53,8 @@ const worker = new Worker('embedding', async (job) => {
     },
   });
 
-  // Update chatbot status to ready
-  await Chatbot.findByIdAndUpdate(chatbotId, { status: 'ready' });
+  // Update chatbot status to active
+  await Chatbot.findByIdAndUpdate(chatbotId, { status: 'active' });
 
   // Update user usage
   await User.findByIdAndUpdate(ownerId, {

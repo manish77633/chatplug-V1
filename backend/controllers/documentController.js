@@ -83,8 +83,8 @@ exports.uploadDocument = async (req, res, next) => {
           },
         });
 
-        // Set chatbot to ready
-        await Chatbot.findByIdAndUpdate(chatbot._id, { status: 'ready' });
+        // Set chatbot to active
+        await Chatbot.findByIdAndUpdate(chatbot._id, { status: 'active' });
 
         // Update user usage
         await User.findByIdAndUpdate(req.user._id, {
@@ -106,7 +106,7 @@ exports.uploadDocument = async (req, res, next) => {
         if (completedDocs === 0) {
           await Chatbot.findByIdAndUpdate(chatbot._id, { status: 'error' });
         } else {
-          await Chatbot.findByIdAndUpdate(chatbot._id, { status: 'ready' });
+          await Chatbot.findByIdAndUpdate(chatbot._id, { status: 'active' });
         }
       }
     });
