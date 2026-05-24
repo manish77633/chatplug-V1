@@ -47,7 +47,13 @@ export default function Playground() {
   const [rightPanelOpen, setRightPanelOpen] = useState(true)
   const [leftSidebarOpen, setLeftSidebarOpen] = useState(false)
   const [isFullscreen, setIsFullscreen] = useState(false)
+  const [prevRightPanel, setPrevRightPanel] = useState(true)
   const [mockMetrics, setMockMetrics] = useState({ tokens: 0, ms: 0, chunks: [] })
+
+  // File Upload State
+  const [uploadedContext, setUploadedContext] = useState(null)
+  const [uploadingFile, setUploadingFile] = useState(false)
+  const fileInputRef = useRef(null)
   
   // History State
   const storageKey = `chatplug_history_${id}`
@@ -58,6 +64,18 @@ export default function Playground() {
   const messagesEndRef = useRef(null)
   const abortRef = useRef(null)
   const textareaRef = useRef(null)
+
+  // Fullscreen toggle
+  const toggleFullscreen = () => {
+    if (!isFullscreen) {
+      setPrevRightPanel(rightPanelOpen)
+      setRightPanelOpen(false)
+      setLeftSidebarOpen(false)
+    } else {
+      setRightPanelOpen(prevRightPanel)
+    }
+    setIsFullscreen(f => !f)
+  }
 
   // Update History Local State (Backend saves it automatically during chat)
   useEffect(() => {
@@ -211,6 +229,41 @@ export default function Playground() {
     }
   }
 
+  // File upload handler
+  const handleFileSelect = async (e) => {
+    const file = e.target.files?.[0]
+    if (!file) return
+
+    // Validate size
+    if (file.size > 10 * 1024 * 1024) {
+      toast.error('File must be smaller than 10MB')
+      e.target.value = ''
+      return
+    }
+
+    setUploadingFile(true)
+    const toastId = toast.loading('Extracting text...')
+
+    try {
+      const fd = new FormData()
+      fd.append('file', file)
+      const { data } = await api.post('/chat/upload-context', fd, {
+        headers: { 'Content-Type': 'multipart/form-data' }
+      })
+
+      if (data.success) {
+        setUploadedContext({ text: data.text, filename: data.filename })
+        toast.success('File ready! Ask questions about it.', { id: toastId })
+      }
+    } catch (err) {
+      const msg = err.response?.data?.message || err.message || 'Upload failed'
+      toast.error(msg, { id: toastId })
+    } finally {
+      setUploadingFile(false)
+      e.target.value = ''
+    }
+  }
+
   const sendMessage = async (e, forcedMessage = null) => {
     if (e) e.preventDefault()
     const userMsg = forcedMessage || input.trim()
@@ -223,6 +276,16 @@ export default function Playground() {
     setMessages(p => [...p, newMsg])
     setBotLoading(true)
     setIsStreaming(false)
+
+    // Build the message with context if uploaded
+    const fullMessage = uploadedContext
+      ? `[Context from ${uploadedContext.filename}]:\n${uploadedContext.text.slice(0, 3000)}\n\nUser question: ${userMsg}`
+      : userMsg
+
+    // Clear context after sending
+    if (uploadedContext) {
+      setUploadedContext(null)
+    }
 
     // Add placeholder bot message
     setMessages(p => [...p, { id: (Date.now()+1).toString(), role: 'assistant', content: '', timestamp: Date.now() }])
@@ -245,7 +308,7 @@ export default function Playground() {
           ...(token ? { 'Authorization': `Bearer ${token}` } : {}),
         },
         body: JSON.stringify({
-          message: userMsg,
+          message: fullMessage,
           sessionId: currentSessionId,
           history: messages.slice(-6).map(m => ({ role: m.role, content: m.content })),
         }),
@@ -346,17 +409,16 @@ export default function Playground() {
   return (
     <div className="absolute top-0 left-0 right-0 bottom-[72px] md:bottom-0 bg-background text-text-primary font-inter flex overflow-hidden selection:bg-accent/30 z-10">
 
-      {/* ─── LEFT PANEL: History Sidebar ─── */}
-      {/* Mobile: slide-in overlay; Desktop: always visible */}
-      {leftSidebarOpen && (
+      {/* ─── LEFT PANEL: History Sidebar (hidden in fullscreen) ─── */}
+      {leftSidebarOpen && !isFullscreen && (
         <div
           className="fixed inset-0 z-[30] bg-background/80 backdrop-blur-sm lg:hidden bottom-[72px] md:bottom-0"
           onClick={() => setLeftSidebarOpen(false)}
         />
       )}
       <div className={`fixed lg:static top-0 bottom-[72px] md:inset-y-0 left-0 z-[40] w-[260px] bg-surface border-r border-border flex flex-col shrink-0 transition-transform duration-300 ${
-        leftSidebarOpen ? 'translate-x-0' : '-translate-x-full lg:translate-x-0'
-      }`}>
+        leftSidebarOpen && !isFullscreen ? 'translate-x-0' : '-translate-x-full lg:translate-x-0'
+      } ${isFullscreen ? 'lg:-translate-x-full' : ''}`}>
         <div className="p-4 border-b border-border flex items-center gap-3">
           <Link to="/dashboard" id="playground-back-btn" className="p-2 -ml-2 rounded-lg hover:bg-surface-elevated text-text-muted hover:text-text-primary transition-colors min-w-[44px] min-h-[44px] flex items-center justify-center">
             <ChevronLeft size={20} />
@@ -464,7 +526,7 @@ export default function Playground() {
               <Settings size={18} />
             </Link>
             <button
-              onClick={() => setIsFullscreen(f => !f)}
+              onClick={toggleFullscreen}
               className="p-2 text-text-muted hover:text-text-primary hover:bg-surface-elevated rounded-lg transition-colors hidden sm:block"
               title={isFullscreen ? 'Exit fullscreen' : 'Fullscreen'}
             >
@@ -560,9 +622,35 @@ export default function Playground() {
         {/* Input Area */}
         <div className="px-2.5 py-4 sm:p-4 bg-surface/50 backdrop-blur-md border-t border-border shrink-0 z-20">
           <div className="max-w-3xl mx-auto">
+            {/* File chip — shown when a file context is loaded */}
+            {uploadedContext && (
+              <div className="flex items-center gap-2 px-3 py-2 mb-2 bg-accent/10 border border-accent/20 rounded-xl">
+                <FileText size={14} className="text-accent" />
+                <span className="text-xs text-accent font-medium flex-1 truncate">{uploadedContext.filename}</span>
+                <button
+                  onClick={() => setUploadedContext(null)}
+                  className="p-0.5 text-text-muted hover:text-red-400 transition-colors"
+                >
+                  <X size={14} />
+                </button>
+              </div>
+            )}
             <form onSubmit={sendMessage} className="relative flex items-end gap-2 bg-background border border-border focus-within:border-accent focus-within:shadow-[0_0_15px_rgba(108,99,255,0.1)] rounded-2xl p-2 transition-all">
-              <button type="button" onClick={() => toast('File attachment coming soon', { icon: '📎' })} className="p-2 text-text-muted hover:text-text-primary transition-colors shrink-0 mb-1 rounded-lg hover:bg-surface">
-                <Paperclip size={20} />
+              <input
+                ref={fileInputRef}
+                type="file"
+                accept=".pdf,.doc,.docx,.txt"
+                onChange={handleFileSelect}
+                className="hidden"
+              />
+              <button
+                type="button"
+                onClick={() => fileInputRef.current?.click()}
+                disabled={uploadingFile}
+                className="p-2 text-text-muted hover:text-text-primary transition-colors shrink-0 mb-1 rounded-lg hover:bg-surface disabled:opacity-50"
+                title="Attach file (PDF, DOC, TXT)"
+              >
+                {uploadingFile ? <Loader2 size={20} className="animate-spin" /> : <Paperclip size={20} />}
               </button>
               
               <textarea
@@ -592,9 +680,9 @@ export default function Playground() {
         </div>
       </div>
 
-      {/* ─── RIGHT PANEL: Debug & Context ─── */}
+      {/* ─── RIGHT PANEL: Debug & Context (hidden in fullscreen) ─── */}
       <AnimatePresence>
-        {rightPanelOpen && (
+        {rightPanelOpen && !isFullscreen && (
           <motion.div
             initial={{ width: 0, opacity: 0 }}
             animate={{ width: 280, opacity: 1 }}

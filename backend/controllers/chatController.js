@@ -5,6 +5,44 @@ const ChatSession = require('../models/ChatSession');
 const User        = require('../models/User');
 const jwt         = require('jsonwebtoken');
 const { v4: uuidv4 } = require('uuid');
+const fs          = require('fs');
+const path        = require('path');
+
+// Optional PDF/DOCX text extraction
+let pdfParse, mammoth;
+try { pdfParse = require('pdf-parse'); } catch {}
+try { mammoth   = require('mammoth');   } catch {}
+
+exports.uploadContext = async (req, res, next) => {
+  try {
+    if (!req.file) return res.status(400).json({ success: false, message: 'No file uploaded' })
+    
+    const ext = path.extname(req.file.originalname).toLowerCase()
+    let text = ''
+
+    if (ext === '.txt') {
+      text = fs.readFileSync(req.file.path, 'utf-8')
+    } else if (ext === '.pdf') {
+      const pdfParse = require('pdf-parse')
+      const buffer = fs.readFileSync(req.file.path)
+      const result = await pdfParse(buffer)
+      text = result.text
+    } else if (ext === '.docx' || ext === '.doc') {
+      const mammoth = require('mammoth')
+      const result = await mammoth.extractRawText({ path: req.file.path })
+      text = result.value
+    }
+
+    fs.unlinkSync(req.file.path) // delete after extraction
+
+    if (!text.trim()) return res.status(400).json({ success: false, message: 'Could not extract text from file' })
+
+    res.json({ success: true, text, filename: req.file.originalname })
+  } catch (err) { 
+    if (req.file?.path) { try { fs.unlinkSync(req.file.path) } catch {} }
+    next(err) 
+  }
+};
 
 exports.chat = async (req, res, next) => {
   try {
