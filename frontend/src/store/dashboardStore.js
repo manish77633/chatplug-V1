@@ -8,8 +8,10 @@ const useDashboardStore = create((set, get) => ({
 
   fetchDashboard: async (token, force = false) => {
     const { lastFetched, isLoading } = get()
-    const CACHE_TTL = 60 * 1000
+    const CACHE_TTL = 5 * 60 * 1000 // 5 min cache
+    // Skip if data is fresh
     if (!force && lastFetched && (Date.now() - lastFetched) < CACHE_TTL) return
+    // Skip if already loading
     if (isLoading) return
 
     set({ isLoading: true })

@@ -163,4 +163,5 @@ module.exports = {
   getApiKey: exports.getApiKey,
   regenerateApiKey: exports.regenerateApiKey,
   uploadAvatar: exports.uploadAvatar,
+  reapplyLimits: exports.reapplyLimits,
 };

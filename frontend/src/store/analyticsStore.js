@@ -9,7 +9,7 @@ const useAnalyticsStore = create((set, get) => ({
 
   fetchAnalytics: async (token, range = '7d', force = false) => {
     const { lastFetched, isLoading } = get()
-    const CACHE_TTL = 60 * 1000
+    const CACHE_TTL = 3 * 60 * 1000 // 3 min cache
     if (!force && lastFetched && (Date.now() - lastFetched) < CACHE_TTL) return
     if (isLoading) return
 

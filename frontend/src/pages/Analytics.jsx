@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import { Link, useParams } from 'react-router-dom'
 import { motion } from 'framer-motion'
 import {
@@ -62,6 +62,29 @@ function CountUp({ end }) {
   return <span>{count}</span>
 }
 
+// Skeleton card component matching KPI layout
+function SkeletonCard() {
+  return (
+    <div className="p-5 md:p-6 bg-surface border border-border rounded-2xl animate-pulse">
+      <div className="flex justify-between items-start mb-4">
+        <div className="p-2.5 md:p-3 rounded-xl bg-surface-elevated w-11 h-11" />
+        <div className="w-14 h-5 bg-surface-elevated rounded-md" />
+      </div>
+      <div className="w-20 h-7 bg-surface-elevated rounded-lg mb-1" />
+      <div className="w-16 h-4 bg-surface-elevated rounded-md" />
+    </div>
+  )
+}
+
+function SkeletonChart() {
+  return (
+    <div className="bg-surface border border-border rounded-3xl p-5 md:p-6 animate-pulse">
+      <div className="w-40 h-5 bg-surface-elevated rounded-lg mb-6" />
+      <div className="h-[250px] md:h-[300px] bg-surface-elevated rounded-xl" />
+    </div>
+  )
+}
+
 export default function Analytics() {
   const { id } = useParams()
   const backTo   = id ? `/chatbot/${id}` : '/dashboard'
@@ -86,9 +109,18 @@ export default function Analytics() {
   
   const [sortConfig, setSortConfig] = useState({ key: 'count', direction: 'desc' })
 
+  // Fetch analytics stats on mount — Zustand cache handles re-fetch logic
   useEffect(() => {
     fetchAnalytics(token)
   }, [])
+
+  // Background refresh: if data is stale (>3 min), refresh silently
+  useEffect(() => {
+    const interval = setInterval(() => {
+      fetchAnalytics(token, '7d', false)
+    }, 3 * 60 * 1000)
+    return () => clearInterval(interval)
+  }, [token])
 
   const [showFilter, setShowFilter] = useState(false)
   const [botFilter, setBotFilter] = useState('All')
@@ -179,13 +211,34 @@ export default function Analytics() {
     )
   }
 
-  if (isLoading && !stats) return (
-    <div className="grid grid-cols-2 md:grid-cols-4 gap-4 p-6">
-      {[...Array(4)].map((_, i) => (
-        <div key={i} className="animate-pulse bg-surface rounded-2xl h-28" />
-      ))}
-    </div>
-  )
+  // ─── FULL PAGE LOADING STATE (skeleton matches layout) ───
+  if (isLoading && !stats) {
+    return (
+      <div className="bg-background text-text-primary font-inter">
+        {/* Breadcrumb Header skeleton */}
+        <div className="border-b border-border bg-surface/50">
+          <div className="max-w-7xl mx-auto px-2.5 md:px-6 py-3 md:py-4">
+            <div className="h-6 w-32 bg-surface-elevated rounded-lg animate-pulse" />
+          </div>
+        </div>
+        <div className="max-w-7xl mx-auto px-2.5 md:px-6 py-6 md:py-10 space-y-8">
+          {/* KPI skeletons */}
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 md:gap-6">
+            {[...Array(4)].map((_, i) => <SkeletonCard key={i} />)}
+          </div>
+          {/* Chart skeletons */}
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+            <div className="lg:col-span-2"><SkeletonChart /></div>
+            <div><SkeletonChart /></div>
+          </div>
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+            <div className="lg:col-span-2"><SkeletonChart /></div>
+            <div><SkeletonChart /></div>
+          </div>
+        </div>
+      </div>
+    )
+  }
   
   const hasNoData = stats && stats[0].value === 0
 

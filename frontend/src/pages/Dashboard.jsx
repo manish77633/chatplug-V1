@@ -44,7 +44,8 @@ export default function Dashboard() {
 
   useEffect(() => {
     fetchDashboard(token)
-  }, [user?._id])
+  }, [])
+  // ^ empty deps — cache in Zustand handles re-fetch logic
 
   const createChatbot = async (e) => {
     e.preventDefault()

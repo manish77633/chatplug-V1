@@ -34,9 +34,13 @@ export default function Sidebar({ isOpen, onClose }) {
       <aside className={`fixed lg:static inset-y-0 left-0 z-[110] w-64 bg-[#0d0d1a] border-r border-[#1a1a2e] transform transition-transform duration-300 ease-in-out ${isOpen ? 'translate-x-0' : '-translate-x-full lg:translate-x-0'} flex flex-col h-screen`}>
         {/* User Profile */}
         <div className="p-5 flex items-center gap-3 border-b border-[#1a1a2e]">
+          {user?.avatar ? (
+            <img src={user.avatar} alt="avatar" className="w-10 h-10 rounded-xl object-cover object-center shrink-0" />
+          ) : (
           <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-accent to-accent-secondary flex items-center justify-center text-white font-bold text-base shadow-lg shrink-0">
             {userName?.charAt(0)?.toUpperCase() || 'U'}
           </div>
+          )}
           <div className="flex-1 min-w-0">
             <h3 className="font-semibold text-text-primary truncate text-sm">{userName}</h3>
             <span className="px-2 py-0.5 rounded-md bg-accent/10 border border-accent/20 text-[10px] font-bold text-accent">
@@ -94,9 +98,13 @@ export default function Sidebar({ isOpen, onClose }) {
             </button>
             <button
               onClick={() => { navigate('/settings'); if (onClose) onClose(); }}
-              className="w-[34px] h-[34px] rounded-full bg-[#1e1e30] border border-[#2a2a45] hover:bg-[#252540] flex items-center justify-center text-sm font-medium text-gray-200 transition-colors"
+              className="w-[34px] h-[34px] rounded-full bg-[#1e1e30] border border-[#2a2a45] hover:bg-[#252540] flex items-center justify-center text-sm font-medium text-gray-200 transition-colors overflow-hidden"
             >
-              {userName?.charAt(0)?.toUpperCase() || 'U'}
+              {user?.avatar ? (
+                <img src={user.avatar} alt="avatar" className="w-full h-full object-cover object-center" />
+              ) : (
+                userName?.charAt(0)?.toUpperCase() || 'U'
+              )}
             </button>
           </div>
         </div>

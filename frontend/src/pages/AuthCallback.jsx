@@ -1,6 +1,7 @@
 import { useEffect } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { useAuthStore } from '../store/authStore';
+import useDashboardStore from '../store/dashboardStore';
 import { Loader2 } from 'lucide-react';
 import api from '../utils/api';
 
@@ -8,6 +9,7 @@ export default function AuthCallback() {
   const navigate = useNavigate();
   const location = useLocation();
   const { hydrate } = useAuthStore();
+  const { fetchDashboard } = useDashboardStore();
 
   useEffect(() => {
     const params = new URLSearchParams(location.search);
@@ -27,6 +29,10 @@ export default function AuthCallback() {
         
         // Update zustand store
         hydrate();
+        
+        // Prefetch dashboard data so it's ready when user navigates to /dashboard
+        fetchDashboard(token, true);
+        
         navigate('/dashboard', { replace: true });
       } catch (e) {
         console.error('Failed to parse user from Google Auth', e);
@@ -35,7 +41,7 @@ export default function AuthCallback() {
     } else {
       navigate('/login', { replace: true });
     }
-  }, [location, navigate, hydrate]);
+  }, [location, navigate, hydrate, fetchDashboard]);
 
   return (
     <div className="min-h-screen bg-background flex flex-col items-center justify-center">

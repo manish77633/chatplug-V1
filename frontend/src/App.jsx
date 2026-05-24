@@ -8,6 +8,7 @@ import Landing       from './pages/Landing'
 import Login         from './pages/Login'
 import Register      from './pages/Register'
 import Dashboard     from './pages/Dashboard'
+import MyChatbots    from './pages/MyChatbots'
 import ChatbotDetail from './pages/ChatbotDetail'
 import Playground    from './pages/Playground'
 import Analytics     from './pages/Analytics'
@@ -35,6 +36,14 @@ const AdminRoute = ({ children }) => {
 export default function App() {
   const { syncAuth } = useAuthStore()
 
+  // Warm up backend (Render cold start) — fire on mount, silent fail
+  useEffect(() => {
+    const apiBase = import.meta.env.VITE_API_URL || ''
+    if (apiBase) {
+      fetch(`${apiBase}/health`).catch(() => {})
+    }
+  }, [])
+
   useEffect(() => {
     syncAuth()
   }, [syncAuth])
@@ -55,7 +64,7 @@ export default function App() {
           <Route path="/docs/guides"                    element={<DocsGuides />} />
           
           <Route path="/dashboard"                      element={<Dashboard />} />
-          <Route path="/chatbots"                       element={<Dashboard />} />
+          <Route path="/chatbots"                       element={<MyChatbots />} />
           <Route path="/settings"                       element={<Settings />} />
           <Route path="/profile"                        element={<Profile />} />
           <Route path="/chatbot/:id"                    element={<ChatbotDetail />} />
