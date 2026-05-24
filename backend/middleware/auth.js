@@ -35,9 +35,9 @@ exports.adminOnly = (req, res, next) => {
 exports.checkPlanLimit = (resource) => async (req, res, next) => {
   const user = req.user;
   const limits = {
-    chatbots:  user.limits?.maxChatbots  || (user.plan?.type === 'pro' ? 20 : 3),
-    documents: user.limits?.maxDocuments || (user.plan?.type === 'pro' ? 100 : 10),
-    tokens:    user.limits?.maxTokens    || (user.plan?.type === 'pro' ? 1000000 : 100000),
+    chatbots:  user.limits?.maxChatbots  || (user.plan?.type === 'pro' ? 10 : 3),
+    documents: user.limits?.maxDocuments || (user.plan?.type === 'pro' ? 50 : 5),
+    tokens:    user.limits?.maxTokens    || (user.plan?.type === 'pro' ? 500000 : 50000),
   };
 
   let currentCount = 0;

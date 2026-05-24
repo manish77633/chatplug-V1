@@ -574,7 +574,7 @@ export default function Landing() {
             {/* Free */}
             <motion.div variants={itemVariants} className="p-8 bg-background border border-border rounded-3xl hover:border-accent/50 transition-all hover:shadow-[0_0_40px_rgba(108,99,255,0.1)] flex flex-col">
               <h3 className="text-xl font-medium text-text-primary mb-2">Free</h3>
-              <div className="mb-6"><span className="text-4xl font-bold">$0</span><span className="text-text-muted">/mo</span></div>
+              <div className="mb-6"><span className="text-4xl font-bold">₹0</span><span className="text-text-muted">/mo</span></div>
               <p className="text-sm text-text-muted mb-8">Perfect for side projects and evaluating ChatPlug.</p>
               <ul className="space-y-4 mb-8 flex-1">
                 <li className="flex items-center gap-3 text-sm text-text-primary"><Check size={16} className="text-accent" /> 3 Chatbots</li>
@@ -592,7 +592,7 @@ export default function Landing() {
               
               <div className="bg-[#0d0d1a] rounded-2xl p-6 h-full flex flex-col relative z-10">
                 <h3 className="text-xl font-medium text-text-primary mb-2">Pro</h3>
-                <div className="mb-6"><span className="text-4xl font-bold">$49</span><span className="text-text-muted">/mo</span></div>
+                <div className="mb-6"><span className="text-4xl font-bold">₹499</span><span className="text-text-muted">/mo</span></div>
                 <p className="text-sm text-text-muted mb-8">For growing startups and professional sites.</p>
                 <ul className="space-y-4 mb-8 flex-1">
                   <li className="flex items-center gap-3 text-sm text-text-primary"><Check size={16} className="text-accent" /> 20 Chatbots</li>

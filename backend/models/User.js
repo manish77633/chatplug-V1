@@ -22,12 +22,26 @@ const userSchema = new mongoose.Schema({
       tokens:   { type: Number, default: 0 },
       messages: { type: Number, default: 0 },
     },
+    today: {
+      messages: { type: Number, default: 0 },
+      date:     { type: Date },
+    },
   },
 
   limits: {
-    maxChatbots:  { type: Number, default: 2 },
-    maxDocuments: { type: Number, default: 10 },
-    maxTokens:    { type: Number, default: 100000 },
+    maxChatbots:        { type: Number, default: 3 },
+    maxDocuments:       { type: Number, default: 5 },
+    maxTokens:          { type: Number, default: 50000 },
+    maxMessagesPerDay:  { type: Number, default: 20 },
+  },
+  
+  // Notification preferences
+  notifications: {
+    newQueries:      { type: Boolean, default: true },
+    weeklyDigest:    { type: Boolean, default: true },
+    botStatusAlerts: { type: Boolean, default: true },
+    billing:         { type: Boolean, default: false },
+    marketing:       { type: Boolean, default: false },
   },
 
   apiKey:          { type: String, unique: true, sparse: true },
@@ -50,9 +64,9 @@ userSchema.methods.comparePassword = async function (candidatePassword) {
 // Set limits based on plan
 userSchema.methods.applyPlanLimits = function () {
   const limits = {
-    free:       { maxChatbots: 2,   maxDocuments: 10,  maxTokens: 100_000 },
-    pro:        { maxChatbots: 10,  maxDocuments: 100, maxTokens: 1_000_000 },
-    enterprise: { maxChatbots: 999, maxDocuments: 999, maxTokens: 999_999_999 },
+    free:       { maxChatbots: 3,   maxDocuments: 5,   maxTokens: 50_000,    maxMessagesPerDay: 20   },
+    pro:        { maxChatbots: 10,  maxDocuments: 50,  maxTokens: 500_000,   maxMessagesPerDay: 500  },
+    enterprise: { maxChatbots: 999, maxDocuments: 999, maxTokens: 9_999_999,  maxMessagesPerDay: 9999 },
   };
   this.limits = limits[this.plan.type] || limits.free;
 };

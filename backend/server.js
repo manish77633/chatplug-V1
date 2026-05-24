@@ -34,6 +34,8 @@ app.use('/api/admin',     require('./routes/admin'));
 app.use('/api/webhooks',  require('./routes/webhooks'));
 app.use('/api/analytics', require('./routes/analytics'));
 app.use('/api/payment',   require('./routes/payment'));
+app.use('/api/user',      require('./routes/user'));
+app.use('/api/billing',   require('./routes/billing'));
 
 // ─── Embed Script (Vanilla JS - ultra light) ──────────────────────────────────
 app.get('/embed/:botId/widget.js', require('./controllers/embedController').serveWidget);
@@ -72,6 +74,22 @@ mongoose
         console.log(`Fixed draft bots: ${result.modifiedCount}`);
       } catch (err) {
         console.error('Failed to fix draft bots:', err.message);
+      }
+    }
+
+    if (process.env.FIX_LIMITS === 'true') {
+      try {
+        const User = require('./models/User');
+        const users = await User.find({});
+        let fixed = 0;
+        for (const u of users) {
+          u.applyPlanLimits();
+          await u.save({ validateBeforeSave: false });
+          fixed++;
+        }
+        console.log(`Fixed limits for users: ${fixed}`);
+      } catch (err) {
+        console.error('Failed to fix user limits:', err.message);
       }
     }
 

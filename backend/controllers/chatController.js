@@ -141,9 +141,26 @@ Rules:
           await Chatbot.findByIdAndUpdate(chatbot._id, {
             $inc: { 'stats.totalMessages': 2, 'stats.totalTokens': totalTokens },
           });
-          await User.findByIdAndUpdate(chatbot.owner, {
-            $inc: { 'usage.totalMessages': 1, 'usage.currentMonth.tokens': totalTokens },
-          });
+          // Update user usage: totalMessages, currentMonth.messages, today.messages and tokens
+          try {
+            const userUsage = await User.findById(chatbot.owner).select('usage');
+            const today = new Date();
+            const todayKey = new Date(today.getFullYear(), today.getMonth(), today.getDate()).toISOString();
+            let usageDateKey = null;
+            if (userUsage?.usage?.today?.date) {
+              const ud = new Date(userUsage.usage.today.date);
+              usageDateKey = new Date(ud.getFullYear(), ud.getMonth(), ud.getDate()).toISOString();
+            }
+
+            const update = { $inc: { 'usage.totalMessages': 1, 'usage.currentMonth.messages': 1, 'usage.currentMonth.tokens': totalTokens } };
+            if (usageDateKey !== todayKey) {
+              update.$set = { 'usage.today.date': today, 'usage.today.messages': 1 };
+            } else {
+              update.$inc['usage.today.messages'] = 1;
+            }
+
+            await User.findByIdAndUpdate(chatbot.owner, update, { validateBeforeSave: false });
+          } catch (e) { console.error('[ChatUserUpdate]', e.message); }
         } catch (e) { console.error('[ChatSave]', e.message); }
       });
     } catch (apiErr) {

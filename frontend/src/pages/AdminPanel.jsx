@@ -30,7 +30,7 @@ export default function AdminPanel() {
     { label: 'Total Users', value: '1,248', icon: Users, color: 'text-accent' },
     { label: 'Total Chatbots', value: '4,592', icon: Bot, color: 'text-accent-secondary' },
     { label: 'Total Queries', value: '2.4M', icon: MessageSquare, color: 'text-purple-400' },
-    { label: 'MRR', value: '$12,450', icon: DollarSign, color: 'text-green-400' },
+    { label: 'MRR', value: '₹12,450', icon: DollarSign, color: 'text-green-400' },
   ]
 
   const healthData = [
