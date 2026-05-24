@@ -3,11 +3,10 @@ import api from '../utils/api'
 
 const useAnalyticsStore = create((set, get) => ({
   stats: null,
-  chartData: [],
   isLoading: false,
   lastFetched: null,
 
-  fetchAnalytics: async (token, range = '7d', force = false) => {
+  fetchAnalytics: async (token, force = false) => {
     const { lastFetched, isLoading } = get()
     const CACHE_TTL = 3 * 60 * 1000 // 3 min cache
     if (!force && lastFetched && (Date.now() - lastFetched) < CACHE_TTL) return

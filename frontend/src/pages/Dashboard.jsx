@@ -41,11 +41,28 @@ export default function Dashboard() {
   const [newName, setNewName] = useState('')
   const [newNameError, setNewNameError] = useState('')
   const [showModal, setShowModal] = useState(false)
+  const [activities, setActivities] = useState([])
+  const [activitiesLoading, setActivitiesLoading] = useState(true)
 
   useEffect(() => {
     fetchDashboard(token)
   }, [])
   // ^ empty deps — cache in Zustand handles re-fetch logic
+
+  // Fetch recent activity
+  useEffect(() => {
+    const fetchActivity = async () => {
+      try {
+        const { data } = await api.get('/analytics/activity?limit=8')
+        setActivities(data.activities || [])
+      } catch {
+        setActivities([])
+      } finally {
+        setActivitiesLoading(false)
+      }
+    }
+    fetchActivity()
+  }, [])
 
   const createChatbot = async (e) => {
     e.preventDefault()
@@ -109,6 +126,24 @@ export default function Dashboard() {
     { label: 'Docs Uploaded', value: chatbots.reduce((s, b) => s + (b.documents?.length || 0), 0), icon: FileText, color: 'text-purple-400', border: 'border-l-purple-400', trend: '+5' },
     { label: 'Active Embeds', value: chatbots.filter(b => b.status === 'ready' || b.status === 'active').length, icon: Globe, color: 'text-blue-400', border: 'border-l-blue-400', trend: 'Stable' },
   ]
+
+  // Icon mapping for activity types
+  const activityIconMap = {
+    bot:     { icon: Bot,          color: 'text-accent',          bg: 'bg-accent/10' },
+    message: { icon: MessageSquare, color: 'text-accent-secondary', bg: 'bg-accent-secondary/10' },
+    file:    { icon: FileText,     color: 'text-blue-400',        bg: 'bg-blue-400/10' },
+  }
+
+  const timeAgo = (date) => {
+    const diff = Date.now() - new Date(date).getTime()
+    const mins = Math.floor(diff / 60000)
+    const hours = Math.floor(diff / 3600000)
+    const days = Math.floor(diff / 86400000)
+    if (mins < 1) return 'Just now'
+    if (mins < 60) return `${mins} minutes ago`
+    if (hours < 24) return `${hours} hours ago`
+    return `${days} days ago`
+  }
 
   const statusColor = {
     ready:    { bg: 'bg-green-500/10',  text: 'text-green-500',  dot: 'bg-green-500',  label: 'Active' },
@@ -311,30 +346,46 @@ export default function Dashboard() {
             )}
           </div>
 
-          {/* Recent Activity */}
+          {/* Recent Activity — dynamic */}
           {chatbots.length > 0 && (
             <div>
               <h2 className="text-lg sm:text-xl font-semibold text-text-primary mb-5 flex items-center gap-2">
                 <Calendar className="text-accent-secondary" size={20} /> Recent Activity
               </h2>
               <div className="bg-surface border border-border rounded-3xl p-5 sm:p-6">
-                <div className="space-y-5">
-                  {[
-                    { action: 'Chatbot created successfully', time: '2 hours ago', icon: Plus, color: 'text-accent', bg: 'bg-accent/10' },
-                    { action: 'Knowledge base synced',        time: '5 hours ago', icon: FileText, color: 'text-blue-400', bg: 'bg-blue-400/10' },
-                    { action: 'Widget embedded on production', time: '1 day ago',  icon: Globe, color: 'text-green-400', bg: 'bg-green-400/10' }
-                  ].map((item, i) => (
-                    <div key={i} className="flex items-center gap-4">
-                      <div className={`w-8 h-8 rounded-full ${item.bg} flex items-center justify-center shrink-0`}>
-                        <item.icon size={14} className={item.color} />
+                {activitiesLoading ? (
+                  <div className="space-y-5">
+                    {[1, 2, 3].map(i => (
+                      <div key={i} className="flex items-center gap-4 animate-pulse">
+                        <div className="w-8 h-8 rounded-full bg-surface-elevated shrink-0" />
+                        <div className="flex-1 space-y-2">
+                          <div className="h-4 bg-surface-elevated rounded w-3/4" />
+                          <div className="h-3 bg-surface-elevated rounded w-1/4" />
+                        </div>
                       </div>
-                      <div className="flex-1 min-w-0">
-                        <p className="text-sm font-medium text-text-primary">{item.action}</p>
-                        <p className="text-xs text-text-muted">{item.time}</p>
-                      </div>
-                    </div>
-                  ))}
-                </div>
+                    ))}
+                  </div>
+                ) : activities.length === 0 ? (
+                  <p className="text-sm text-text-muted text-center py-4">No recent activity yet</p>
+                ) : (
+                  <div className="space-y-5">
+                    {activities.map((item, i) => {
+                      const iconConfig = activityIconMap[item.type] || activityIconMap.bot
+                      const IconComp = iconConfig.icon
+                      return (
+                        <div key={i} className="flex items-center gap-4">
+                          <div className={`w-8 h-8 rounded-full ${iconConfig.bg} flex items-center justify-center shrink-0`}>
+                            <IconComp size={14} className={iconConfig.color} />
+                          </div>
+                          <div className="flex-1 min-w-0">
+                            <p className="text-sm font-medium text-text-primary">{item.action}</p>
+                            <p className="text-xs text-text-muted">{timeAgo(item.time)}</p>
+                          </div>
+                        </div>
+                      )
+                    })}
+                  </div>
+                )}
               </div>
             </div>
           )}

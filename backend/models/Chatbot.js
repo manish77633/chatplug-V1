@@ -7,7 +7,7 @@ const chatbotSchema = new mongoose.Schema({
   description: { type: String, default: '' },
 
   // Unique embed ID for public widget
-  embedId: { type: String, default: () => uuidv4(), unique: true },
+  embedId: { type: String, default: () => uuidv4(), unique: true, index: true },
 
   // Knowledge base - linked documents
   documents: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Document' }],

@@ -40,7 +40,9 @@ export default function Login() {
   const validate = () => {
     const newErrors = {}
     if (!form.email) newErrors.email = 'Email is required'
+    else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(form.email)) newErrors.email = 'Invalid email format'
     if (!form.password) newErrors.password = 'Password is required'
+    else if (form.password.length < 6) newErrors.password = 'Password must be at least 6 characters'
     return newErrors
   }
 

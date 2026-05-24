@@ -1,8 +1,15 @@
-import { useState } from 'react'
+import { useState, Suspense } from 'react'
 import { Link, useNavigate, Outlet } from 'react-router-dom'
-import { Menu, Zap, Bell, LogOut } from 'lucide-react'
+import { Menu, Zap, Bell, LogOut, Loader2 } from 'lucide-react'
 import Sidebar from './Sidebar'
+import ErrorBoundary from './ErrorBoundary'
 import { useAuthStore } from '../store/authStore'
+
+const PageFallback = () => (
+  <div className="flex items-center justify-center h-64">
+    <Loader2 className="animate-spin text-accent" size={28} />
+  </div>
+)
 
 export default function Layout({ children }) {
   const [sidebarOpen, setSidebarOpen] = useState(false)
@@ -46,7 +53,11 @@ export default function Layout({ children }) {
 
         {/* Main Content Area */}
         <div className="flex-1 overflow-y-auto pb-[72px] md:pb-0 relative">
-          {children || <Outlet />}
+          <ErrorBoundary>
+            <Suspense fallback={<PageFallback />}>
+              {children || <Outlet />}
+            </Suspense>
+          </ErrorBoundary>
         </div>
       </div>
     </div>

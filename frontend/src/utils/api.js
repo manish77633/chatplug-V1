@@ -1,4 +1,5 @@
 import axios from 'axios'
+import toast from 'react-hot-toast'
 
 const api = axios.create({
   baseURL: import.meta.env.VITE_API_URL || '/api',
@@ -16,11 +17,22 @@ api.interceptors.request.use((config) => {
 api.interceptors.response.use(
   (res) => res,
   (err) => {
-    if (err.response?.status === 401) {
+    const status = err.response?.status
+    const msg = err.response?.data?.message
+
+    if (status === 401) {
       localStorage.removeItem('token')
       localStorage.removeItem('user')
-      window.location.href = '/login'
+      // Only redirect if not already on login page
+      if (!window.location.pathname.startsWith('/login')) {
+        window.location.href = '/login'
+      }
+    } else if (status === 429) {
+      toast.error(msg || 'Too many requests, please wait')
+    } else if (status >= 500) {
+      toast.error(msg || 'Server error, please try again')
     }
+
     return Promise.reject(err)
   }
 )
