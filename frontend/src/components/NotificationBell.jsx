@@ -3,12 +3,22 @@ import { Bell, Check, Trash2, ExternalLink } from 'lucide-react'
 import { Link } from 'react-router-dom'
 import { useAuthStore } from '../store/authStore'
 
-export default function NotificationBell() {
+export default function NotificationBell({ placement = 'bottom-end' }) {
   const [isOpen, setIsOpen] = useState(false)
   const [notifications, setNotifications] = useState([])
   const [unreadCount, setUnreadCount] = useState(0)
   const dropdownRef = useRef(null)
   const { token } = useAuthStore()
+
+  // Dynamic positioning based on placement
+  let placementClasses = 'absolute mt-2 right-0' // default
+  if (placement === 'bottom-end') {
+    // Top header (mobile): pop down, align right but pull left on small screens
+    placementClasses = 'absolute top-full right-[-44px] sm:right-0 mt-2'
+  } else if (placement === 'top-start') {
+    // Sidebar bottom (desktop): pop up, align left
+    placementClasses = 'absolute bottom-full left-0 mb-2'
+  }
 
   const fetchNotifications = async () => {
     try {
@@ -83,7 +93,7 @@ export default function NotificationBell() {
       </button>
 
       {isOpen && (
-        <div className="absolute right-0 mt-2 w-80 bg-[#12121a] border border-[#1e1e2d] rounded-xl shadow-2xl z-50 overflow-hidden flex flex-col max-h-[400px]">
+        <div className={`${placementClasses} w-[calc(100vw-32px)] sm:w-80 bg-[#12121a] border border-[#1e1e2d] rounded-xl shadow-2xl z-50 overflow-hidden flex flex-col max-h-[400px]`}>
           <div className="p-3 border-b border-[#1e1e2d] flex items-center justify-between bg-[#151522] shrink-0">
             <h3 className="font-semibold text-white text-sm">Notifications</h3>
             {unreadCount > 0 && (
@@ -106,12 +116,12 @@ export default function NotificationBell() {
                 {notifications.map((notif) => (
                   <div 
                     key={notif._id} 
-                    className={\`p-3 border-b border-[#1e1e2d]/50 hover:bg-[#1a1a2e] transition-colors flex gap-3 \${!notif.isRead ? 'bg-[#1a1a2e]/30' : ''}\`}
+                    className={`p-3 border-b border-[#1e1e2d]/50 hover:bg-[#1a1a2e] transition-colors flex gap-3 ${!notif.isRead ? 'bg-[#1a1a2e]/30' : ''}`}
                     onClick={() => !notif.isRead && markAsRead(notif._id)}
                   >
                     <div className="flex-1 min-w-0">
                       <div className="flex justify-between items-start mb-1">
-                        <h4 className={\`text-sm font-medium \${notif.isRead ? 'text-gray-300' : 'text-white'}\`}>
+                        <h4 className={`text-sm font-medium ${notif.isRead ? 'text-gray-300' : 'text-white'}`}>
                           {notif.title}
                         </h4>
                         {!notif.isRead && <span className="w-2 h-2 rounded-full bg-accent mt-1.5 shrink-0" />}

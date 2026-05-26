@@ -112,7 +112,7 @@ export default function Sidebar({ isOpen, onClose }) {
               <LogOut size={16} /> Sign out
             </button>
             <div className="flex items-center gap-1">
-              <NotificationBell />
+              <NotificationBell placement="top-start" />
               <button
                 onClick={() => { navigate('/settings'); if (onClose) onClose(); }}
                 className="w-[34px] h-[34px] rounded-full bg-[#1e1e30] border border-[#2a2a45] hover:bg-[#252540] flex items-center justify-center text-sm font-medium text-gray-200 transition-colors overflow-hidden"
