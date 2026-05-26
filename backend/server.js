@@ -21,6 +21,13 @@ required.forEach(key => {
   }
 });
 
+// Warn if email is not configured (not fatal, but emails won't send)
+if (!process.env.EMAIL_USER || !process.env.EMAIL_PASS) {
+  console.warn('⚠️  EMAIL_USER / EMAIL_PASS not set — email notifications will NOT be sent');
+} else {
+  console.log(`✅ Email configured for ${process.env.EMAIL_USER}`);
+}
+
 // ─── Middleware ───────────────────────────────────────────────────────────────
 app.use(helmet());
 app.use(mongoSanitize());
