@@ -3,7 +3,7 @@ import { motion, AnimatePresence } from 'framer-motion'
 import {
   Users, Bot, MessageSquare, CreditCard, Search,
   Trash2, ShieldAlert, ShieldCheck, ChevronLeft, ChevronRight,
-  TrendingUp, BarChart3, Crown, X, Calendar, Clock, Settings
+  TrendingUp, BarChart3, Crown, X, Calendar, Clock, Settings, AlertTriangle
 } from 'lucide-react'
 import toast from 'react-hot-toast'
 import api from '../utils/api'
@@ -26,7 +26,7 @@ const Avatar = ({ user, size = 'sm', onImageClick }) => {
         src={user.avatar}
         alt={user?.name}
         onClick={(e) => { e.stopPropagation(); onImageClick?.({ src: user.avatar, name: user.name }) }}
-        className={`${dim} rounded-full object-cover shrink-0 cursor-pointer hover:opacity-80 transition-opacity ring-2 ring-transparent hover:ring-accent`}
+        className={`${dim} rounded-full object-cover shrink-0 cursor-pointer hover:opacity-80 transition-opacity ring-2 ring-transparent hover:ring-accent ${user?.isBanned ? 'grayscale opacity-60' : ''}`}
       />
     )
   }
@@ -51,6 +51,90 @@ const PlanBadge = ({ plan }) => {
   )
 }
 
+// ─── Delete Confirmation Modal ─────────────────────────────────────────────────
+function DeleteConfirmModal({ user, onConfirm, onCancel, deleting }) {
+  const [typedName, setTypedName] = useState('')
+  const nameMatch = typedName === user?.name
+
+  return (
+    <motion.div
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      exit={{ opacity: 0 }}
+      className="fixed inset-0 z-[200] bg-black/80 backdrop-blur-sm flex items-center justify-center p-4"
+      onClick={onCancel}
+    >
+      <motion.div
+        initial={{ scale: 0.95, opacity: 0 }}
+        animate={{ scale: 1, opacity: 1 }}
+        exit={{ scale: 0.95, opacity: 0 }}
+        transition={{ type: 'spring', damping: 25, stiffness: 300 }}
+        onClick={e => e.stopPropagation()}
+        className="bg-[#0d0d1a] border border-red-500/30 rounded-2xl p-6 w-full max-w-md shadow-2xl"
+      >
+        {/* Icon */}
+        <div className="flex items-center justify-center mb-4">
+          <div className="w-14 h-14 rounded-full bg-red-500/10 flex items-center justify-center">
+            <AlertTriangle size={28} className="text-red-400" />
+          </div>
+        </div>
+
+        {/* Title */}
+        <h2 className="text-lg font-bold text-white text-center mb-2">
+          Delete User Permanently
+        </h2>
+        <p className="text-sm text-gray-400 text-center mb-6">
+          This action <strong className="text-red-400">cannot be undone</strong>. All associated data will be permanently removed:
+        </p>
+
+        {/* Data that will be deleted */}
+        <div className="bg-[#1a1a2e]/50 border border-[#2a2a45] rounded-xl p-3 mb-6 space-y-1.5 text-xs text-gray-400">
+          <p>• Chatbots owned by <strong className="text-white">{user?.name}</strong></p>
+          <p>• All chat sessions (messages, feedback)</p>
+          <p>• All uploaded documents</p>
+          <p>• All notifications</p>
+        </div>
+
+        {/* Username confirmation input */}
+        <label className="block text-sm font-medium text-gray-300 mb-2">
+          Type <span className="text-red-400 font-bold">{user?.name}</span> to confirm:
+        </label>
+        <input
+          type="text"
+          value={typedName}
+          onChange={e => setTypedName(e.target.value)}
+          placeholder={user?.name || ''}
+          autoFocus
+          className="w-full bg-[#1a1a2e] border border-[#2a2a45] rounded-xl px-4 py-3 text-sm text-white placeholder-gray-500 focus:outline-none focus:border-red-500/50 transition-colors mb-6"
+        />
+
+        {/* Actions */}
+        <div className="flex gap-3">
+          <button
+            onClick={onCancel}
+            disabled={deleting}
+            className="flex-1 py-2.5 rounded-xl border border-[#2a2a45] text-gray-300 hover:text-white hover:bg-[#1a1a2e] font-semibold text-sm transition-colors disabled:opacity-50"
+          >
+            Cancel
+          </button>
+          <button
+            onClick={() => onConfirm(user._id)}
+            disabled={!nameMatch || deleting}
+            className="flex-1 py-2.5 rounded-xl bg-red-500/20 text-red-400 border border-red-500/30 font-semibold text-sm transition-colors hover:bg-red-500/30 disabled:opacity-40 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+          >
+            {deleting ? (
+              <span className="animate-spin w-4 h-4 border-2 border-red-400 border-t-transparent rounded-full" />
+            ) : (
+              <Trash2 size={16} />
+            )}
+            {deleting ? 'Deleting...' : `Delete ${user?.name?.split(' ')[0] || 'user'}`}
+          </button>
+        </div>
+      </motion.div>
+    </motion.div>
+  )
+}
+
 export default function AdminPanel() {
   const [activeTab, setActiveTab] = useState('overview')
   const [stats, setStats] = useState(null)
@@ -60,6 +144,10 @@ export default function AdminPanel() {
   const [selectedUser, setSelectedUser] = useState(null)
   const [userDetail, setUserDetail] = useState(null)
   const [detailLoading, setDetailLoading] = useState(false)
+
+  // Delete confirmation modal state
+  const [deleteTarget, setDeleteTarget] = useState(null)  // user object to delete
+  const [deleting, setDeleting] = useState(false)
 
   const [users, setUsers] = useState({ data: [], total: 0, pages: 1, loading: true })
   const [userPage, setUserPage] = useState(1)
@@ -127,14 +215,21 @@ export default function AdminPanel() {
     } catch { toast.error('Failed to toggle ban') }
   }
 
-  const handleDeleteUser = async (id) => {
-    if (!window.confirm('Delete this user? This cannot be undone.')) return
+  // ─── Delete handlers (with confirmation modal) ──────────────────────────────
+  const openDeleteModal = (user) => {
+    setDeleteTarget(user)
+  }
+
+  const handleDeleteConfirmed = async (id) => {
+    setDeleting(true)
     try {
       await api.delete(`/admin/users/${id}`)
-      toast.success('User deleted')
+      toast.success('User and all associated data permanently deleted')
+      setDeleteTarget(null)
       fetchUsers()
       if (selectedUser && selectedUser._id === id) setSelectedUser(null)
     } catch { toast.error('Failed to delete') }
+    finally { setDeleting(false) }
   }
 
   const openUserDetail = async (user) => {
@@ -244,7 +339,7 @@ export default function AdminPanel() {
                   <h3 className="font-semibold mb-4">Recent Users</h3>
                   <div className="space-y-3">
                     {users.data.slice(0, 5).map(u => (
-                      <div key={u._id} className="flex items-center gap-3 hover:bg-[#1a1a2e]/30 p-2 -mx-2 rounded-lg cursor-pointer transition-colors" onClick={() => openUserDetail(u)}>
+                      <div key={u._id} className={`flex items-center gap-3 hover:bg-[#1a1a2e]/30 p-2 -mx-2 rounded-lg cursor-pointer transition-colors ${u.isBanned ? 'opacity-50' : ''}`} onClick={() => openUserDetail(u)}>
                         <Avatar user={u} onImageClick={setPreviewImg} />
                         <div className="flex-1 min-w-0">
                           <p className="text-sm font-medium truncate">{u.name}</p>
@@ -347,7 +442,7 @@ export default function AdminPanel() {
                               className="p-1.5 text-gray-400 hover:text-amber-400 bg-[#1a1a2e] hover:bg-[#2a2a45] rounded transition-colors">
                               <ShieldAlert size={14} />
                             </button>
-                            <button onClick={(e) => { e.stopPropagation(); handleDeleteUser(u._id) }} title="Delete"
+                            <button onClick={(e) => { e.stopPropagation(); openDeleteModal(u) }} title="Delete"
                               className="p-1.5 text-gray-400 hover:text-red-400 bg-[#1a1a2e] hover:bg-[#2a2a45] rounded transition-colors">
                               <Trash2 size={14} />
                             </button>
@@ -406,7 +501,7 @@ export default function AdminPanel() {
                         className="flex items-center gap-1 px-2 py-1.5 text-xs font-medium rounded border bg-[#1a1a2e] border-[#2a2a45] text-amber-400">
                         <ShieldAlert size={11} /> {u.isBanned ? 'Unban' : 'Ban'}
                       </button>
-                      <button onClick={(e) => { e.stopPropagation(); handleDeleteUser(u._id) }}
+                      <button onClick={(e) => { e.stopPropagation(); openDeleteModal(u) }}
                         className="flex items-center gap-1 px-2 py-1.5 text-xs font-medium rounded border bg-[#1a1a2e] border-[#2a2a45] text-red-400">
                         <Trash2 size={11} /> Delete
                       </button>
@@ -461,30 +556,36 @@ export default function AdminPanel() {
                       </tr>
                     )) : bots.data.length === 0 ? (
                       <tr><td colSpan="7" className="px-4 py-8 text-center text-gray-400">No chatbots found.</td></tr>
-                    ) : bots.data.map(bot => (
-                      <tr key={bot._id} className="border-b border-[#1a1a2e] hover:bg-[#1a1a2e]/30 transition-colors">
-                        <td className="px-4 py-3 font-medium">{bot.name}</td>
-                        <td className="px-4 py-3">
-                          <div className="flex items-center gap-2">
-                            <Avatar user={bot.owner} onImageClick={setPreviewImg} />
-                            <div>
-                              <div className="text-sm">{bot.owner?.name || 'Unknown'}</div>
-                              <div className="text-xs text-gray-400">{bot.owner?.email}</div>
+                    ) : bots.data.map(bot => {
+                      const ownerBanned = bot.owner?.isBanned
+                      return (
+                        <tr key={bot._id} className={`border-b border-[#1a1a2e] hover:bg-[#1a1a2e]/30 transition-colors ${ownerBanned ? 'opacity-40' : ''}`}>
+                          <td className="px-4 py-3 font-medium">{bot.name}</td>
+                          <td className="px-4 py-3">
+                            <div className="flex items-center gap-2">
+                              <Avatar user={bot.owner} onImageClick={setPreviewImg} />
+                              <div>
+                                <div className="text-sm flex items-center gap-1">
+                                  {bot.owner?.name || 'Unknown'}
+                                  {ownerBanned && <span className="text-[9px] font-bold text-red-400">(BANNED)</span>}
+                                </div>
+                                <div className="text-xs text-gray-400">{bot.owner?.email}</div>
+                              </div>
                             </div>
-                          </div>
-                        </td>
-                        <td className="px-4 py-3 text-center">
-                          <span className={`px-2 py-0.5 text-[10px] font-bold rounded-full uppercase border ${bot.status === 'active' || bot.status === 'ready'
-                              ? 'bg-emerald-500/10 text-emerald-400 border-emerald-500/20'
-                              : 'bg-amber-500/10 text-amber-400 border-amber-500/20'
-                            }`}>{bot.status}</span>
-                        </td>
-                        <td className="px-4 py-3 text-center text-gray-400">{bot.documents?.length || 0}</td>
-                        <td className="px-4 py-3 text-center text-gray-400">{bot.queries ?? bot.stats?.totalMessages ?? bot.stats?.totalChats ?? 0}</td>
-                        <td className="px-4 py-3 text-center text-gray-400">{fmt(bot.tokens ?? bot.stats?.totalTokens ?? 0)}</td>
-                        <td className="px-4 py-3 text-gray-400 text-xs">{new Date(bot.createdAt).toLocaleDateString()}</td>
-                      </tr>
-                    ))}
+                          </td>
+                          <td className="px-4 py-3 text-center">
+                            <span className={`px-2 py-0.5 text-[10px] font-bold rounded-full uppercase border ${bot.status === 'active' || bot.status === 'ready'
+                                ? 'bg-emerald-500/10 text-emerald-400 border-emerald-500/20'
+                                : 'bg-amber-500/10 text-amber-400 border-amber-500/20'
+                              }`}>{bot.status}</span>
+                          </td>
+                          <td className="px-4 py-3 text-center text-gray-400">{bot.documents?.length || 0}</td>
+                          <td className="px-4 py-3 text-center text-gray-400">{bot.queries ?? bot.stats?.totalMessages ?? bot.stats?.totalChats ?? 0}</td>
+                          <td className="px-4 py-3 text-center text-gray-400">{fmt(bot.tokens ?? bot.stats?.totalTokens ?? 0)}</td>
+                          <td className="px-4 py-3 text-gray-400 text-xs">{new Date(bot.createdAt).toLocaleDateString()}</td>
+                        </tr>
+                      )
+                    })}
                   </tbody>
                 </table>
               </div>
@@ -498,34 +599,40 @@ export default function AdminPanel() {
                   </div>
                 )) : bots.data.length === 0 ? (
                   <div className="p-8 text-center text-gray-400 text-sm">No chatbots found.</div>
-                ) : bots.data.map(bot => (
-                  <div key={bot._id} className="p-4 space-y-2.5">
-                    <div className="flex items-center justify-between">
-                      <div className="flex items-center gap-2">
-                        <div className="w-8 h-8 rounded-lg bg-accent/10 text-accent flex items-center justify-center shrink-0">
-                          <Bot size={15} />
+                ) : bots.data.map(bot => {
+                  const ownerBanned = bot.owner?.isBanned
+                  return (
+                    <div key={bot._id} className={`p-4 space-y-2.5 ${ownerBanned ? 'opacity-40' : ''}`}>
+                      <div className="flex items-center justify-between">
+                        <div className="flex items-center gap-2">
+                          <div className="w-8 h-8 rounded-lg bg-accent/10 text-accent flex items-center justify-center shrink-0">
+                            <Bot size={15} />
+                          </div>
+                          <div>
+                            <p className="font-medium text-sm">{bot.name}</p>
+                            <p className="text-xs text-gray-400">{new Date(bot.createdAt).toLocaleDateString()}</p>
+                          </div>
                         </div>
-                        <div>
-                          <p className="font-medium text-sm">{bot.name}</p>
-                          <p className="text-xs text-gray-400">{new Date(bot.createdAt).toLocaleDateString()}</p>
-                        </div>
+                        <span className={`px-2 py-0.5 text-[10px] font-bold rounded-full uppercase border ${bot.status === 'active' || bot.status === 'ready'
+                            ? 'bg-emerald-500/10 text-emerald-400 border-emerald-500/20'
+                            : 'bg-amber-500/10 text-amber-400 border-amber-500/20'
+                          }`}>{bot.status}</span>
                       </div>
-                      <span className={`px-2 py-0.5 text-[10px] font-bold rounded-full uppercase border ${bot.status === 'active' || bot.status === 'ready'
-                          ? 'bg-emerald-500/10 text-emerald-400 border-emerald-500/20'
-                          : 'bg-amber-500/10 text-amber-400 border-amber-500/20'
-                        }`}>{bot.status}</span>
+                      <div className="flex items-center gap-2">
+                        <Avatar user={bot.owner} onImageClick={setPreviewImg} />
+                        <span className="text-xs text-gray-400 truncate">
+                          {bot.owner?.email || 'Unknown'}
+                          {ownerBanned && <span className="ml-1 text-red-400">(BANNED)</span>}
+                        </span>
+                      </div>
+                      <div className="flex gap-3 text-xs text-gray-400">
+                        <span>📄 {bot.documents?.length || 0} docs</span>
+                        <span>💬 {bot.queries ?? bot.stats?.totalMessages ?? bot.stats?.totalChats ?? 0} queries</span>
+                        <span>🔤 {fmt(bot.tokens ?? bot.stats?.totalTokens ?? 0)} tokens</span>
+                      </div>
                     </div>
-                    <div className="flex items-center gap-2">
-                      <Avatar user={bot.owner} onImageClick={setPreviewImg} />
-                      <span className="text-xs text-gray-400 truncate">{bot.owner?.email || 'Unknown'}</span>
-                    </div>
-                    <div className="flex gap-3 text-xs text-gray-400">
-                      <span>📄 {bot.documents?.length || 0} docs</span>
-                      <span>💬 {bot.queries ?? bot.stats?.totalMessages ?? bot.stats?.totalChats ?? 0} queries</span>
-                      <span>🔤 {fmt(bot.tokens ?? bot.stats?.totalTokens ?? 0)} tokens</span>
-                    </div>
-                  </div>
-                ))}
+                  )
+                })}
               </div>
 
               <div className="p-3 border-t border-[#1a1a2e] flex items-center justify-between text-xs">
@@ -614,6 +721,18 @@ export default function AdminPanel() {
               <p className="text-white font-semibold mt-4 text-lg">{previewImg.name}</p>
             </motion.div>
           </motion.div>
+        )}
+      </AnimatePresence>
+
+      {/* ─── Delete Confirmation Modal ───────────────────────────────────────── */}
+      <AnimatePresence>
+        {deleteTarget && (
+          <DeleteConfirmModal
+            user={deleteTarget}
+            onConfirm={handleDeleteConfirmed}
+            onCancel={() => { setDeleteTarget(null); setDeleting(false) }}
+            deleting={deleting}
+          />
         )}
       </AnimatePresence>
 
@@ -755,7 +874,7 @@ export default function AdminPanel() {
                             <p className="text-xs text-gray-400">Permanent removal</p>
                           </div>
                           <button
-                            onClick={() => handleDeleteUser(userDetail.user._id)}
+                            onClick={() => openDeleteModal(userDetail.user)}
                             className="px-3 py-1.5 text-xs font-bold rounded-lg border bg-red-500/10 text-red-400 border-red-500/20 hover:bg-red-500/20 transition-colors flex items-center gap-2"
                           >
                             <Trash2 size={14} /> Delete

@@ -1,6 +1,8 @@
 const passport = require('passport');
 const GoogleStrategy = require('passport-google-oauth20').Strategy;
 const User = require('../models/User');
+const Notification = require('../models/Notification');
+const { sendWelcomeEmail } = require('../utils/emailService');
 
 passport.use(new GoogleStrategy({
   clientID: process.env.GOOGLE_CLIENT_ID || 'your_client_id',
@@ -36,8 +38,21 @@ passport.use(new GoogleStrategy({
     user.applyPlanLimits();
     await user.save();
 
+    // ── In-app welcome notification (non-blocking) ──────────────────────
+    Notification.create({
+      user: user._id,
+      title: 'Welcome to ChatPlug! 👋',
+      message: 'Your account has been created successfully. Create your first chatbot now.',
+      type: 'success',
+      link: '/dashboard'
+    }).catch(e => console.error('Failed to create welcome notification for Google user', e));
+
+    // ── Welcome email (non-blocking) ────────────────────────────────────
+    sendWelcomeEmail(user).catch(e => console.error('Welcome email failed for Google user', e));
+
     return done(null, user);
   } catch (error) {
+    console.error('Google OAuth error:', error);
     return done(error, null);
   }
 }));

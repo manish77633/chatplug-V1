@@ -3,6 +3,7 @@ const { protect, adminOnly } = require('../middleware/auth');
 const User = require('../models/User');
 const Chatbot = require('../models/Chatbot');
 const ChatSession = require('../models/ChatSession');
+const Notification = require('../models/Notification');
 
 router.use(protect, adminOnly);
 
@@ -66,13 +67,13 @@ router.get('/users/:id', async (req, res, next) => {
   } catch (err) { next(err); }
 });
 
-// All chatbots
+// All chatbots (with owner ban status so admin can see grayed UI)
 router.get('/chatbots', async (req, res, next) => {
   try {
     const { page = 1, limit = 20, search } = req.query;
     const query = search ? { name: new RegExp(search, 'i') } : {};
     const chatbotsData = await Chatbot.find(query)
-      .populate('owner', 'name email avatar')
+      .populate('owner', 'name email avatar isBanned')
       .select('name status documents stats createdAt owner')
       .sort('-createdAt')
       .skip((page - 1) * limit)
@@ -87,7 +88,7 @@ router.get('/chatbots', async (req, res, next) => {
   } catch (err) { next(err); }
 });
 
-// Ban user
+// Ban / unban user
 router.patch('/users/:id/ban', async (req, res, next) => {
   try {
     const user = await User.findById(req.params.id);
@@ -129,11 +130,33 @@ router.patch('/users/:id/plan', async (req, res, next) => {
   } catch (err) { next(err); }
 });
 
-// Delete user
+// ─── Delete user (full cascade) ────────────────────────────────────────────────
 router.delete('/users/:id', async (req, res, next) => {
   try {
-    await User.findByIdAndDelete(req.params.id);
-    res.json({ success: true, message: 'User deleted' });
+    const userId = req.params.id;
+
+    // 1. Find all chatbots owned by this user (to cascade further)
+    const chatbots = await Chatbot.find({ owner: userId }).select('_id');
+    const chatbotIds = chatbots.map(c => c._id);
+
+    // 2. Delete all chat sessions tied to those chatbots
+    await ChatSession.deleteMany({ chatbot: { $in: chatbotIds } });
+
+    // 3. Delete all documents owned by this user
+    //    (Document model has owner field, so we can clean up directly)
+    const Document = require('../models/Document');
+    await Document.deleteMany({ owner: userId });
+
+    // 4. Delete all chatbots owned by this user
+    await Chatbot.deleteMany({ owner: userId });
+
+    // 5. Delete all notifications for this user
+    await Notification.deleteMany({ user: userId });
+
+    // 6. Finally delete the user
+    await User.findByIdAndDelete(userId);
+
+    res.json({ success: true, message: 'User and all associated data permanently deleted' });
   } catch (err) { next(err); }
 });
 
