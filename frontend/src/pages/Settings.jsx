@@ -628,7 +628,7 @@ export default function Settings() {
   }[activeTab]
 
   return (
-    <div className="bg-background text-text-primary font-inter selection:bg-accent/30">
+    <div className="bg-background text-text-primary font-inter selection:bg-accent/30" style={{ scrollPaddingTop: '72px' }}>
       {/* Header */}
       <div className="border-b border-border bg-surface/80 backdrop-blur-md sticky top-0 z-40">
         <div className="w-full px-2.5 sm:px-4 lg:max-w-5xl lg:mx-auto py-3 flex items-center gap-3">
