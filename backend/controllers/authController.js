@@ -1,5 +1,6 @@
 const jwt = require('jsonwebtoken');
 const User = require('../models/User');
+const Notification = require('../models/Notification');
 const { sendWelcomeEmail } = require('../utils/emailService');
 
 const signToken = (id) => jwt.sign({ id }, process.env.JWT_SECRET, { expiresIn: process.env.JWT_EXPIRES_IN || '7d' });
@@ -14,6 +15,15 @@ exports.register = async (req, res, next) => {
     user.applyPlanLimits();
     await user.save();
     
+    // In-app Notification
+    await Notification.create({
+      user: user._id,
+      title: 'Welcome to ChatPlug!',
+      message: 'Your account has been created successfully. Create your first chatbot now.',
+      type: 'success',
+      link: '/dashboard'
+    }).catch(e => console.error('Failed to create welcome notification', e));
+
     // send welcome email (non-blocking)
     sendWelcomeEmail(user).catch((e) => console.error('Welcome email failed', e));
 

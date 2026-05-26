@@ -6,6 +6,7 @@ import {
   LayoutDashboard, LogOut, Sparkles, User, X, Home, Shield
 } from 'lucide-react'
 import { useAuthStore } from '../store/authStore'
+import NotificationBell from './NotificationBell'
 
 
 export default function Sidebar({ isOpen, onClose }) {
@@ -104,22 +105,25 @@ export default function Sidebar({ isOpen, onClose }) {
           
           {/* Profile Dropdown trigger as Logout button area on desktop */}
           <div className="flex items-center justify-between w-full px-3 py-2.5 mt-2">
-             <button
+            <button
               onClick={handleLogout}
               className="flex items-center gap-3 text-gray-400 hover:text-red-400 transition-all text-sm font-medium"
             >
               <LogOut size={16} /> Sign out
             </button>
-            <button
-              onClick={() => { navigate('/settings'); if (onClose) onClose(); }}
-              className="w-[34px] h-[34px] rounded-full bg-[#1e1e30] border border-[#2a2a45] hover:bg-[#252540] flex items-center justify-center text-sm font-medium text-gray-200 transition-colors overflow-hidden"
-            >
-              {user?.avatar ? (
-                <img src={user.avatar} alt="avatar" className="w-full h-full object-cover object-center" />
-              ) : (
-                userName?.charAt(0)?.toUpperCase() || 'U'
-              )}
-            </button>
+            <div className="flex items-center gap-1">
+              <NotificationBell />
+              <button
+                onClick={() => { navigate('/settings'); if (onClose) onClose(); }}
+                className="w-[34px] h-[34px] rounded-full bg-[#1e1e30] border border-[#2a2a45] hover:bg-[#252540] flex items-center justify-center text-sm font-medium text-gray-200 transition-colors overflow-hidden"
+              >
+                {user?.avatar ? (
+                  <img src={user.avatar} alt="avatar" className="w-full h-full object-cover object-center" />
+                ) : (
+                  userName?.charAt(0)?.toUpperCase() || 'U'
+                )}
+              </button>
+            </div>
           </div>
         </div>
       </aside>

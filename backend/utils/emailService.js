@@ -106,7 +106,28 @@ const sendChatbotCreatedEmail = async (user, chatbot, usedChatbotsCount) => {
   });
 };
 
+const sendNotificationEmail = async (user, subject, htmlContent) => {
+  const html = `
+    <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; color: #333; line-height: 1.6;">
+      <div style="text-align: center; padding: 20px 0;">
+        <h1 style="color: #6366f1; margin: 0;">ChatPlug</h1>
+      </div>
+      <div style="background-color: #f9fafb; padding: 30px; border-radius: 8px;">
+        <h2 style="margin-top: 0;">Hi ${user.name},</h2>
+        ${htmlContent}
+      </div>
+    </div>
+  `;
+
+  return sendEmail({
+    to: user.email,
+    subject,
+    html,
+  });
+};
+
 module.exports = {
   sendWelcomeEmail,
   sendChatbotCreatedEmail,
+  sendNotificationEmail,
 };

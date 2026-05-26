@@ -41,16 +41,17 @@ app.set('trust proxy', 1);
 app.get('/health', (_req, res) => res.json({ status: 'ok', ts: new Date().toISOString() }));
 
 // ─── API Routes ───────────────────────────────────────────────────────────────
-app.use('/api/auth',      require('./routes/auth'));
-app.use('/api/chatbots',  require('./routes/chatbots'));
-app.use('/api/documents', require('./routes/documents'));
-app.use('/api/chat',      require('./routes/chat'));
-app.use('/api/admin',     require('./routes/admin'));
-app.use('/api/webhooks',  require('./routes/webhooks'));
-app.use('/api/analytics', require('./routes/analytics'));
-app.use('/api/payment',   require('./routes/payment'));
-app.use('/api/user',      require('./routes/user'));
-app.use('/api/billing',   require('./routes/billing'));
+app.use('/api/auth',          require('./routes/auth'));
+app.use('/api/chatbots',      require('./routes/chatbots'));
+app.use('/api/documents',     require('./routes/documents'));
+app.use('/api/chat',          require('./routes/chat'));
+app.use('/api/admin',         require('./routes/admin'));
+app.use('/api/webhooks',      require('./routes/webhooks'));
+app.use('/api/analytics',     require('./routes/analytics'));
+app.use('/api/payment',       require('./routes/payment'));
+app.use('/api/user',          require('./routes/user'));
+app.use('/api/billing',       require('./routes/billing'));
+app.use('/api/notifications', require('./routes/notifications'));
 
 // ─── Embed Script ─────────────────────────────────────────────────────────────
 app.get('/embed/:botId/widget.js', require('./controllers/embedController').serveWidget);

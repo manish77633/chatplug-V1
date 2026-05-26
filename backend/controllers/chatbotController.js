@@ -1,5 +1,6 @@
 const Chatbot  = require('../models/Chatbot');
 const Document = require('../models/Document');
+const Notification = require('../models/Notification');
 const { deleteNamespace } = require('../services/embeddingService');
 const { sendChatbotCreatedEmail } = require('../utils/emailService');
 
@@ -17,6 +18,15 @@ exports.create = async (req, res, next) => {
 
     const chatbot = await Chatbot.create({ owner: req.user._id, name, description, status: 'draft' });
     
+    // In-app Notification
+    await Notification.create({
+      user: req.user._id,
+      title: 'Chatbot Created',
+      message: `Your new chatbot "${chatbot.name}" was successfully created.`,
+      type: 'success',
+      link: `/dashboard/bots/${chatbot._id}`
+    }).catch(e => console.error('Failed to create chatbot notification', e));
+
     // Notify owner by email (best-effort)
     if (req.user && req.user.email) {
       sendChatbotCreatedEmail(req.user, chatbot, currentCount + 1)

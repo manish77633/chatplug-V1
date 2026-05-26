@@ -3,6 +3,7 @@ import { Link, useNavigate, Outlet } from 'react-router-dom'
 import { Menu, Zap, Bell, LogOut, Loader2 } from 'lucide-react'
 import Sidebar from './Sidebar'
 import ErrorBoundary from './ErrorBoundary'
+import NotificationBell from './NotificationBell'
 import { useAuthStore } from '../store/authStore'
 
 const PageFallback = () => (
@@ -39,9 +40,7 @@ export default function Layout({ children }) {
             <Link to="/" className="font-bold tracking-tight text-white">ChatPlug</Link>
           </div>
           <div className="flex items-center gap-2">
-            <button className="p-2 text-gray-400 hover:text-white rounded-xl hover:bg-[#1a1a2e] transition-colors min-w-[36px] min-h-[36px] flex items-center justify-center">
-              <Bell size={18} />
-            </button>
+            <NotificationBell />
             <button
               onClick={handleLogout}
               className="p-2 text-red-400 hover:text-red-300 rounded-xl hover:bg-[#1a1a2e] transition-colors min-w-[36px] min-h-[36px] flex items-center justify-center"
