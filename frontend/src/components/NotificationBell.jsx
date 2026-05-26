@@ -20,12 +20,15 @@ export default function NotificationBell({ placement = 'bottom-end' }) {
     placementClasses = 'absolute bottom-full left-0 mb-2'
   }
 
-  const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000'
+  // VITE_API_URL may be "http://localhost:5000/api" or "http://localhost:5000"
+  // Strip trailing /api to get base, then rebuild paths cleanly
+  const rawUrl = import.meta.env.VITE_API_URL || 'http://localhost:5000/api'
+  const API_BASE = rawUrl.endsWith('/api') ? rawUrl.slice(0, -4) : rawUrl
 
   const fetchNotifications = async () => {
     if (!token) return
     try {
-      const res = await fetch(`${API_URL}/api/notifications`, {
+      const res = await fetch(`${API_BASE}/api/notifications`, {
         headers: { Authorization: `Bearer ${token}` }
       })
       const data = await res.json()
@@ -64,7 +67,7 @@ export default function NotificationBell({ placement = 'bottom-end' }) {
 
   const markAllAsRead = async () => {
     try {
-      await fetch(`${API_URL}/api/notifications/read-all`, {
+      await fetch(`${API_BASE}/api/notifications/read-all`, {
         method: 'PATCH',
         headers: { Authorization: `Bearer ${token}` }
       })
@@ -77,7 +80,7 @@ export default function NotificationBell({ placement = 'bottom-end' }) {
 
   const markAsRead = async (id) => {
     try {
-      await fetch(`${API_URL}/api/notifications/${id}/read`, {
+      await fetch(`${API_BASE}/api/notifications/${id}/read`, {
         method: 'PATCH',
         headers: { Authorization: `Bearer ${token}` }
       })
