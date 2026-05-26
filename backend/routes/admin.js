@@ -19,12 +19,7 @@ router.get('/stats', async (req, res, next) => {
         $group: { 
           _id: null, 
           total: { 
-            $sum: { 
-              $add: [
-                { $ifNull: ['$usage.totalTokens', 0] },
-                { $ifNull: ['$usage.currentMonth.tokens', 0] }
-              ] 
-            } 
+            $sum: { $ifNull: ['$usage.totalTokens', 0] }
           } 
         } 
       }
@@ -65,7 +60,7 @@ router.get('/users/:id', async (req, res, next) => {
       chatbotsCount,
       sessionsCount,
       totalMessages: user.usage?.totalMessages || 0,
-      totalTokens: user.usage?.currentMonth?.tokens || user.usage?.totalTokens || 0,
+      totalTokens: user.usage?.totalTokens || 0,
       monthlyTokens: user.usage?.currentMonth?.tokens || 0,
     });
   } catch (err) { next(err); }
