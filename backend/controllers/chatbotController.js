@@ -1,7 +1,7 @@
 const Chatbot  = require('../models/Chatbot');
 const Document = require('../models/Document');
 const { deleteNamespace } = require('../services/embeddingService');
-const { sendEmail } = require('../utils/email');
+const { sendChatbotCreatedEmail } = require('../utils/emailService');
 
 exports.create = async (req, res, next) => {
   try {
@@ -16,13 +16,11 @@ exports.create = async (req, res, next) => {
     }
 
     const chatbot = await Chatbot.create({ owner: req.user._id, name, description, status: 'draft' });
+    
     // Notify owner by email (best-effort)
     if (req.user && req.user.email) {
-      sendEmail({
-        to: req.user.email,
-        subject: 'Your Chatbot is created',
-        html: `<p>Your chatbot "${chatbot.name}" was created. Visit your dashboard to activate and configure it.</p>`
-      }).catch(e => console.error('Bot-created email failed', e));
+      sendChatbotCreatedEmail(req.user, chatbot, currentCount + 1)
+        .catch(e => console.error('Bot-created email failed', e));
     }
 
     res.status(201).json({ success: true, chatbot });

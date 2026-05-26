@@ -1,6 +1,6 @@
 const jwt = require('jsonwebtoken');
 const User = require('../models/User');
-const { sendEmail } = require('../utils/email');
+const { sendWelcomeEmail } = require('../utils/emailService');
 
 const signToken = (id) => jwt.sign({ id }, process.env.JWT_SECRET, { expiresIn: process.env.JWT_EXPIRES_IN || '7d' });
 
@@ -13,12 +13,9 @@ exports.register = async (req, res, next) => {
     const user = await User.create({ name, email, password });
     user.applyPlanLimits();
     await user.save();
+    
     // send welcome email (non-blocking)
-    sendEmail({
-      to: email,
-      subject: 'Welcome to ChatPlug',
-      html: `<p>Hi ${name},</p><p>Welcome to ChatPlug — your account is ready.</p>`
-    }).catch((e) => console.error('Welcome email failed', e));
+    sendWelcomeEmail(user).catch((e) => console.error('Welcome email failed', e));
 
     const token = signToken(user._id);
     res.status(201).json({ success: true, token, user: { _id: user._id, name, email, plan: user.plan, role: user.role, avatar: user.avatar } });
