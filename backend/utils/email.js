@@ -5,16 +5,14 @@ const dns = require('dns');
 dns.setDefaultResultOrder('ipv4first');
 
 const transporter = nodemailer.createTransport({
-  host: process.env.EMAIL_HOST || 'smtp.gmail.com',
-  port: parseInt(process.env.EMAIL_PORT) || 587,
-  secure: process.env.EMAIL_PORT == 465 ? true : false, // false for 587 (STARTTLS)
+  host: 'smtp.gmail.com',
+  port: 587,
+  secure: false,
   auth: {
     user: process.env.EMAIL_USER,
     pass: process.env.EMAIL_PASS,
   },
-  // Force IPv4 only — Render free tier blocks IPv6 outbound
-  connection: { family: 4 },
-  // Timeouts
+  tls: { rejectUnauthorized: false },
   connectionTimeout: 10000,
   greetingTimeout: 10000,
   socketTimeout: 15000,
