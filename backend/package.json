@@ -45,6 +45,7 @@
     "pdf-parse": "^1.1.1",
     "puppeteer": "^22.8.0",
     "razorpay": "^2.9.6",
+    "resend": "^6.12.4",
     "streamifier": "^0.1.1",
     "uuid": "^9.0.1"
   },

@@ -1,53 +1,42 @@
-const nodemailer = require('nodemailer');
-const dns = require('dns');
+const { Resend } = require('resend');
 
-// Force Node.js to prefer IPv4 — Render free tier blocks IPv6
-dns.setDefaultResultOrder('ipv4first');
+const resend = new Resend(process.env.RESEND_API_KEY);
 
-const transporter = nodemailer.createTransport({
-  host: 'smtp.gmail.com',
-  port: 587,
-  secure: false,
-  auth: {
-    user: process.env.EMAIL_USER,
-    pass: process.env.EMAIL_PASS,
-  },
-  tls: { rejectUnauthorized: false },
-  connectionTimeout: 10000,
-  greetingTimeout: 10000,
-  socketTimeout: 15000,
-});
-
-// Test connection on startup so we know if email is misconfigured
-if (process.env.EMAIL_USER && process.env.EMAIL_PASS) {
-  transporter.verify()
-    .then(() => console.log('✅ SMTP connection verified — emails will send'))
-    .catch(err => console.error('❌ SMTP connection FAILED — check EMAIL_USER/EMAIL_PASS:', err.message));
+// Log on startup if configured
+if (process.env.RESEND_API_KEY) {
+  console.log('✅ Resend configured for email delivery');
+} else {
+  console.warn('⚠️  RESEND_API_KEY not set — email notifications will NOT be sent');
 }
 
 async function sendEmail({ to, subject, text, html }) {
-  if (!process.env.EMAIL_USER || !process.env.EMAIL_PASS) {
-    console.error(`[email] Cannot send to ${to} — EMAIL_USER/EMAIL_PASS not configured`);
+  if (!process.env.RESEND_API_KEY) {
+    console.error(`[email] Cannot send to ${to} — RESEND_API_KEY not configured`);
     return;
   }
 
-  const msg = {
-    from: process.env.EMAIL_FROM || process.env.EMAIL_USER,
-    to,
-    subject,
-    text,
-    html,
-  };
+  const from = process.env.EMAIL_FROM || 'onboarding@resend.dev';
 
   try {
-    const info = await transporter.sendMail(msg);
-    console.log(`[email] Sent "${subject}" to ${to} — messageId: ${info.messageId}`);
-    return info;
+    const { data, error } = await resend.emails.send({
+      from,
+      to,
+      subject,
+      text,
+      html,
+    });
+
+    if (error) {
+      console.error(`[email] FAILED to send "${subject}" to ${to}:`, error.message);
+      throw error;
+    }
+
+    console.log(`[email] Sent "${subject}" to ${to} — id: ${data?.id}`);
+    return data;
   } catch (err) {
     console.error(`[email] FAILED to send "${subject}" to ${to}:`, err.message);
-    if (err.response) console.error('[email] SMTP response:', err.response);
     throw err;
   }
 }
 
-module.exports = { sendEmail, transporter };
+module.exports = { sendEmail };

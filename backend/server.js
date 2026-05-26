@@ -22,10 +22,10 @@ required.forEach(key => {
 });
 
 // Warn if email is not configured (not fatal, but emails won't send)
-if (!process.env.EMAIL_USER || !process.env.EMAIL_PASS) {
-  console.warn('⚠️  EMAIL_USER / EMAIL_PASS not set — email notifications will NOT be sent');
+if (!process.env.RESEND_API_KEY) {
+  console.warn('⚠️  RESEND_API_KEY not set — email notifications will NOT be sent');
 } else {
-  console.log(`✅ Email configured for ${process.env.EMAIL_USER}`);
+  console.log('✅ Resend configured for email delivery');
 }
 
 // ─── Middleware ───────────────────────────────────────────────────────────────
@@ -62,16 +62,6 @@ app.use('/api/notifications', require('./routes/notifications'));
 
 // ─── Embed Script ─────────────────────────────────────────────────────────────
 app.get('/embed/:botId/widget.js', require('./controllers/embedController').serveWidget);
-
-// ─── Serve Frontend in Production ─────────────────────────────────────────────
-if (process.env.NODE_ENV === 'production') {
-  const path = require('path');
-  app.use(express.static(path.join(__dirname, '../frontend/dist')));
-  app.get('*', (req, res, next) => {
-    if (req.path.startsWith('/api') || req.path.startsWith('/embed')) return next();
-    res.sendFile(path.join(__dirname, '../frontend/dist', 'index.html'));
-  });
-}
 
 // ─── 404 Handler ──────────────────────────────────────────────────────────────
 app.use((_req, res) => res.status(404).json({ success: false, message: 'Route not found' }));
