@@ -3,7 +3,7 @@ import { Link, useNavigate, useLocation } from 'react-router-dom'
 import { motion, AnimatePresence } from 'framer-motion'
 import {
   Bot, Settings, BarChart3, FileText,
-  LayoutDashboard, LogOut, Sparkles, User, X, Home
+  LayoutDashboard, LogOut, Sparkles, User, X, Home, Shield
 } from 'lucide-react'
 import { useAuthStore } from '../store/authStore'
 
@@ -71,6 +71,20 @@ export default function Sidebar({ isOpen, onClose }) {
               </Link>
             )
           })}
+          
+          {user?.role === 'admin' && (
+            <>
+              <div className="my-2 border-t border-[#1a1a2e]" />
+              <Link
+                to="/admin"
+                onClick={onClose}
+                className={`flex items-center gap-3 px-3 py-2.5 rounded-xl transition-all duration-200 font-medium text-sm min-h-[44px] ${location.pathname === '/admin' ? 'bg-[#1a1a2e] text-white' : 'text-gray-400 hover:bg-[#1a1a2e]/50 hover:text-white'}`}
+              >
+                <Shield size={18} className={location.pathname === '/admin' ? 'text-white' : 'text-gray-400'} />
+                Admin Panel
+              </Link>
+            </>
+          )}
         </nav>
 
         {/* Upgrade Card + Logout */}

@@ -45,6 +45,7 @@ const userSchema = new mongoose.Schema({
   },
 
   apiKey:          { type: String, unique: true, sparse: true },
+  isBanned:        { type: Boolean, default: false },
   isEmailVerified: { type: Boolean, default: false },
   lastLogin:       { type: Date },
 }, { timestamps: true });

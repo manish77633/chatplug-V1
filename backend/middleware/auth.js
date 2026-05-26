@@ -12,6 +12,10 @@ exports.protect = async (req, res, next) => {
     const user = await User.findById(decoded.id).select('-password');
     if (!user) return res.status(401).json({ success: false, message: 'User not found' });
     
+    if (user.isBanned) {
+      return res.status(403).json({ success: false, message: 'Your account has been suspended' });
+    }
+    
     // Ensure limits are always set (Google OAuth users may not have limits)
     if (!user.limits || !user.limits.maxChatbots) {
       user.applyPlanLimits();
