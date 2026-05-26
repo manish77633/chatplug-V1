@@ -4,6 +4,7 @@ const User = require('../models/User');
 const Chatbot = require('../models/Chatbot');
 const ChatSession = require('../models/ChatSession');
 const Notification = require('../models/Notification');
+const { sendAccountSuspendedEmail, sendAccountDeletedEmail } = require('../utils/emailService');
 
 router.use(protect, adminOnly);
 
@@ -97,6 +98,20 @@ router.patch('/users/:id/ban', async (req, res, next) => {
     user.isBanned = !user.isBanned;
     await user.save();
 
+    // In-app notification for banned user (persists in DB, shows on unban)
+    Notification.create({
+      user: user._id,
+      title: 'Account Suspended',
+      message: 'Your ChatPlug account has been suspended by an administrator. You cannot log in at this time.',
+      type: 'warning',
+    }).catch(e => console.error('Ban notification failed', e));
+
+    // Send suspension email
+    if (user.email && user.isBanned) {
+      sendAccountSuspendedEmail(user)
+        .catch(e => console.error('Ban email failed', e));
+    }
+
     res.json({ success: true, user });
   } catch (err) { next(err); }
 });
@@ -135,6 +150,13 @@ router.delete('/users/:id', async (req, res, next) => {
   try {
     const userId = req.params.id;
 
+    // Send account deleted email BEFORE any deletion (user must still exist)
+    const user = await User.findById(userId);
+    if (user && user.email) {
+      sendAccountDeletedEmail(user)
+        .catch(e => console.error('Account-deleted email failed', e));
+    }
+
     // 1. Find all chatbots owned by this user (to cascade further)
     const chatbots = await Chatbot.find({ owner: userId }).select('_id');
     const chatbotIds = chatbots.map(c => c._id);
@@ -143,7 +165,6 @@ router.delete('/users/:id', async (req, res, next) => {
     await ChatSession.deleteMany({ chatbot: { $in: chatbotIds } });
 
     // 3. Delete all documents owned by this user
-    //    (Document model has owner field, so we can clean up directly)
     const Document = require('../models/Document');
     await Document.deleteMany({ owner: userId });
 

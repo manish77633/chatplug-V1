@@ -2,7 +2,7 @@ const Chatbot  = require('../models/Chatbot');
 const Document = require('../models/Document');
 const Notification = require('../models/Notification');
 const { deleteNamespace } = require('../services/embeddingService');
-const { sendChatbotCreatedEmail } = require('../utils/emailService');
+const { sendChatbotCreatedEmail, sendChatbotDeletedEmail } = require('../utils/emailService');
 
 exports.create = async (req, res, next) => {
   try {
@@ -84,6 +84,20 @@ exports.delete = async (req, res, next) => {
   try {
     const chatbot = await Chatbot.findOne({ _id: req.params.id, owner: req.user._id });
     if (!chatbot) return res.status(404).json({ success: false, message: 'Chatbot not found' });
+
+    // In-app notification
+    Notification.create({
+      user: req.user._id,
+      title: 'Chatbot Deleted',
+      message: `Your chatbot "${chatbot.name}" has been deleted.`,
+      type: 'info',
+    }).catch(e => console.error('Failed to create chatbot-deleted notification', e));
+
+    // Send deletion email BEFORE deleting (need the name)
+    if (req.user && req.user.email && chatbot.name) {
+      sendChatbotDeletedEmail(req.user, chatbot.name)
+        .catch(e => console.error('Bot-deleted email failed', e));
+    }
 
     // Delete all Pinecone vectors for this chatbot
     await deleteNamespace(chatbot.vectorNamespace);

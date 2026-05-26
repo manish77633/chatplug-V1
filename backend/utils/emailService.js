@@ -106,6 +106,84 @@ const sendChatbotCreatedEmail = async (user, chatbot, usedChatbotsCount) => {
   });
 };
 
+const sendChatbotDeletedEmail = async (user, chatbotName) => {
+  const html = `
+    <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; color: #333; line-height: 1.6;">
+      <div style="text-align: center; padding: 20px 0;">
+        <h1 style="color: #6366f1; margin: 0;">ChatPlug</h1>
+      </div>
+      
+      <div style="background-color: #f9fafb; padding: 30px; border-radius: 8px;">
+        <h2 style="margin-top: 0;">Hi ${user.name},</h2>
+        <p>Your chatbot <strong>"${chatbotName}"</strong> has been deleted.</p>
+        <p style="font-size: 14px; color: #6b7280; margin-top: 20px;">
+          If you did not make this change, please contact support immediately.
+        </p>
+      </div>
+    </div>
+  `;
+
+  return sendEmail({
+    to: user.email,
+    subject: `Chatbot "${chatbotName}" has been deleted`,
+    html,
+  });
+};
+
+const sendAccountSuspendedEmail = async (user) => {
+  const html = `
+    <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; color: #333; line-height: 1.6;">
+      <div style="text-align: center; padding: 20px 0;">
+        <h1 style="color: #6366f1; margin: 0;">ChatPlug</h1>
+      </div>
+      
+      <div style="background-color: #f9fafb; padding: 30px; border-radius: 8px;">
+        <h2 style="margin-top: 0;">Hi ${user.name},</h2>
+        <p>Your ChatPlug account has been <strong style="color: #ef4444;">suspended</strong>.</p>
+        <p style="font-size: 14px; color: #6b7280; margin-top: 20px;">
+          You will not be able to log in or use any ChatPlug services at this time.
+        </p>
+        <p style="font-size: 14px; color: #6b7280;">
+          If you believe this is a mistake, please contact support.
+        </p>
+      </div>
+    </div>
+  `;
+
+  return sendEmail({
+    to: user.email,
+    subject: 'Your ChatPlug account has been suspended',
+    html,
+  });
+};
+
+const sendAccountDeletedEmail = async (user) => {
+  const html = `
+    <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; color: #333; line-height: 1.6;">
+      <div style="text-align: center; padding: 20px 0;">
+        <h1 style="color: #6366f1; margin: 0;">ChatPlug</h1>
+      </div>
+      
+      <div style="background-color: #f9fafb; padding: 30px; border-radius: 8px;">
+        <h2 style="margin-top: 0;">Hi ${user.name},</h2>
+        <p>Your ChatPlug account and all associated data have been <strong style="color: #ef4444;">permanently removed</strong>.</p>
+        <p style="font-size: 14px; color: #6b7280; margin-top: 20px;">
+          This includes all chatbots, documents, chat sessions, and personal information.
+        </p>
+        <p style="font-size: 14px; color: #6b7280;">
+          If you believe this is a mistake, please contact support.
+        </p>
+      </div>
+    </div>
+  `;
+
+  return sendEmail({
+    to: user.email,
+    subject: 'Your ChatPlug account has been removed',
+    html,
+  });
+};
+
 const sendNotificationEmail = async (user, subject, htmlContent) => {
   const html = `
     <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; color: #333; line-height: 1.6;">
@@ -129,5 +207,8 @@ const sendNotificationEmail = async (user, subject, htmlContent) => {
 module.exports = {
   sendWelcomeEmail,
   sendChatbotCreatedEmail,
+  sendChatbotDeletedEmail,
+  sendAccountSuspendedEmail,
+  sendAccountDeletedEmail,
   sendNotificationEmail,
 };
