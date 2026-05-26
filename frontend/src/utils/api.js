@@ -1,8 +1,12 @@
 import axios from 'axios'
 import toast from 'react-hot-toast'
 
+// VITE_API_URL should be the backend origin (e.g. "http://localhost:5000")
+// The /api prefix is appended automatically so all calls match server routes
+const origin = import.meta.env.VITE_API_URL || ''
+
 const api = axios.create({
-  baseURL: import.meta.env.VITE_API_URL || '/api',
+  baseURL: origin ? `${origin}/api` : '/api',
   timeout: 30000,
 })
 

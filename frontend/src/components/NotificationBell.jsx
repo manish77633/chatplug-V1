@@ -18,10 +18,9 @@ export default function NotificationBell({ placement = 'bottom-end' }) {
   const longPressTimer = useRef(null)
   const { token } = useAuthStore()
 
-  // VITE_API_URL may be "http://localhost:5000/api" or "http://localhost:5000"
-  // Strip trailing /api to get base, then rebuild paths cleanly
-  const rawUrl = import.meta.env.VITE_API_URL || 'http://localhost:5000/api'
-  const API_BASE = rawUrl.endsWith('/api') ? rawUrl.slice(0, -4) : rawUrl
+  // VITE_API_URL should be just the origin (e.g. "http://localhost:5000")
+  // The /api prefix is appended by each endpoint below
+  const API_BASE = import.meta.env.VITE_API_URL || 'http://localhost:5000'
 
   const fetchNotifications = async () => {
     if (!token) return
