@@ -162,6 +162,7 @@ Rules:
       setImmediate(async () => {
         try {
           const totalTokens = Math.ceil((message.length + fullResponse.length) / 4);
+          
           await ChatSession.findOneAndUpdate(
             { sessionId },
             {
@@ -169,16 +170,22 @@ Rules:
               $push: {
                 messages: [
                   { role: 'user',      content: message,      tokens: Math.ceil(message.length / 4) },
-                  { role: 'assistant', content: fullResponse,  tokens: Math.ceil(fullResponse.length / 4) },
+                  { role: 'assistant', content: fullResponse, tokens: Math.ceil(fullResponse.length / 4) },
                 ],
               },
               $inc: { 'stats.totalMessages': 2, 'stats.totalTokens': totalTokens },
             },
             { upsert: true, new: true }
           );
+
+          // Update chatbot stats
           await Chatbot.findByIdAndUpdate(chatbot._id, {
-            $inc: { 'stats.totalMessages': 2, 'stats.totalTokens': totalTokens },
+            $inc: { 
+              'stats.totalMessages': 1, 
+              'stats.totalTokens': totalTokens 
+            },
           });
+
           // Update user usage: totalMessages, currentMonth.messages, today.messages and tokens
           try {
             const userUsage = await User.findById(chatbot.owner).select('usage');
@@ -190,7 +197,15 @@ Rules:
               usageDateKey = new Date(ud.getFullYear(), ud.getMonth(), ud.getDate()).toISOString();
             }
 
-            const update = { $inc: { 'usage.totalMessages': 1, 'usage.currentMonth.messages': 1, 'usage.currentMonth.tokens': totalTokens } };
+            const update = { 
+              $inc: { 
+                'usage.totalMessages': 1, 
+                'usage.totalTokens': totalTokens, 
+                'usage.currentMonth.messages': 1, 
+                'usage.currentMonth.tokens': totalTokens 
+              } 
+            };
+            
             if (usageDateKey !== todayKey) {
               update.$set = { 'usage.today.date': today, 'usage.today.messages': 1 };
             } else {
