@@ -20,9 +20,12 @@ export default function NotificationBell({ placement = 'bottom-end' }) {
     placementClasses = 'absolute bottom-full left-0 mb-2'
   }
 
+  const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000'
+
   const fetchNotifications = async () => {
+    if (!token) return
     try {
-      const res = await fetch(`${import.meta.env.VITE_API_URL}/api/notifications`, {
+      const res = await fetch(`${API_URL}/api/notifications`, {
         headers: { Authorization: `Bearer ${token}` }
       })
       const data = await res.json()
@@ -35,14 +38,19 @@ export default function NotificationBell({ placement = 'bottom-end' }) {
     }
   }
 
+  // Fetch on mount and whenever token changes
   useEffect(() => {
     if (token) fetchNotifications()
-    // Optional: poll every minute
     const interval = setInterval(() => {
       if (token) fetchNotifications()
     }, 60000)
     return () => clearInterval(interval)
   }, [token])
+
+  // Re-fetch every time dropdown opens so data is always fresh
+  useEffect(() => {
+    if (isOpen && token) fetchNotifications()
+  }, [isOpen])
 
   useEffect(() => {
     const handleClickOutside = (e) => {
@@ -56,7 +64,7 @@ export default function NotificationBell({ placement = 'bottom-end' }) {
 
   const markAllAsRead = async () => {
     try {
-      await fetch(`${import.meta.env.VITE_API_URL}/api/notifications/read-all`, {
+      await fetch(`${API_URL}/api/notifications/read-all`, {
         method: 'PATCH',
         headers: { Authorization: `Bearer ${token}` }
       })
@@ -69,7 +77,7 @@ export default function NotificationBell({ placement = 'bottom-end' }) {
 
   const markAsRead = async (id) => {
     try {
-      await fetch(`${import.meta.env.VITE_API_URL}/api/notifications/${id}/read`, {
+      await fetch(`${API_URL}/api/notifications/${id}/read`, {
         method: 'PATCH',
         headers: { Authorization: `Bearer ${token}` }
       })
