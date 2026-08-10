@@ -294,7 +294,7 @@ export default function Playground() {
     const startTime = Date.now()
 
     try {
-      const apiBase = import.meta.env.VITE_API_URL || 'http://localhost:5000/api'
+      const apiBase = (import.meta.env.VITE_API_URL || 'http://localhost:5000') + '/api'
       const stored  = JSON.parse(localStorage.getItem('chatplug-auth') || '{}')
       const token   = stored?.state?.token
 
