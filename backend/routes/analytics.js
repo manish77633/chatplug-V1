@@ -65,14 +65,16 @@ router.get('/messages', async (req, res, next) => {
   try {
     const { range = '7d', botId } = req.query;
 
-    // Calculate start date based on range
+    // Calculate start date based on range (include today)
     const now = new Date();
-    let startDate;
+    let days = 7;
     switch (range) {
-      case '30d': startDate = new Date(now.setDate(now.getDate() - 30)); break;
-      case '90d': startDate = new Date(now.setDate(now.getDate() - 90)); break;
-      default:    startDate = new Date(now.setDate(now.getDate() - 7));  break;
+      case '30d': days = 30; break;
+      case '90d': days = 90; break;
+      default: days = 7; break;
     }
+    const startDate = new Date(new Date().setHours(0,0,0,0));
+    startDate.setDate(startDate.getDate() - (days - 1)); // include today
 
     const chatbotIds = await getUserChatbotIds(req.user._id, botId);
 
@@ -80,27 +82,40 @@ router.get('/messages', async (req, res, next) => {
       return res.json({ success: true, chartData: [] });
     }
 
+    // Unwind messages and count only user messages by day.
+    // Use message.createdAt when present, otherwise fall back to the session createdAt.
     const pipeline = [
-      { $match: { chatbot: { $in: chatbotIds }, createdAt: { $gte: startDate } } },
-      { $unwind: '$messages' },
+      { $match: { chatbot: { $in: chatbotIds } } },
+      { $unwind: { path: '$messages', preserveNullAndEmptyArrays: true } },
+      { $addFields: { msgDate: { $ifNull: [ '$messages.createdAt', '$createdAt' ] }, msgRole: '$messages.role' } },
+      { $match: { msgRole: 'user', msgDate: { $gte: startDate } } },
       {
         $group: {
-          _id: {
-            $dateToString: { format: '%Y-%m-%d', date: '$createdAt' },
-          },
+          _id: { $dateToString: { format: '%Y-%m-%d', date: '$msgDate' } },
           queries: { $sum: 1 },
-        },
+        }
       },
       { $sort: { _id: 1 } },
     ];
 
     const rawData = await ChatSession.aggregate(pipeline);
 
-    // Map to weekday format for display
-    const chartData = rawData.map(d => ({
-      name: new Date(d._id).toLocaleDateString('en-US', { weekday: 'short' }),
-      queries: d.queries,
-    }));
+    // Build a map of date -> queries
+    const countsByDate = {};
+    rawData.forEach(d => { countsByDate[d._id] = d.queries; });
+
+    // Build full chart data for the range (one entry per day)
+    const chartData = [];
+    for (let i = 0; i < days; i++) {
+      const day = new Date(startDate);
+      day.setDate(startDate.getDate() + i);
+      const iso = day.toISOString().slice(0,10); // YYYY-MM-DD
+      chartData.push({
+        date: iso,
+        name: day.toLocaleDateString('en-US', { weekday: 'short' }),
+        queries: countsByDate[iso] || 0,
+      });
+    }
 
     res.json({ success: true, chartData });
   } catch (err) { next(err); }

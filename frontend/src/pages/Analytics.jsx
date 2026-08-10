@@ -193,7 +193,13 @@ export default function Analytics() {
       setChartsLoading(true)
       try {
         const res = await api.get(`/analytics/messages?range=${timeRange}${botFilter !== 'All' ? `&botId=${botFilter}` : ''}`)
-        setChartData(res.data.chartData || [])
+        const raw = res.data?.chartData || []
+        const normalized = raw.map(d => ({
+          name: d.name || (d.date ? new Date(d.date).toLocaleDateString('en-US', { weekday: 'short' }) : ''),
+          date: d.date || null,
+          queries: Number(d.queries) || 0,
+        }))
+        setChartData(normalized)
       } catch {
         setChartData([])
       } finally {
@@ -336,7 +342,7 @@ export default function Analytics() {
     )
   }
 
-  const hasNoData = stats && stats[0].value === 0 && stats[1].value === 0 && stats[2].value === 0
+  const hasNoData = stats && Array.isArray(stats) && stats.every(s => (s.value ?? 0) === 0)
 
   if (hasNoData && !isLoading) {
     return (
